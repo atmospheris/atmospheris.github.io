@@ -1,0 +1,44 @@
+import { defineConfig } from 'vite'
+import vue from '@vitejs/plugin-vue'
+import { resolve } from 'path'
+
+export default defineConfig({
+  plugins: [vue()],
+  resolve: {
+    alias: {
+      '@': resolve(__dirname, 'src'),
+      'atmospheris': resolve(__dirname, '../../atmospheris-js/dist/index.js')
+    }
+  },
+  base: '/',
+  build: {
+    outDir: 'dist',
+    assetsDir: 'assets',
+    cssCodeSplit: false,
+    rollupOptions: {
+      output: {
+        manualChunks: undefined
+      }
+    }
+  },
+  ssgOptions: {
+    script: 'async',
+    formatting: 'minify',
+    includedRoutes() {
+      return ['/', '/calculator', '/library', '/iso-2533', '/references', '/symbols', '/about']
+    },
+    sitemap: {
+      hostname: 'https://www.atmospheris.org',
+      lastmod: new Date().toISOString()
+    },
+    crittersOptions: {
+      reduceInlineStyles: false
+    }
+  },
+  optimizeDeps: {
+    include: ['vue', 'vue-router', '@unhead/vue']
+  },
+  ssr: {
+    noExternal: ['three', 'chart.js']
+  }
+})

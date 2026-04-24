@@ -1,0 +1,25 @@
+{
+  "name": "atmospheris-website",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite-ssg build && cp dist/index.html dist/404.html",
+    "preview": "vite preview",
+    "deploy": "npm run build && echo 'www.atmospheris.org' > dist/CNAME"
+  },
+  "dependencies": {
+    "@unhead/vue": "^2.1.4",
+    "atmospheris": "file:../atmospheris-js",
+    "chart.js": "^4.5.1",
+    "three": "^0.184.0",
+    "vite-ssg": "^0.24.0",
+    "vue": "^3.5.13",
+    "vue-router": "^4.5.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.2.1",
+    "vite": "^6.1.0"
+  }
+}
