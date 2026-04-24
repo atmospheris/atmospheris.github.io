@@ -342,6 +342,7 @@
 .results-table .property-value {
   font-family: var(--font-mono);
   text-align: right;
+  font-variant-numeric: tabular-nums;
   font-weight: var(--font-weight-medium);
   color: var(--color-primary);
   font-variant-numeric: tabular-nums;
@@ -1142,6 +1143,12 @@
    Print Stylesheet
    Clean, professional print output for engineers
    ================================================ */
+
+/* Hide print-only elements on screen */
+.print-only {
+  display: none;
+}
+
 @media print {
   /* Hide non-essential UI */
   .site-header,
