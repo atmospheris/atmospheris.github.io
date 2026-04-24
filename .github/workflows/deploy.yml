@@ -20,14 +20,12 @@ jobs:
     steps:
       - name: Checkout website
         uses: actions/checkout@v4
-        with:
-          path: atmospheris.github.io
 
       - name: Checkout atmospheris-js
         uses: actions/checkout@v4
         with:
           repository: atmospheris/atmospheris-js
-          path: atmospheris-js
+          path: vendor/atmospheris-js
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -36,24 +34,26 @@ jobs:
 
       - name: Build atmospheris-js
         run: |
-          cd "$GITHUB_WORKSPACE/atmospheris-js"
+          cd vendor/atmospheris-js
           npm ci
           npm run build
 
       - name: Install website dependencies
         run: |
-          cd "$GITHUB_WORKSPACE/atmospheris.github.io"
+          mkdir -p ../atmospheris-js
+          cp -r vendor/atmospheris-js/dist ../atmospheris-js/dist
+          cp vendor/atmospheris-js/package.json ../atmospheris-js/package.json
           npm ci
 
       - name: Build website
-        run: |
-          cd "$GITHUB_WORKSPACE/atmospheris.github.io"
-          npm run build
+        run: npm run build
+        env:
+          ATMOSPHERIS_PATH: ${{ github.workspace }}/vendor/atmospheris-js/dist/index.js
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ${{ github.workspace }}/atmospheris.github.io/dist
+          path: dist
 
   deploy:
     environment:

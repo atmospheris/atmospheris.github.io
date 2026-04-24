@@ -7,7 +7,9 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': resolve(__dirname, 'src'),
-      'atmospheris': resolve(__dirname, '../../atmospheris-js/dist/index.js')
+      'atmospheris': process.env.ATMOSPHERIS_PATH
+        ? resolve(process.env.ATMOSPHERIS_PATH)
+        : resolve(__dirname, '../../atmospheris-js/dist/index.js')
     }
   },
   base: '/',
