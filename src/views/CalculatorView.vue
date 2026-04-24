@@ -7,7 +7,7 @@ import CalculatorResults from '@/components/calculator/CalculatorResults.vue'
 import AtmosphereExplorer from '@/components/calculator/AtmosphereExplorer.vue'
 import CalculatorCharts from '@/components/calculator/CalculatorCharts.vue'
 import CalculatorTable from '@/components/calculator/CalculatorTable.vue'
-import { getAllProperties, getAltitudeFromPressure } from 'atmospheris'
+import { getAllProperties, getAltitudeFromPressure, getAltitudeFromProperty } from 'atmospheris'
 
 useSeo({
   title: 'Standard Atmosphere Calculator',
@@ -58,12 +58,26 @@ function handleCalculate(input) {
           }
         }
       }
-    } else {
+    } else if (input.mode === 'pressure') {
       result.value = getAltitudeFromPressure({
         value: input.value,
         unit: input.unit,
         precision: input.precision
       }) || null
+      if (result.value) {
+        currentAltitude.value = result.value.geopotentialAltitude.meters
+      }
+    } else if (input.mode === 'property') {
+      result.value = getAltitudeFromProperty({
+        mode: 'property',
+        property: input.property,
+        value: input.value,
+        precision: input.precision
+      }) || null
+      if (result.value) {
+        currentAltitude.value = result.value.geopotentialAltitude.meters
+        calcMode.value = 'property'
+      }
     }
   } catch (e) {
     result.value = null
@@ -72,7 +86,6 @@ function handleCalculate(input) {
 
 function handleExplorerAltitude(alt) {
   currentAltitude.value = alt
-  // Also update the calculator results
   try {
     result.value = getAllProperties({
       value: alt,
@@ -92,9 +105,16 @@ onMounted(() => {
     activeTab.value = hash
   }
 
-  // Auto-calculate at sea level on load (or from URL params)
+  // Auto-calculate on load (or from URL params)
   const q = route.query
-  if (q.pressure) {
+  if (q.prop) {
+    handleCalculate({
+      mode: 'property',
+      property: q.prop,
+      value: Number(q.val),
+      precision: q.prec || 'normal'
+    })
+  } else if (q.pressure) {
     handleCalculate({
       mode: 'pressure',
       value: Number(q.pressure),

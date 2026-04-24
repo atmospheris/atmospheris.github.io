@@ -1,6 +1,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
+import { PROPERTY_DEFS } from 'atmospheris'
 
 const emit = defineEmits(['calculate'])
 
@@ -14,6 +15,10 @@ const pressureValue = ref(1013.25)
 const pressureUnit = ref('mbar')
 const precision = ref('normal')
 const tempOffset = ref(0)
+
+// By Property mode
+const selectedProperty = ref('temperature_k')
+const propertyValue = ref(288.15)
 
 const presets = [
   { label: 'Sea Level', value: 0, range: 'Sea Level' },
@@ -31,6 +36,16 @@ const presets = [
 const altitudeRange = computed(() => {
   if (altitudeUnit.value === 'meters') return { min: -2000, max: 80000, step: 100 }
   return { min: -6562, max: 262467, step: 328 }
+})
+
+// Property groups for the dropdown
+const propertyGroups = computed(() => {
+  const groups = {}
+  for (const [key, def] of Object.entries(PROPERTY_DEFS)) {
+    if (!groups[def.group]) groups[def.group] = []
+    groups[def.group].push({ key, ...def })
+  }
+  return groups
 })
 
 function setPreset(val) {
@@ -58,11 +73,18 @@ function doCalculate() {
       precision: precision.value,
       tempOffset: Number(tempOffset.value) || 0
     })
-  } else {
+  } else if (mode.value === 'pressure') {
     emit('calculate', {
       mode: 'pressure',
       value: Number(pressureValue.value),
       unit: pressureUnit.value,
+      precision: precision.value
+    })
+  } else if (mode.value === 'property') {
+    emit('calculate', {
+      mode: 'property',
+      property: selectedProperty.value,
+      value: Number(propertyValue.value),
       precision: precision.value
     })
   }
@@ -85,7 +107,13 @@ function getShareUrl() {
     if (tempOffset.value) params.set('dt', tempOffset.value)
     return base + '?' + params.toString()
   }
-  return base + '?pressure=' + pressureValue.value + '&punit=' + pressureUnit.value
+  if (mode.value === 'pressure') {
+    return base + '?pressure=' + pressureValue.value + '&punit=' + pressureUnit.value
+  }
+  if (mode.value === 'property') {
+    return base + '?prop=' + selectedProperty.value + '&val=' + propertyValue.value
+  }
+  return base
 }
 
 function copyShareUrl() {
@@ -94,7 +122,11 @@ function copyShareUrl() {
 
 onMounted(() => {
   const q = route.query
-  if (q.pressure) {
+  if (q.prop) {
+    mode.value = 'property'
+    selectedProperty.value = q.prop
+    propertyValue.value = Number(q.val)
+  } else if (q.pressure) {
     mode.value = 'pressure'
     pressureValue.value = Number(q.pressure)
     pressureUnit.value = q.punit || 'mbar'
@@ -113,6 +145,7 @@ onMounted(() => {
     <div class="mode-toggle">
       <button :class="{ active: mode === 'altitude' }" @click="setMode('altitude')">By Altitude</button>
       <button :class="{ active: mode === 'pressure' }" @click="setMode('pressure')">By Pressure</button>
+      <button :class="{ active: mode === 'property' }" @click="setMode('property')">By Property</button>
     </div>
 
     <!-- Altitude mode -->
@@ -182,7 +215,7 @@ onMounted(() => {
     </template>
 
     <!-- Pressure mode -->
-    <template v-else>
+    <template v-else-if="mode === 'pressure'">
       <div class="input-group">
         <label>Pressure</label>
         <input
@@ -198,6 +231,43 @@ onMounted(() => {
         <div class="radio-pills">
           <button :class="{ active: pressureUnit === 'mbar' }" @click="pressureUnit = 'mbar'; doCalculate()">mbar</button>
           <button :class="{ active: pressureUnit === 'mmHg' }" @click="pressureUnit = 'mmHg'; doCalculate()">mmHg</button>
+        </div>
+      </div>
+
+      <div class="input-group">
+        <label>Precision</label>
+        <div class="radio-pills">
+          <button :class="{ active: precision === 'normal' }" @click="precision = 'normal'; doCalculate()">Normal</button>
+          <button :class="{ active: precision === 'reduced' }" @click="precision = 'reduced'; doCalculate()">Reduced</button>
+        </div>
+      </div>
+    </template>
+
+    <!-- Property mode -->
+    <template v-else-if="mode === 'property'">
+      <div class="input-group">
+        <label>Property</label>
+        <select v-model="selectedProperty" @change="doCalculate" class="property-select">
+          <optgroup v-for="(props, group) in propertyGroups" :key="group" :label="group">
+            <option v-for="p in props" :key="p.key" :value="p.key">
+              {{ p.label }}{{ p.unit ? ' (' + p.unit + ')' : '' }}
+            </option>
+          </optgroup>
+        </select>
+      </div>
+
+      <div class="input-group">
+        <label>Value</label>
+        <div class="property-input-row">
+          <input
+            type="number"
+            v-model.number="propertyValue"
+            step="any"
+            @input="doCalculate"
+          />
+          <span class="property-input-unit" v-if="PROPERTY_DEFS[selectedProperty]?.unit">
+            {{ PROPERTY_DEFS[selectedProperty].unit }}
+          </span>
         </div>
       </div>
 
