@@ -631,6 +631,7 @@
   overflow: hidden;
   background: linear-gradient(180deg, #030712 0%, #0f0b2e 30%, #1e1b4b 60%, #312e81 100%);
   border: 1px solid var(--color-border);
+  display: flex;
 }
 
 [data-theme="dark"] .atmosphere-explorer {
@@ -643,6 +644,135 @@
   height: 100%;
 }
 
+/* Explorer side controls — vertical slider + altitude input */
+.explorer-controls {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 72px;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16px 8px;
+  background: linear-gradient(90deg, rgba(3, 7, 18, 0.7) 0%, rgba(3, 7, 18, 0) 100%);
+  pointer-events: auto;
+}
+
+.altitude-slider-track {
+  flex: 1;
+  display: flex;
+  align-items: stretch;
+  gap: 6px;
+  position: relative;
+  width: 100%;
+}
+
+.altitude-slider {
+  writing-mode: vertical-lr;
+  direction: rtl;
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  width: 20px;
+  flex-shrink: 0;
+  cursor: pointer;
+  margin: 4px 0;
+}
+
+.altitude-slider::-webkit-slider-runnable-track {
+  width: 3px;
+  background: rgba(129, 140, 248, 0.25);
+  border-radius: 2px;
+}
+
+.altitude-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 14px;
+  height: 6px;
+  background: #f59e0b;
+  border-radius: 3px;
+  margin-left: -5.5px;
+  cursor: grab;
+  box-shadow: 0 0 6px rgba(245, 158, 11, 0.4);
+}
+
+.altitude-slider::-moz-range-track {
+  width: 3px;
+  background: rgba(129, 140, 248, 0.25);
+  border-radius: 2px;
+  border: none;
+}
+
+.altitude-slider::-moz-range-thumb {
+  width: 14px;
+  height: 6px;
+  background: #f59e0b;
+  border-radius: 3px;
+  border: none;
+  cursor: grab;
+  box-shadow: 0 0 6px rgba(245, 158, 11, 0.4);
+}
+
+.altitude-slider:focus-visible::-webkit-slider-thumb {
+  outline: 2px solid rgba(245, 158, 11, 0.8);
+  outline-offset: 2px;
+}
+
+.slider-ticks {
+  flex: 1;
+  position: relative;
+  width: 30px;
+}
+
+.slider-ticks .tick {
+  position: absolute;
+  left: 0;
+  font-size: 9px;
+  color: rgba(255, 255, 255, 0.3);
+  font-family: var(--font-mono);
+  white-space: nowrap;
+  transform: translateY(-50%);
+  line-height: 1;
+}
+
+.altitude-input-group {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  margin-top: 8px;
+  background: rgba(15, 11, 46, 0.6);
+  border: 1px solid rgba(129, 140, 248, 0.2);
+  border-radius: 6px;
+  padding: 4px 6px;
+}
+
+.altitude-number-input {
+  width: 50px;
+  background: transparent;
+  border: none;
+  color: #f59e0b;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  outline: none;
+  -moz-appearance: textfield;
+}
+
+.altitude-number-input::-webkit-outer-spin-button,
+.altitude-number-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.altitude-input-unit {
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 10px;
+  font-family: var(--font-mono);
+}
+
 .explorer-fallback {
   display: flex;
   flex-direction: column;
@@ -652,6 +782,7 @@
   color: rgba(255, 255, 255, 0.6);
   text-align: center;
   padding: var(--spacing-2xl);
+  width: 100%;
 }
 
 .explorer-fallback svg {
@@ -669,7 +800,7 @@
   padding: var(--spacing-md) var(--spacing-lg);
   color: white;
   font-size: var(--font-size-sm);
-  min-width: 200px;
+  min-width: 210px;
   pointer-events: none;
 }
 
@@ -683,25 +814,51 @@
 
 .explorer-overlay .altitude-display {
   font-family: var(--font-mono);
-  font-size: var(--font-size-xl);
+  font-size: var(--font-size-lg);
   font-weight: var(--font-weight-bold);
-  margin-bottom: var(--spacing-sm);
+  margin-bottom: 2px;
+  color: #f59e0b;
+}
+
+.explorer-overlay .altitude-ft {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-normal);
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.explorer-overlay .overlay-props {
+  margin-top: var(--spacing-xs);
+  padding-top: var(--spacing-xs);
+  border-top: 1px solid rgba(129, 140, 248, 0.1);
 }
 
 .explorer-overlay .property-row {
   display: flex;
   justify-content: space-between;
+  gap: 12px;
   padding: 3px 0;
   font-size: var(--font-size-xs);
 }
 
+.explorer-overlay .property-row.indent {
+  padding-top: 0;
+  margin-top: -2px;
+}
+
 .explorer-overlay .property-row .label {
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(255, 255, 255, 0.5);
+  flex-shrink: 0;
 }
 
 .explorer-overlay .property-row .value {
   font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.explorer-overlay .property-row .value.dim {
+  color: rgba(255, 255, 255, 0.45);
+  font-size: 10px;
 }
 
 .explorer-hint {
@@ -1095,6 +1252,13 @@
   .atmosphere-explorer {
     min-height: 420px;
   }
+  .explorer-controls {
+    width: 56px;
+    padding: 12px 4px;
+  }
+  .slider-ticks .tick {
+    display: none;
+  }
   .explorer-overlay {
     position: relative;
     top: auto;
@@ -1109,6 +1273,15 @@
     color: var(--color-accent);
   }
   .explorer-overlay .property-row .label {
+    color: var(--color-text-light);
+  }
+  .explorer-overlay .altitude-display {
+    color: var(--color-accent);
+  }
+  .explorer-overlay .altitude-ft {
+    color: var(--color-text-light);
+  }
+  .explorer-overlay .property-row .value.dim {
     color: var(--color-text-light);
   }
   .chart-canvas-wrapper {
