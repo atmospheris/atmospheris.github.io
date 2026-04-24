@@ -641,6 +641,7 @@
   display: block;
   width: 100%;
   height: 100%;
+  touch-action: none;
 }
 
 /* Explorer side controls — vertical slider + altitude input */
@@ -880,6 +881,56 @@
   font-size: var(--font-size-xs);
   pointer-events: none;
   white-space: nowrap;
+}
+
+/* Explorer zoom buttons */
+.explorer-zoom-buttons {
+  position: absolute;
+  bottom: var(--spacing-lg);
+  right: var(--spacing-md);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  z-index: 10;
+  opacity: 0.6;
+  transition: opacity 0.2s;
+}
+
+.explorer-zoom-buttons:hover {
+  opacity: 1;
+}
+
+@media (hover: none) {
+  .explorer-zoom-buttons {
+    opacity: 0.8;
+  }
+}
+
+.zoom-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid rgba(129, 140, 248, 0.25);
+  background: rgba(15, 11, 46, 0.8);
+  backdrop-filter: blur(8px);
+  color: rgba(255, 255, 255, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.zoom-btn:hover {
+  background: rgba(129, 140, 248, 0.2);
+  border-color: rgba(129, 140, 248, 0.4);
+  color: white;
+}
+
+.zoom-btn:active {
+  transform: scale(0.9);
+  background: rgba(129, 140, 248, 0.3);
 }
 
 /* --- Chart Container --- */
@@ -1291,6 +1342,20 @@
   }
   .chart-canvas-wrapper {
     height: 300px;
+  }
+  .zoom-btn {
+    width: 42px;
+    height: 42px;
+  }
+  .explorer-zoom-buttons {
+    bottom: var(--spacing-xl);
+    right: var(--spacing-sm);
+    gap: 6px;
+  }
+  .explorer-hint {
+    font-size: 10px;
+    max-width: 70%;
+    text-align: center;
   }
 }
 

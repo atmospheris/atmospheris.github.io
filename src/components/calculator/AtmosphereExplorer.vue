@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted, onUnmounted, watch } from 'vue'
-import { IsaAlgorithms, TEMPERATURE_LAYERS, kelvinToCelsius, paToMbar, mToFeet } from 'atmospheris'
+import { IsaAlgorithms, kelvinToCelsius, paToMbar, mToFeet } from 'atmospheris'
 
 const props = defineProps({
   altitude: { type: Number, default: 0 },
@@ -22,8 +22,9 @@ let isDragging = false
 let isHovering = false
 let raycaster = null
 let raycastTargets = []
+let isTouchPrimary = false
 
-// Drag state: track mouse Y delta for reliable altitude changes
+// Drag state
 let dragStartClientY = 0
 let dragStartAlt = 0
 
@@ -35,18 +36,15 @@ const MIN_ALT = -2000
 const MAX_ALT = 80000
 const eps = 0.001
 
-// Convert altitude (m) to Y position in scene
 function altToY(alt) {
   return ((alt - MIN_ALT) / (MAX_ALT - MIN_ALT)) * COLUMN_HEIGHT - COLUMN_HEIGHT / 2
 }
 
-// Convert Y position to altitude (m)
 function yToAlt(y) {
   const alt = ((y + COLUMN_HEIGHT / 2) / COLUMN_HEIGHT) * (MAX_ALT - MIN_ALT) + MIN_ALT
   return Math.round(Math.max(MIN_ALT, Math.min(MAX_ALT, alt)))
 }
 
-// Layer colors and labels
 const layers = [
   { name: 'Troposphere', from: -2000, to: 11000, color: 0x3b82f6, opacity: 0.25 },
   { name: 'Tropopause', from: 11000, to: 20000, color: 0x6366f1, opacity: 0.15 },
@@ -57,7 +55,6 @@ const layers = [
   { name: 'Thermosphere', from: 71000, to: 80000, color: 0x0f0b2e, opacity: 0.3 },
 ]
 
-// Milestones
 const milestones = [
   { name: 'Sea Level', alt: 0 },
   { name: 'Mt. Everest', alt: 8849 },
@@ -96,6 +93,15 @@ function onNumberInput(e) {
   setAltitude(Number(e.target.value))
 }
 
+function adjustZoom(factor) {
+  if (!camera || !controls) return
+  const offset = camera.position.clone().sub(controls.target)
+  const newOffset = offset.multiplyScalar(factor)
+  const dist = newOffset.length()
+  if (dist < 4 || dist > 25) return
+  camera.position.copy(controls.target).add(newOffset)
+}
+
 watch(() => props.altitude, (newAlt) => {
   if (isDragging) return
   const y = altToY(newAlt || 0)
@@ -108,6 +114,9 @@ watch(() => props.altitude, (newAlt) => {
 
 onMounted(async () => {
   if (!containerRef.value) return
+  // Detect touch-primary device (mobile/tablet)
+  isTouchPrimary = typeof window !== 'undefined' &&
+    window.matchMedia('(hover: none)').matches
   try {
     THREE = await import('three')
     await buildScene(THREE)
@@ -134,11 +143,11 @@ async function buildScene(THREE) {
   renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false })
   renderer.setSize(containerRef.value.clientWidth, containerRef.value.clientHeight)
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+  // Prevent browser touch defaults (scroll, pinch-zoom page) on the canvas
+  renderer.domElement.style.touchAction = 'none'
   containerRef.value.appendChild(renderer.domElement)
 
-  // ===== CRITICAL: Register OUR pointer handlers BEFORE OrbitControls =====
-  // This ensures our handlers fire first, letting us stopImmediatePropagation
-  // to prevent OrbitControls from interfering with altitude drags.
+  // ===== Register OUR pointer handlers FIRST =====
   raycaster = new THREE.Raycaster()
   const mouseVec = new THREE.Vector2()
   const el = renderer.domElement
@@ -149,17 +158,37 @@ async function buildScene(THREE) {
     mouseVec.y = -((e.clientY - rect.top) / rect.height) * 2 + 1
   }
 
+  function startDrag(e) {
+    isDragging = true
+    if (controls) controls.enabled = false
+    dragStartClientY = e.clientY
+    dragStartAlt = props.altitude || 0
+    el.setPointerCapture(e.pointerId)
+    // Visual feedback
+    if (altitudeMarker) altitudeMarker.material.opacity = 1.0
+    if (markerGlow) markerGlow.material.opacity = 0.3
+    if (handleMesh) handleMesh.scale.setScalar(1.4)
+  }
+
   function onPointerDown(e) {
+    // ===== MOBILE: any single-finger touch = altitude drag =====
+    if (e.pointerType === 'touch') {
+      startDrag(e)
+      el.style.cursor = 'grabbing'
+      e.stopImmediatePropagation()
+      e.preventDefault()
+      return
+    }
+
+    // ===== DESKTOP: raycast against column layers + marker =====
     if (!raycastTargets.length && !altitudeMarker) return
 
     getMouseVec(e)
     raycaster.setFromCamera(mouseVec, camera)
 
-    // Build list of targets: column layer meshes + marker + handle
     const targets = [...raycastTargets]
     if (altitudeMarker) {
       targets.push(altitudeMarker)
-      // Also check handle children
       altitudeMarker.children.forEach(child => {
         if (child.isMesh) targets.push(child)
       })
@@ -167,17 +196,8 @@ async function buildScene(THREE) {
 
     const hits = raycaster.intersectObjects(targets, false)
     if (hits.length > 0) {
-      isDragging = true
-      if (controls) controls.enabled = false
-      dragStartClientY = e.clientY
-      dragStartAlt = props.altitude || 0
+      startDrag(e)
       el.style.cursor = 'grabbing'
-      el.setPointerCapture(e.pointerId)
-      // Visual feedback: brighten marker
-      if (altitudeMarker) altitudeMarker.material.opacity = 1.0
-      if (markerGlow) markerGlow.material.opacity = 0.3
-      if (handleMesh) handleMesh.material.emissive?.setHex(0xf59e0b)
-      // CRITICAL: prevent OrbitControls from seeing this event
       e.stopImmediatePropagation()
       e.preventDefault()
     }
@@ -185,7 +205,8 @@ async function buildScene(THREE) {
 
   function onPointerMove(e) {
     if (!isDragging) {
-      // Hover detection for cursor and subtle feedback
+      // Hover detection (desktop only — no hover on touch)
+      if (isTouchPrimary || e.pointerType === 'touch') return
       if (!raycastTargets.length && !altitudeMarker) return
 
       getMouseVec(e)
@@ -206,15 +227,13 @@ async function buildScene(THREE) {
         isHovering = onTarget
         if (altitudeMarker) altitudeMarker.material.opacity = onTarget ? 1.0 : 0.9
         if (markerGlow) markerGlow.material.opacity = onTarget ? 0.2 : 0.12
-        if (handleMesh) {
-          handleMesh.scale.setScalar(onTarget ? 1.3 : 1.0)
-        }
+        if (handleMesh) handleMesh.scale.setScalar(onTarget ? 1.3 : 1.0)
       }
       return
     }
 
-    // Drag: map vertical mouse delta to altitude change
-    const deltaY = dragStartClientY - e.clientY // positive = mouse up = higher altitude
+    // Drag: vertical pointer delta → altitude change
+    const deltaY = dragStartClientY - e.clientY
     const containerHeight = el.clientHeight
     const altRange = MAX_ALT - MIN_ALT
     const altChange = (deltaY / containerHeight) * altRange
@@ -222,7 +241,6 @@ async function buildScene(THREE) {
     const clamped = Math.max(MIN_ALT, Math.min(MAX_ALT, newAlt))
     const y = altToY(clamped)
 
-    // Update all marker positions immediately for responsive feedback
     if (altitudeMarker) altitudeMarker.position.y = y
     if (markerGlow) markerGlow.position.y = y
 
@@ -235,7 +253,6 @@ async function buildScene(THREE) {
     if (controls) controls.enabled = true
     el.style.cursor = isHovering ? 'grab' : 'default'
     try { el.releasePointerCapture(e.pointerId) } catch (_) {}
-    // Reset visual state
     if (altitudeMarker) altitudeMarker.material.opacity = 0.9
     if (markerGlow) markerGlow.material.opacity = 0.12
     if (handleMesh) handleMesh.scale.setScalar(1.0)
@@ -246,7 +263,7 @@ async function buildScene(THREE) {
   el.addEventListener('pointerup', onPointerUp)
   el.addEventListener('pointerleave', onPointerUp)
 
-  // ===== NOW create OrbitControls — its handlers fire AFTER ours =====
+  // ===== Create OrbitControls AFTER our handlers =====
   const { OrbitControls } = await import('three/addons/controls/OrbitControls.js')
   controls = new OrbitControls(camera, renderer.domElement)
   controls.enableDamping = true
@@ -258,19 +275,24 @@ async function buildScene(THREE) {
   controls.minPolarAngle = Math.PI * 0.2
   controls.target.set(0, markerY, 0)
 
+  // On touch-primary devices: disable OrbitControls rotation + zoom
+  // Our pointer handler manages altitude via vertical swipe
+  // Zoom is handled by +/- buttons
+  if (isTouchPrimary) {
+    controls.enableRotate = false
+    controls.enableZoom = false
+  }
+
   // Lights
   scene.add(new THREE.AmbientLight(0x6366f1, 0.4))
   const dirLight = new THREE.DirectionalLight(0xffffff, 0.6)
   dirLight.position.set(5, 10, 7)
   scene.add(dirLight)
 
-  // Column group
+  // Column
   const column = new THREE.Group()
-
-  // Reset raycast targets
   raycastTargets = []
 
-  // Layer bands — these are the primary click targets for altitude interaction
   layers.forEach(layer => {
     const yBot = altToY(layer.from)
     const yTop = altToY(layer.to)
@@ -285,37 +307,27 @@ async function buildScene(THREE) {
     const mesh = new THREE.Mesh(geo, mat)
     mesh.position.y = yBot + height / 2
     column.add(mesh)
-    // Add to raycast targets for altitude interaction
     raycastTargets.push(mesh)
 
-    // Layer label
     const label = makeTextSprite(THREE, layer.name, { color: 'rgba(255,255,255,0.4)', scale: 2.5, fontSize: 28 })
     label.position.set(COLUMN_WIDTH / 2 + 0.3, yBot + height / 2, COLUMN_DEPTH / 2 + 0.1)
     column.add(label)
   })
 
-  // Layer boundary lines
   const boundaryAlts = [11000, 20000, 32000, 47000, 51000, 71000]
   boundaryAlts.forEach(alt => {
     const y = altToY(alt)
     const lineGeo = new THREE.BoxGeometry(COLUMN_WIDTH + 0.6, 0.015, COLUMN_DEPTH + 0.2)
-    const lineMat = new THREE.MeshBasicMaterial({
-      color: 0x818cf8,
-      transparent: true,
-      opacity: 0.35
-    })
+    const lineMat = new THREE.MeshBasicMaterial({ color: 0x818cf8, transparent: true, opacity: 0.35 })
     const line = new THREE.Mesh(lineGeo, lineMat)
     line.position.y = y
     column.add(line)
   })
 
-  // Milestones
   milestones.forEach(ms => {
     const y = altToY(ms.alt)
     const label = makeTextSprite(THREE, `${ms.name} (${ms.alt.toLocaleString()}m)`, {
-      color: 'rgba(129,140,248,0.6)',
-      scale: 2,
-      fontSize: 24
+      color: 'rgba(129,140,248,0.6)', scale: 2, fontSize: 24
     })
     label.position.set(-COLUMN_WIDTH / 2 - 2.5, y, 0)
     column.add(label)
@@ -339,63 +351,45 @@ async function buildScene(THREE) {
   const particleGeo = new THREE.BufferGeometry()
   particleGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3))
   const particleMat = new THREE.PointsMaterial({
-    color: 0x818cf8,
-    size: 0.04,
-    transparent: true,
-    opacity: 0.6,
-    sizeAttenuation: true,
-    blending: THREE.AdditiveBlending,
-    depthWrite: false
+    color: 0x818cf8, size: 0.04, transparent: true, opacity: 0.6,
+    sizeAttenuation: true, blending: THREE.AdditiveBlending, depthWrite: false
   })
   particleSystem = new THREE.Points(particleGeo, particleMat)
   column.add(particleSystem)
   scene.add(column)
 
-  // ===== Altitude marker =====
-  // Thicker bar (0.15 units) for easier clicking + visibility
+  // Altitude marker
   const markerGeo = new THREE.BoxGeometry(COLUMN_WIDTH + 1, 0.15, COLUMN_DEPTH + 0.5)
   const markerMat = new THREE.MeshBasicMaterial({
-    color: 0xf59e0b,
-    transparent: true,
-    opacity: 0.9,
-    side: THREE.DoubleSide
+    color: 0xf59e0b, transparent: true, opacity: 0.9, side: THREE.DoubleSide
   })
   altitudeMarker = new THREE.Mesh(markerGeo, markerMat)
   altitudeMarker.position.y = altToY(props.altitude || 0)
   scene.add(altitudeMarker)
 
-  // Drag handle sphere — visible, clearly interactive
+  // Drag handle sphere
   const handleGeo = new THREE.SphereGeometry(0.3, 16, 16)
   const handleMat = new THREE.MeshPhongMaterial({
-    color: 0xf59e0b,
-    emissive: 0xf59e0b,
-    emissiveIntensity: 0.3,
-    transparent: true,
-    opacity: 0.95
+    color: 0xf59e0b, emissive: 0xf59e0b, emissiveIntensity: 0.3,
+    transparent: true, opacity: 0.95
   })
   handleMesh = new THREE.Mesh(handleGeo, handleMat)
   handleMesh.position.set(-COLUMN_WIDTH / 2 - 0.6, 0, 0)
-  altitudeMarker.add(handleMesh) // child moves with parent
+  altitudeMarker.add(handleMesh)
 
   // Handle glow halo
   const hGlowGeo = new THREE.SphereGeometry(0.5, 16, 16)
   const hGlowMat = new THREE.MeshBasicMaterial({
-    color: 0xf59e0b,
-    transparent: true,
-    opacity: 0.15,
-    side: THREE.DoubleSide
+    color: 0xf59e0b, transparent: true, opacity: 0.15, side: THREE.DoubleSide
   })
   handleGlowMesh = new THREE.Mesh(hGlowGeo, hGlowMat)
   handleGlowMesh.position.copy(handleMesh.position)
   altitudeMarker.add(handleGlowMesh)
 
-  // Marker glow — larger, softer halo behind the bar
+  // Marker glow
   const glowGeo = new THREE.BoxGeometry(COLUMN_WIDTH + 2, 0.5, COLUMN_DEPTH + 1)
   const glowMat = new THREE.MeshBasicMaterial({
-    color: 0xf59e0b,
-    transparent: true,
-    opacity: 0.12,
-    side: THREE.DoubleSide
+    color: 0xf59e0b, transparent: true, opacity: 0.12, side: THREE.DoubleSide
   })
   markerGlow = new THREE.Mesh(glowGeo, glowMat)
   markerGlow.position.y = altitudeMarker.position.y
@@ -416,11 +410,9 @@ async function buildScene(THREE) {
   function animate() {
     animFrameId = requestAnimationFrame(animate)
     if (particleSystem) particleSystem.rotation.y += 0.0003
-    // Pulse the glow when not dragging/hovering
     if (markerGlow && !isDragging && !isHovering) {
       markerGlow.material.opacity = 0.08 + 0.04 * Math.sin(Date.now() * 0.003)
     }
-    // Pulse handle glow
     if (handleGlowMesh && !isDragging) {
       handleGlowMesh.material.opacity = 0.1 + 0.05 * Math.sin(Date.now() * 0.004)
       handleGlowMesh.scale.setScalar(1.0 + 0.15 * Math.sin(Date.now() * 0.004))
@@ -430,7 +422,6 @@ async function buildScene(THREE) {
   }
   animate()
 
-  // Initial overlay
   overlayData.value = getOverlayData(props.altitude || 0)
 }
 
@@ -541,8 +532,21 @@ onUnmounted(() => {
       </div>
     </div>
 
+    <!-- Zoom buttons (visible on touch devices) -->
+    <div v-if="!fallback" class="explorer-zoom-buttons">
+      <button class="zoom-btn" @click="adjustZoom(0.8)" title="Zoom in">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+      </button>
+      <button class="zoom-btn" @click="adjustZoom(1.25)" title="Zoom out">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+      </button>
+    </div>
+
     <div v-if="!fallback" class="explorer-hint">
-      Click the atmosphere column or drag the marker to explore altitudes. Orbit with mouse on background.
+      {{ isTouchPrimary
+        ? 'Swipe vertically to explore altitudes. Use the slider for precise control.'
+        : 'Click the atmosphere column or drag the marker to explore altitudes. Orbit with mouse on background.'
+      }}
     </div>
   </div>
 </template>
