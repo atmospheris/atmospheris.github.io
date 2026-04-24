@@ -11,6 +11,8 @@ const toastMsg = ref('')
 const toastVisible = ref(false)
 const collapsedGroups = ref(new Set())
 const globalUnitSystem = ref('metric') // 'metric' | 'imperial'
+const tasValue = ref(250) // True Airspeed input (m/s)
+const tasUnit = ref('m/s') // 'm/s' | 'knots' | 'ft/s'
 
 // Per-row unit toggles state: key → unit key
 const unitToggles = ref({})
@@ -65,6 +67,27 @@ function getConversionFactor(row) {
   if (!conv) return 1
   return conv[current] ?? 1
 }
+
+// Aviation: computed from TAS + ISA properties
+const tasMs = computed(() => {
+  const v = tasValue.value
+  if (tasUnit.value === 'knots') return v / 1.9438445
+  if (tasUnit.value === 'ft/s') return v / 3.280839895
+  return v
+})
+
+const aviationProps = computed(() => {
+  if (!props.result || props.mode === 'pressure') return null
+  const r = props.result
+  const tas = tasMs.value
+  const sos = r.speedOfSound
+  const rho = r.density
+  const mach = tas / sos
+  const q = 0.5 * rho * tas * tas // dynamic pressure
+  const eas = tas * Math.sqrt(r.densityRatio) // equivalent airspeed
+  const cas = eas // at ISA conditions, CAS ≈ EAS (simplified, no compressibility correction)
+  return { mach, dynamicPressure: q, tas, eas, cas }
+})
 
 const rows = computed(() => {
   if (!props.result) return []
@@ -122,7 +145,8 @@ const rows = computed(() => {
       { name: 'Collision Frequency', symbol: '<math><mi>ω</mi></math>', key: 'cf', value: r.collisionFrequency, unit: 's⁻¹', unitOptions: null },
       { name: 'Mean Free Path', symbol: '<math><mi>l</mi></math>', key: 'mfp', value: r.meanFreePath, unitOptions: ['m', 'ft', 'nmi'], conversions: IMPERIAL.meanFreePath },
       { name: 'Mole Volume', symbol: '<math><msub><mi>V</mi><mi>m</mi></msub></math>', key: 'mv', value: r.moleVolume, unit: 'm³/mol', unitOptions: null },
-    ]}
+    ]},
+    { group: 'Aviation (from TAS)', rows: [] }
   ]
 })
 
@@ -230,31 +254,74 @@ function toggleGroup(group) {
     </div>
     <table class="results-table">
       <template v-for="(group, gi) in rows" :key="gi">
-        <tr class="results-group-header" @click="toggleGroup(group.group)">
-          <td colspan="3">
-            <span class="collapse-icon" :class="{ collapsed: collapsedGroups.has(group.group) }">&#9660;</span>
-            {{ group.group }}
-          </td>
-        </tr>
-        <template v-if="!collapsedGroups.has(group.group)">
-          <tr v-for="(row, ri) in group.rows" :key="ri">
-            <td class="property-name">
-              <span v-if="row.symbol" class="property-symbol" v-html="row.symbol"></span>
-              {{ row.name }}
-            </td>
-            <td class="property-value" @click="copyValue(row)" title="Click to copy">
-              {{ getDisplayValue(row) }}
-              <span class="property-unit">{{ getDisplayUnit(row) }}</span>
-              <span v-if="row.unitOptions" class="property-unit-toggle">
-                <button
-                  v-for="u in row.unitOptions"
-                  :key="u"
-                  :class="{ active: getUnitToggle(row.key, row.unitOptions) === u }"
-                  @click.stop="setUnitToggle(row.key, u)"
-                >{{ u }}</button>
-              </span>
+        <!-- Aviation group: special rendering with TAS input -->
+        <template v-if="group.group === 'Aviation (from TAS)' && aviationProps && mode !== 'pressure'">
+          <tr class="results-group-header" @click="toggleGroup(group.group)">
+            <td colspan="3">
+              <span class="collapse-icon" :class="{ collapsed: collapsedGroups.has(group.group) }">&#9660;</span>
+              {{ group.group }}
             </td>
           </tr>
+          <template v-if="!collapsedGroups.has(group.group)">
+            <tr class="tas-input-row">
+              <td colspan="2">
+                <div class="tas-input">
+                  <label>TAS:</label>
+                  <input type="number" v-model.number="tasValue" step="1" min="0" />
+                  <div class="radio-pills tas-pills">
+                    <button :class="{ active: tasUnit === 'm/s' }" @click="tasUnit = 'm/s'">m/s</button>
+                    <button :class="{ active: tasUnit === 'knots' }" @click="tasUnit = 'knots'">knots</button>
+                    <button :class="{ active: tasUnit === 'ft/s' }" @click="tasUnit = 'ft/s'">ft/s</button>
+                  </div>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td class="property-name"><span class="property-symbol"><math><mi>M</mi></math></span> Mach Number</td>
+              <td class="property-value">{{ aviationProps.mach.toFixed(4) }}</td>
+            </tr>
+            <tr>
+              <td class="property-name"><span class="property-symbol"><math><mi>q</mi></math></span> Dynamic Pressure</td>
+              <td class="property-value">{{ formatValue(aviationProps.dynamicPressure) }} <span class="property-unit">Pa</span></td>
+            </tr>
+            <tr>
+              <td class="property-name"><span class="property-symbol"><math><msub><mi>V</mi><mi>E</mi></msub></math></span> Equivalent Airspeed</td>
+              <td class="property-value">{{ formatValue(aviationProps.eas) }} <span class="property-unit">m/s</span></td>
+            </tr>
+            <tr>
+              <td class="property-name"><span class="property-symbol"><math><msub><mi>V</mi><mi>C</mi></msub></math></span> Calibrated Airspeed (ISA)</td>
+              <td class="property-value">{{ formatValue(aviationProps.cas) }} <span class="property-unit">m/s</span></td>
+            </tr>
+          </template>
+        </template>
+        <!-- Regular property groups -->
+        <template v-else-if="group.group !== 'Aviation (from TAS)'">
+          <tr class="results-group-header" @click="toggleGroup(group.group)">
+            <td colspan="3">
+              <span class="collapse-icon" :class="{ collapsed: collapsedGroups.has(group.group) }">&#9660;</span>
+              {{ group.group }}
+            </td>
+          </tr>
+          <template v-if="!collapsedGroups.has(group.group)">
+            <tr v-for="(row, ri) in group.rows" :key="ri">
+              <td class="property-name">
+                <span v-if="row.symbol" class="property-symbol" v-html="row.symbol"></span>
+                {{ row.name }}
+              </td>
+              <td class="property-value" @click="copyValue(row)" title="Click to copy">
+                {{ getDisplayValue(row) }}
+                <span class="property-unit">{{ getDisplayUnit(row) }}</span>
+                <span v-if="row.unitOptions" class="property-unit-toggle">
+                  <button
+                    v-for="u in row.unitOptions"
+                    :key="u"
+                    :class="{ active: getUnitToggle(row.key, row.unitOptions) === u }"
+                    @click.stop="setUnitToggle(row.key, u)"
+                  >{{ u }}</button>
+                </span>
+              </td>
+            </tr>
+          </template>
         </template>
       </template>
     </table>
