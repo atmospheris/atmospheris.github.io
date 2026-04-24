@@ -140,7 +140,7 @@ puts result.density               #=> 0.4135 kg/m³`
         <FeatureCard
           :icon="featureIcons.precision"
           title="Dual Precision"
-          description="Normal precision for engineering or reduced precision for quick estimates, matching ISO 2533 tables."
+          description="Normal precision for engineering or reduced precision for quick estimates, dynamically calculated per ISO 2533 formulas."
           link-text="Learn more"
           linkTo="/library"
         />
@@ -153,8 +153,8 @@ puts result.density               #=> 0.4135 kg/m³`
         />
         <FeatureCard
           :icon="featureIcons.tables"
-          title="Full ISO Tables"
-          description="Complete set of atmospheric property tables covering all temperature layers defined in the standard."
+          title="Dynamically Calculated Tables"
+          description="Generate custom atmospheric property tables at any step size and altitude range, dynamically computed per the standard."
           link-text="See constants"
           linkTo="/iso-2533"
         />

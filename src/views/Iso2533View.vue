@@ -395,15 +395,25 @@ useSeo({
 
     <!-- Get the Standard CTA -->
     <section class="section">
-      <div class="cta-card">
-        <h2>Get the Full Standard</h2>
-        <p>
-          The complete ISO 2533 Standard Atmosphere document is available for purchase from the
-          ISO Store. It contains the full specification, all equations, and comprehensive tables
-          of atmospheric properties.
-        </p>
-        <a href="https://www.iso.org/standard/7472.html" target="_blank" rel="noopener" class="btn btn-primary">
-          Purchase ISO 2533 from ISO Store
+      <div class="cta-card iso-purchase-card">
+        <div class="iso-purchase-header">
+          <img
+            src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/ISO_Logo.svg/200px-ISO_Logo.svg.png"
+            alt="ISO logo"
+            class="iso-logo"
+            width="60"
+            height="60"
+          />
+          <div>
+            <h2>Get the Official Standard</h2>
+            <p>
+              Purchase the official ISO 2533:1975 Standard Atmosphere document from the ISO Store
+              for the complete specification, all equations, and authoritative reference tables.
+            </p>
+          </div>
+        </div>
+        <a href="https://www.iso.org/standard/7472.html" target="_blank" rel="noopener" class="btn btn-primary iso-purchase-btn">
+          Purchase ISO 2533:1975
         </a>
       </div>
     </section>

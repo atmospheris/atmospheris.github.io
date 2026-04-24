@@ -935,6 +935,43 @@ pre code {
   margin-bottom: var(--spacing-md);
 }
 
+/* --- ISO Purchase Card --- */
+.iso-purchase-card {
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+  border: 1px solid rgba(99, 102, 241, 0.2);
+}
+
+.iso-purchase-header {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
+}
+
+.iso-logo {
+  flex-shrink: 0;
+  filter: brightness(0) invert(1);
+  opacity: 0.85;
+}
+
+.iso-purchase-header h2 {
+  margin-bottom: var(--spacing-xs);
+}
+
+.iso-purchase-header p {
+  margin-bottom: 0;
+}
+
+.iso-purchase-btn {
+  background: #fff;
+  color: #0f172a;
+  font-weight: var(--font-weight-semibold);
+}
+
+.iso-purchase-btn:hover {
+  background: #e2e8f0;
+}
+
 /* --- Content Page Lead --- */
 .content-lead {
   font-size: var(--font-size-lg);
