@@ -15,12 +15,13 @@ const overlayData = ref(null)
 
 let THREE = null
 let scene, camera, renderer, controls
-let altitudeMarker, markerGlow, hitboxMesh
+let altitudeMarker, markerGlow, handleMesh, handleGlowMesh
 let particleSystem
 let animFrameId = null
 let isDragging = false
 let isHovering = false
 let raycaster = null
+let raycastTargets = []
 
 // Drag state: track mouse Y delta for reliable altitude changes
 let dragStartClientY = 0
@@ -100,7 +101,6 @@ watch(() => props.altitude, (newAlt) => {
   const y = altToY(newAlt || 0)
   if (altitudeMarker) altitudeMarker.position.y = y
   if (markerGlow) markerGlow.position.y = y
-  if (hitboxMesh) hitboxMesh.position.y = y
   if (newAlt !== undefined && newAlt !== null) {
     overlayData.value = getOverlayData(newAlt || 0)
   }
@@ -136,7 +136,117 @@ async function buildScene(THREE) {
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
   containerRef.value.appendChild(renderer.domElement)
 
-  // OrbitControls
+  // ===== CRITICAL: Register OUR pointer handlers BEFORE OrbitControls =====
+  // This ensures our handlers fire first, letting us stopImmediatePropagation
+  // to prevent OrbitControls from interfering with altitude drags.
+  raycaster = new THREE.Raycaster()
+  const mouseVec = new THREE.Vector2()
+  const el = renderer.domElement
+
+  function getMouseVec(e) {
+    const rect = el.getBoundingClientRect()
+    mouseVec.x = ((e.clientX - rect.left) / rect.width) * 2 - 1
+    mouseVec.y = -((e.clientY - rect.top) / rect.height) * 2 + 1
+  }
+
+  function onPointerDown(e) {
+    if (!raycastTargets.length && !altitudeMarker) return
+
+    getMouseVec(e)
+    raycaster.setFromCamera(mouseVec, camera)
+
+    // Build list of targets: column layer meshes + marker + handle
+    const targets = [...raycastTargets]
+    if (altitudeMarker) {
+      targets.push(altitudeMarker)
+      // Also check handle children
+      altitudeMarker.children.forEach(child => {
+        if (child.isMesh) targets.push(child)
+      })
+    }
+
+    const hits = raycaster.intersectObjects(targets, false)
+    if (hits.length > 0) {
+      isDragging = true
+      if (controls) controls.enabled = false
+      dragStartClientY = e.clientY
+      dragStartAlt = props.altitude || 0
+      el.style.cursor = 'grabbing'
+      el.setPointerCapture(e.pointerId)
+      // Visual feedback: brighten marker
+      if (altitudeMarker) altitudeMarker.material.opacity = 1.0
+      if (markerGlow) markerGlow.material.opacity = 0.3
+      if (handleMesh) handleMesh.material.emissive?.setHex(0xf59e0b)
+      // CRITICAL: prevent OrbitControls from seeing this event
+      e.stopImmediatePropagation()
+      e.preventDefault()
+    }
+  }
+
+  function onPointerMove(e) {
+    if (!isDragging) {
+      // Hover detection for cursor and subtle feedback
+      if (!raycastTargets.length && !altitudeMarker) return
+
+      getMouseVec(e)
+      raycaster.setFromCamera(mouseVec, camera)
+
+      const targets = [...raycastTargets]
+      if (altitudeMarker) {
+        targets.push(altitudeMarker)
+        altitudeMarker.children.forEach(child => {
+          if (child.isMesh) targets.push(child)
+        })
+      }
+
+      const hits = raycaster.intersectObjects(targets, false)
+      const onTarget = hits.length > 0
+      el.style.cursor = onTarget ? 'grab' : 'default'
+      if (onTarget !== isHovering) {
+        isHovering = onTarget
+        if (altitudeMarker) altitudeMarker.material.opacity = onTarget ? 1.0 : 0.9
+        if (markerGlow) markerGlow.material.opacity = onTarget ? 0.2 : 0.12
+        if (handleMesh) {
+          handleMesh.scale.setScalar(onTarget ? 1.3 : 1.0)
+        }
+      }
+      return
+    }
+
+    // Drag: map vertical mouse delta to altitude change
+    const deltaY = dragStartClientY - e.clientY // positive = mouse up = higher altitude
+    const containerHeight = el.clientHeight
+    const altRange = MAX_ALT - MIN_ALT
+    const altChange = (deltaY / containerHeight) * altRange
+    const newAlt = Math.round(dragStartAlt + altChange)
+    const clamped = Math.max(MIN_ALT, Math.min(MAX_ALT, newAlt))
+    const y = altToY(clamped)
+
+    // Update all marker positions immediately for responsive feedback
+    if (altitudeMarker) altitudeMarker.position.y = y
+    if (markerGlow) markerGlow.position.y = y
+
+    emit('update:altitude', clamped)
+  }
+
+  function onPointerUp(e) {
+    if (!isDragging) return
+    isDragging = false
+    if (controls) controls.enabled = true
+    el.style.cursor = isHovering ? 'grab' : 'default'
+    try { el.releasePointerCapture(e.pointerId) } catch (_) {}
+    // Reset visual state
+    if (altitudeMarker) altitudeMarker.material.opacity = 0.9
+    if (markerGlow) markerGlow.material.opacity = 0.12
+    if (handleMesh) handleMesh.scale.setScalar(1.0)
+  }
+
+  el.addEventListener('pointerdown', onPointerDown)
+  el.addEventListener('pointermove', onPointerMove)
+  el.addEventListener('pointerup', onPointerUp)
+  el.addEventListener('pointerleave', onPointerUp)
+
+  // ===== NOW create OrbitControls — its handlers fire AFTER ours =====
   const { OrbitControls } = await import('three/addons/controls/OrbitControls.js')
   controls = new OrbitControls(camera, renderer.domElement)
   controls.enableDamping = true
@@ -157,7 +267,10 @@ async function buildScene(THREE) {
   // Column group
   const column = new THREE.Group()
 
-  // Layer bands
+  // Reset raycast targets
+  raycastTargets = []
+
+  // Layer bands — these are the primary click targets for altitude interaction
   layers.forEach(layer => {
     const yBot = altToY(layer.from)
     const yTop = altToY(layer.to)
@@ -172,6 +285,8 @@ async function buildScene(THREE) {
     const mesh = new THREE.Mesh(geo, mat)
     mesh.position.y = yBot + height / 2
     column.add(mesh)
+    // Add to raycast targets for altitude interaction
+    raycastTargets.push(mesh)
 
     // Layer label
     const label = makeTextSprite(THREE, layer.name, { color: 'rgba(255,255,255,0.4)', scale: 2.5, fontSize: 28 })
@@ -179,7 +294,7 @@ async function buildScene(THREE) {
     column.add(label)
   })
 
-  // Layer boundary lines (thin glowing horizontal lines at layer transitions)
+  // Layer boundary lines
   const boundaryAlts = [11000, 20000, 32000, 47000, 51000, 71000]
   boundaryAlts.forEach(alt => {
     const y = altToY(alt)
@@ -236,8 +351,9 @@ async function buildScene(THREE) {
   column.add(particleSystem)
   scene.add(column)
 
-  // Altitude marker — visible thin bright plane
-  const markerGeo = new THREE.BoxGeometry(COLUMN_WIDTH + 1, 0.06, COLUMN_DEPTH + 0.5)
+  // ===== Altitude marker =====
+  // Thicker bar (0.15 units) for easier clicking + visibility
+  const markerGeo = new THREE.BoxGeometry(COLUMN_WIDTH + 1, 0.15, COLUMN_DEPTH + 0.5)
   const markerMat = new THREE.MeshBasicMaterial({
     color: 0xf59e0b,
     transparent: true,
@@ -248,7 +364,32 @@ async function buildScene(THREE) {
   altitudeMarker.position.y = altToY(props.altitude || 0)
   scene.add(altitudeMarker)
 
-  // Marker glow — larger, softer halo
+  // Drag handle sphere — visible, clearly interactive
+  const handleGeo = new THREE.SphereGeometry(0.3, 16, 16)
+  const handleMat = new THREE.MeshPhongMaterial({
+    color: 0xf59e0b,
+    emissive: 0xf59e0b,
+    emissiveIntensity: 0.3,
+    transparent: true,
+    opacity: 0.95
+  })
+  handleMesh = new THREE.Mesh(handleGeo, handleMat)
+  handleMesh.position.set(-COLUMN_WIDTH / 2 - 0.6, 0, 0)
+  altitudeMarker.add(handleMesh) // child moves with parent
+
+  // Handle glow halo
+  const hGlowGeo = new THREE.SphereGeometry(0.5, 16, 16)
+  const hGlowMat = new THREE.MeshBasicMaterial({
+    color: 0xf59e0b,
+    transparent: true,
+    opacity: 0.15,
+    side: THREE.DoubleSide
+  })
+  handleGlowMesh = new THREE.Mesh(hGlowGeo, hGlowMat)
+  handleGlowMesh.position.copy(handleMesh.position)
+  altitudeMarker.add(handleGlowMesh)
+
+  // Marker glow — larger, softer halo behind the bar
   const glowGeo = new THREE.BoxGeometry(COLUMN_WIDTH + 2, 0.5, COLUMN_DEPTH + 1)
   const glowMat = new THREE.MeshBasicMaterial({
     color: 0xf59e0b,
@@ -259,96 +400,6 @@ async function buildScene(THREE) {
   markerGlow = new THREE.Mesh(glowGeo, glowMat)
   markerGlow.position.y = altitudeMarker.position.y
   scene.add(markerGlow)
-
-  // Invisible hitbox — much larger for reliable click/drag targeting
-  // 2 units tall so users can click near the marker, not just on the thin line
-  const hitGeo = new THREE.BoxGeometry(COLUMN_WIDTH + 1, 2.0, COLUMN_DEPTH + 1)
-  const hitMat = new THREE.MeshBasicMaterial({
-    transparent: true,
-    opacity: 0,
-    depthWrite: false,
-    side: THREE.DoubleSide
-  })
-  hitboxMesh = new THREE.Mesh(hitGeo, hitMat)
-  hitboxMesh.position.y = altitudeMarker.position.y
-  scene.add(hitboxMesh)
-
-  // --- Pointer interaction ---
-  raycaster = new THREE.Raycaster()
-  const mouseVec = new THREE.Vector2()
-  const el = renderer.domElement
-
-  function getMouseVec(e) {
-    const rect = el.getBoundingClientRect()
-    mouseVec.x = ((e.clientX - rect.left) / rect.width) * 2 - 1
-    mouseVec.y = -((e.clientY - rect.top) / rect.height) * 2 + 1
-  }
-
-  function onPointerDown(e) {
-    getMouseVec(e)
-    raycaster.setFromCamera(mouseVec, camera)
-    const hits = raycaster.intersectObject(hitboxMesh)
-    if (hits.length > 0) {
-      isDragging = true
-      controls.enabled = false
-      dragStartClientY = e.clientY
-      dragStartAlt = props.altitude || 0
-      el.style.cursor = 'grabbing'
-      // Visual feedback: brighten marker
-      altitudeMarker.material.opacity = 1.0
-      markerGlow.material.opacity = 0.3
-      e.preventDefault()
-    }
-  }
-
-  function onPointerMove(e) {
-    if (!isDragging) {
-      // Hover detection for cursor and subtle feedback
-      getMouseVec(e)
-      raycaster.setFromCamera(mouseVec, camera)
-      const hits = raycaster.intersectObject(hitboxMesh)
-      const onMarker = hits.length > 0
-      el.style.cursor = onMarker ? 'grab' : 'default'
-      if (onMarker !== isHovering) {
-        isHovering = onMarker
-        altitudeMarker.material.opacity = onMarker ? 1.0 : 0.9
-        markerGlow.material.opacity = onMarker ? 0.2 : 0.12
-      }
-      return
-    }
-
-    // Drag: map vertical mouse delta to altitude change
-    // This is more robust than ray-plane intersection — works at any camera angle
-    const deltaY = dragStartClientY - e.clientY // positive = mouse moved up = higher altitude
-    const containerHeight = el.clientHeight
-    const altRange = MAX_ALT - MIN_ALT
-    const altChange = (deltaY / containerHeight) * altRange
-    const newAlt = Math.round(dragStartAlt + altChange)
-    const clamped = Math.max(MIN_ALT, Math.min(MAX_ALT, newAlt))
-    const y = altToY(clamped)
-
-    // Update all marker positions immediately for responsive feedback
-    altitudeMarker.position.y = y
-    markerGlow.position.y = y
-    hitboxMesh.position.y = y
-
-    emit('update:altitude', clamped)
-  }
-
-  function onPointerUp() {
-    if (!isDragging) return
-    isDragging = false
-    controls.enabled = true
-    el.style.cursor = isHovering ? 'grab' : 'default'
-    // Reset visual state
-    altitudeMarker.material.opacity = 0.9
-    markerGlow.material.opacity = 0.12
-  }
-
-  el.addEventListener('pointerdown', onPointerDown)
-  el.addEventListener('pointermove', onPointerMove)
-  el.addEventListener('pointerup', onPointerUp)
-  el.addEventListener('pointerleave', onPointerUp)
 
   // Resize
   function onResize() {
@@ -368,6 +419,11 @@ async function buildScene(THREE) {
     // Pulse the glow when not dragging/hovering
     if (markerGlow && !isDragging && !isHovering) {
       markerGlow.material.opacity = 0.08 + 0.04 * Math.sin(Date.now() * 0.003)
+    }
+    // Pulse handle glow
+    if (handleGlowMesh && !isDragging) {
+      handleGlowMesh.material.opacity = 0.1 + 0.05 * Math.sin(Date.now() * 0.004)
+      handleGlowMesh.scale.setScalar(1.0 + 0.15 * Math.sin(Date.now() * 0.004))
     }
     controls.update()
     renderer.render(scene, camera)
@@ -486,7 +542,7 @@ onUnmounted(() => {
     </div>
 
     <div v-if="!fallback" class="explorer-hint">
-      Drag the yellow marker or use the slider to explore altitudes. Orbit with mouse.
+      Click the atmosphere column or drag the marker to explore altitudes. Orbit with mouse on background.
     </div>
   </div>
 </template>
