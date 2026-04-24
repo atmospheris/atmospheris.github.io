@@ -40,11 +40,6 @@ function altToY(alt) {
   return ((alt - MIN_ALT) / (MAX_ALT - MIN_ALT)) * COLUMN_HEIGHT - COLUMN_HEIGHT / 2
 }
 
-function yToAlt(y) {
-  const alt = ((y + COLUMN_HEIGHT / 2) / COLUMN_HEIGHT) * (MAX_ALT - MIN_ALT) + MIN_ALT
-  return Math.round(Math.max(MIN_ALT, Math.min(MAX_ALT, alt)))
-}
-
 const layers = [
   { name: 'Troposphere', from: -2000, to: 11000, color: 0x3b82f6, opacity: 0.25 },
   { name: 'Tropopause', from: 11000, to: 20000, color: 0x6366f1, opacity: 0.15 },
@@ -97,8 +92,7 @@ function adjustZoom(factor) {
   if (!camera || !controls) return
   const offset = camera.position.clone().sub(controls.target)
   const newOffset = offset.multiplyScalar(factor)
-  const dist = newOffset.length()
-  if (dist < 4 || dist > 25) return
+  if (newOffset.length() < 4 || newOffset.length() > 25) return
   camera.position.copy(controls.target).add(newOffset)
 }
 
@@ -114,7 +108,6 @@ watch(() => props.altitude, (newAlt) => {
 
 onMounted(async () => {
   if (!containerRef.value) return
-  // Detect touch-primary device (mobile/tablet)
   isTouchPrimary = typeof window !== 'undefined' &&
     window.matchMedia('(hover: none)').matches
   try {
@@ -143,96 +136,61 @@ async function buildScene(THREE) {
   renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false })
   renderer.setSize(containerRef.value.clientWidth, containerRef.value.clientHeight)
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
-  // Prevent browser touch defaults (scroll, pinch-zoom page) on the canvas
   renderer.domElement.style.touchAction = 'none'
   containerRef.value.appendChild(renderer.domElement)
-
-  // ===== Register OUR pointer handlers FIRST =====
-  raycaster = new THREE.Raycaster()
-  const mouseVec = new THREE.Vector2()
   const el = renderer.domElement
 
-  function getMouseVec(e) {
-    const rect = el.getBoundingClientRect()
-    mouseVec.x = ((e.clientX - rect.left) / rect.width) * 2 - 1
-    mouseVec.y = -((e.clientY - rect.top) / rect.height) * 2 + 1
-  }
+  // Prevent context menu on right-click so orbit works
+  el.addEventListener('contextmenu', e => e.preventDefault())
 
-  function startDrag(e) {
+  // ===== POINTER HANDLERS — registered BEFORE OrbitControls =====
+  // Interaction model (NO raycasting — entire canvas is the scrub surface):
+  //   Desktop: left-drag = altitude, right-drag = orbit, scroll = zoom
+  //   Mobile:  single-finger = altitude, zoom via +/- buttons
+  function onPointerDown(e) {
+    // Mobile: any touch = altitude drag
+    if (e.pointerType === 'touch') {
+      isDragging = true
+      dragStartClientY = e.clientY
+      dragStartAlt = props.altitude || 0
+      el.setPointerCapture(e.pointerId)
+      if (altitudeMarker) altitudeMarker.material.opacity = 1.0
+      if (markerGlow) markerGlow.material.opacity = 0.3
+      if (handleMesh) handleMesh.scale.setScalar(1.4)
+      e.stopImmediatePropagation()
+      e.preventDefault()
+      return
+    }
+
+    // Desktop: right-click or middle-click → pass to OrbitControls
+    if (e.button !== 0) return
+
+    // Desktop: left-click → altitude drag (entire canvas)
     isDragging = true
     if (controls) controls.enabled = false
     dragStartClientY = e.clientY
     dragStartAlt = props.altitude || 0
+    el.style.cursor = 'grabbing'
     el.setPointerCapture(e.pointerId)
-    // Visual feedback
     if (altitudeMarker) altitudeMarker.material.opacity = 1.0
     if (markerGlow) markerGlow.material.opacity = 0.3
     if (handleMesh) handleMesh.scale.setScalar(1.4)
-  }
-
-  function onPointerDown(e) {
-    // ===== MOBILE: any single-finger touch = altitude drag =====
-    if (e.pointerType === 'touch') {
-      startDrag(e)
-      el.style.cursor = 'grabbing'
-      e.stopImmediatePropagation()
-      e.preventDefault()
-      return
-    }
-
-    // ===== DESKTOP: raycast against column layers + marker =====
-    if (!raycastTargets.length && !altitudeMarker) return
-
-    getMouseVec(e)
-    raycaster.setFromCamera(mouseVec, camera)
-
-    const targets = [...raycastTargets]
-    if (altitudeMarker) {
-      targets.push(altitudeMarker)
-      altitudeMarker.children.forEach(child => {
-        if (child.isMesh) targets.push(child)
-      })
-    }
-
-    const hits = raycaster.intersectObjects(targets, false)
-    if (hits.length > 0) {
-      startDrag(e)
-      el.style.cursor = 'grabbing'
-      e.stopImmediatePropagation()
-      e.preventDefault()
-    }
+    e.stopImmediatePropagation()
+    e.preventDefault()
   }
 
   function onPointerMove(e) {
     if (!isDragging) {
-      // Hover detection (desktop only — no hover on touch)
+      // Hover feedback (desktop only)
       if (isTouchPrimary || e.pointerType === 'touch') return
-      if (!raycastTargets.length && !altitudeMarker) return
-
-      getMouseVec(e)
-      raycaster.setFromCamera(mouseVec, camera)
-
-      const targets = [...raycastTargets]
-      if (altitudeMarker) {
-        targets.push(altitudeMarker)
-        altitudeMarker.children.forEach(child => {
-          if (child.isMesh) targets.push(child)
-        })
-      }
-
-      const hits = raycaster.intersectObjects(targets, false)
-      const onTarget = hits.length > 0
-      el.style.cursor = onTarget ? 'grab' : 'default'
-      if (onTarget !== isHovering) {
-        isHovering = onTarget
-        if (altitudeMarker) altitudeMarker.material.opacity = onTarget ? 1.0 : 0.9
-        if (markerGlow) markerGlow.material.opacity = onTarget ? 0.2 : 0.12
-        if (handleMesh) handleMesh.scale.setScalar(onTarget ? 1.3 : 1.0)
-      }
+      isHovering = true
+      if (altitudeMarker) altitudeMarker.material.opacity = 1.0
+      if (markerGlow) markerGlow.material.opacity = 0.2
+      if (handleMesh) handleMesh.scale.setScalar(1.2)
       return
     }
 
-    // Drag: vertical pointer delta → altitude change
+    // Drag: vertical delta → altitude change
     const deltaY = dragStartClientY - e.clientY
     const containerHeight = el.clientHeight
     const altRange = MAX_ALT - MIN_ALT
@@ -251,19 +209,29 @@ async function buildScene(THREE) {
     if (!isDragging) return
     isDragging = false
     if (controls) controls.enabled = true
-    el.style.cursor = isHovering ? 'grab' : 'default'
+    el.style.cursor = 'default'
     try { el.releasePointerCapture(e.pointerId) } catch (_) {}
     if (altitudeMarker) altitudeMarker.material.opacity = 0.9
     if (markerGlow) markerGlow.material.opacity = 0.12
     if (handleMesh) handleMesh.scale.setScalar(1.0)
   }
 
+  function onPointerLeave() {
+    isHovering = false
+    if (!isDragging) {
+      if (altitudeMarker) altitudeMarker.material.opacity = 0.9
+      if (markerGlow) markerGlow.material.opacity = 0.12
+      if (handleMesh) handleMesh.scale.setScalar(1.0)
+    }
+  }
+
   el.addEventListener('pointerdown', onPointerDown)
   el.addEventListener('pointermove', onPointerMove)
   el.addEventListener('pointerup', onPointerUp)
   el.addEventListener('pointerleave', onPointerUp)
+  el.addEventListener('pointerleave', onPointerLeave)
 
-  // ===== Create OrbitControls AFTER our handlers =====
+  // ===== OrbitControls — created AFTER our handlers =====
   const { OrbitControls } = await import('three/addons/controls/OrbitControls.js')
   controls = new OrbitControls(camera, renderer.domElement)
   controls.enableDamping = true
@@ -275,9 +243,7 @@ async function buildScene(THREE) {
   controls.minPolarAngle = Math.PI * 0.2
   controls.target.set(0, markerY, 0)
 
-  // On touch-primary devices: disable OrbitControls rotation + zoom
-  // Our pointer handler manages altitude via vertical swipe
-  // Zoom is handled by +/- buttons
+  // Touch devices: disable orbit entirely (altitude via swipe, zoom via buttons)
   if (isTouchPrimary) {
     controls.enableRotate = false
     controls.enableZoom = false
@@ -291,7 +257,6 @@ async function buildScene(THREE) {
 
   // Column
   const column = new THREE.Group()
-  raycastTargets = []
 
   layers.forEach(layer => {
     const yBot = altToY(layer.from)
@@ -299,15 +264,11 @@ async function buildScene(THREE) {
     const height = Math.max(eps, yTop - yBot)
     const geo = new THREE.BoxGeometry(COLUMN_WIDTH, height, COLUMN_DEPTH)
     const mat = new THREE.MeshPhongMaterial({
-      color: layer.color,
-      transparent: true,
-      opacity: layer.opacity,
-      side: THREE.DoubleSide
+      color: layer.color, transparent: true, opacity: layer.opacity, side: THREE.DoubleSide
     })
     const mesh = new THREE.Mesh(geo, mat)
     mesh.position.y = yBot + height / 2
     column.add(mesh)
-    raycastTargets.push(mesh)
 
     const label = makeTextSprite(THREE, layer.name, { color: 'rgba(255,255,255,0.4)', scale: 2.5, fontSize: 28 })
     label.position.set(COLUMN_WIDTH / 2 + 0.3, yBot + height / 2, COLUMN_DEPTH / 2 + 0.1)
@@ -331,7 +292,6 @@ async function buildScene(THREE) {
     })
     label.position.set(-COLUMN_WIDTH / 2 - 2.5, y, 0)
     column.add(label)
-
     const dotGeo = new THREE.SphereGeometry(0.05, 8, 8)
     const dotMat = new THREE.MeshBasicMaterial({ color: 0x818cf8 })
     const dot = new THREE.Mesh(dotGeo, dotMat)
@@ -367,7 +327,7 @@ async function buildScene(THREE) {
   altitudeMarker.position.y = altToY(props.altitude || 0)
   scene.add(altitudeMarker)
 
-  // Drag handle sphere
+  // Handle sphere
   const handleGeo = new THREE.SphereGeometry(0.3, 16, 16)
   const handleMat = new THREE.MeshPhongMaterial({
     color: 0xf59e0b, emissive: 0xf59e0b, emissiveIntensity: 0.3,
@@ -377,7 +337,7 @@ async function buildScene(THREE) {
   handleMesh.position.set(-COLUMN_WIDTH / 2 - 0.6, 0, 0)
   altitudeMarker.add(handleMesh)
 
-  // Handle glow halo
+  // Handle glow
   const hGlowGeo = new THREE.SphereGeometry(0.5, 16, 16)
   const hGlowMat = new THREE.MeshBasicMaterial({
     color: 0xf59e0b, transparent: true, opacity: 0.15, side: THREE.DoubleSide
@@ -532,7 +492,7 @@ onUnmounted(() => {
       </div>
     </div>
 
-    <!-- Zoom buttons (visible on touch devices) -->
+    <!-- Zoom buttons -->
     <div v-if="!fallback" class="explorer-zoom-buttons">
       <button class="zoom-btn" @click="adjustZoom(0.8)" title="Zoom in">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
@@ -544,8 +504,8 @@ onUnmounted(() => {
 
     <div v-if="!fallback" class="explorer-hint">
       {{ isTouchPrimary
-        ? 'Swipe vertically to explore altitudes. Use the slider for precise control.'
-        : 'Click the atmosphere column or drag the marker to explore altitudes. Orbit with mouse on background.'
+        ? 'Swipe up/down to change altitude. Use the slider for precise control.'
+        : 'Drag to change altitude. Right-drag to orbit. Scroll to zoom.'
       }}
     </div>
   </div>
