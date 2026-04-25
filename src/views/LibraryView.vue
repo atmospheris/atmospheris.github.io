@@ -170,7 +170,7 @@ interface PressureResult {
     <section class="section">
       <h2 class="section-title">Resources</h2>
       <ul class="content-list">
-        <li><a href="https://github.com/riboseinc/atmospheris" target="_blank" rel="noopener">Ruby gem on GitHub</a></li>
+        <li><a href="https://github.com/atmospheris/" target="_blank" rel="noopener">Ruby gem on GitHub</a></li>
         <li><a href="https://www.npmjs.com/package/atmospheris" target="_blank" rel="noopener">atmospheris on npm</a></li>
         <li><router-link to="/calculator">Interactive Calculator</router-link></li>
         <li><router-link to="/iso-2533">About ISO 2533</router-link></li>
