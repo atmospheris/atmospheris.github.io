@@ -398,7 +398,7 @@ useSeo({
       <div class="cta-card iso-purchase-card">
         <div class="iso-purchase-header">
           <img
-            src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/ISO_Logo.svg/200px-ISO_Logo.svg.png"
+            src="/iso-logo.svg"
             alt="ISO logo"
             class="iso-logo"
             width="60"
@@ -412,6 +412,9 @@ useSeo({
             </p>
           </div>
         </div>
+        <a href="https://www.iso.org/standard/90293.html" target="_blank" rel="noopener" class="btn btn-primary iso-purchase-btn">
+          Purchase ISO/DIS 2533
+        </a>
         <a href="https://www.iso.org/standard/7472.html" target="_blank" rel="noopener" class="btn btn-primary iso-purchase-btn">
           Purchase ISO 2533:1975
         </a>

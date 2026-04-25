@@ -950,8 +950,9 @@ pre code {
 
 .iso-logo {
   flex-shrink: 0;
-  filter: brightness(0) invert(1);
-  opacity: 0.85;
+  border-radius: var(--radius-sm);
+  width: 60px;
+  height: 60px;
 }
 
 .iso-purchase-header h2 {
