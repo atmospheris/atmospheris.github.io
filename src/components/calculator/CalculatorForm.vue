@@ -1,7 +1,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
-import { PROPERTY_DEFS } from 'atmospheris'
+import { PROPERTY_DEFS, getAllProperties, getAltitudeFromProperty } from 'atmospheris'
 
 const emit = defineEmits(['calculate'])
 
@@ -19,6 +19,70 @@ const tempOffset = ref(0)
 // By Property mode
 const selectedProperty = ref('temperature_k')
 const propertyValue = ref(288.15)
+
+// Compute valid range for the selected property
+// Get values at altitude extremes (-2000m and 80000m)
+const propertyRange = computed(() => {
+  try {
+    const propsAtMin = getAllProperties({ value: -2000, unit: 'meters', type: 'geopotential', precision: 'normal' })
+    const propsAtMax = getAllProperties({ value: 80000, unit: 'meters', type: 'geopotential', precision: 'normal' })
+    if (!propsAtMin || !propsAtMax) return null
+
+    const key = selectedProperty.value
+    const valAtMin = getPropertyValue(propsAtMin, key)
+    const valAtMax = getPropertyValue(propsAtMax, key)
+
+    if (valAtMin == null || valAtMax == null) return null
+    return {
+      min: Math.min(valAtMin, valAtMax),
+      max: Math.max(valAtMin, valAtMax)
+    }
+  } catch {
+    return null
+  }
+})
+
+function getPropertyValue(props, key) {
+  const mapping = {
+    geopotential_altitude_m: () => props.geopotentialAltitude?.meters,
+    geopotential_altitude_ft: () => props.geopotentialAltitude?.feet,
+    geometric_altitude_m: () => props.geometricAltitude?.meters,
+    geometric_altitude_ft: () => props.geometricAltitude?.feet,
+    temperature_k: () => props.temperature?.kelvin,
+    temperature_c: () => props.temperature?.celsius,
+    temperature_f: () => props.temperature?.fahrenheit,
+    temperature_r: () => props.temperature?.rankine,
+    temperature_ratio: () => props.temperatureRatio,
+    lapse_rate: () => props.lapseRate,
+    pressure_pa: () => props.pressure?.pascal,
+    pressure_mbar: () => props.pressure?.millibar,
+    pressure_mmhg: () => props.pressure?.mmHg,
+    pressure_ratio: () => props.pressureRatio,
+    density_kgm3: () => props.density?.kgm3,
+    density_ratio: () => props.densityRatio,
+    sqrt_density_ratio: () => props.sqrtDensityRatio,
+    gravity_ms2: () => props.gravity,
+    gravity_ratio: () => props.gravityRatio,
+    speed_of_sound_ms: () => props.speedOfSound,
+    speed_of_sound_ratio: () => props.speedOfSoundRatio,
+    dynamic_viscosity: () => props.dynamicViscosity,
+    dynamic_viscosity_ratio: () => props.dynamicViscosityRatio,
+    kinematic_viscosity: () => props.kinematicViscosity,
+    kinematic_viscosity_ratio: () => props.kinematicViscosityRatio,
+    thermal_conductivity: () => props.thermalConductivity,
+    thermal_conductivity_ratio: () => props.thermalConductivityRatio,
+    pressure_scale_height: () => props.pressureScaleHeight,
+    specific_weight: () => props.specificWeight,
+    air_number_density: () => props.airNumberDensity,
+    mean_particle_speed: () => props.meanParticleSpeed,
+    collision_frequency: () => props.collisionFrequency,
+    mean_free_path: () => props.meanFreePath,
+    mole_volume: () => props.moleVolume,
+    molecular_temperature: () => props.molecularTemperature,
+  }
+  const fn = mapping[key]
+  return fn ? fn() : null
+}
 
 const presets = [
   { label: 'Sea Level', value: 0, range: 'Sea Level' },
@@ -118,6 +182,16 @@ function getShareUrl() {
 
 function copyShareUrl() {
   navigator.clipboard.writeText(getShareUrl())
+}
+
+function formatRangeValue(val) {
+  if (val === 0) return '0'
+  const abs = Math.abs(val)
+  if (abs >= 1e6) return val.toExponential(2)
+  if (abs >= 100) return val.toFixed(1)
+  if (abs >= 1) return val.toFixed(3)
+  if (abs >= 0.001) return val.toFixed(6)
+  return val.toExponential(2)
 }
 
 onMounted(() => {
@@ -224,6 +298,9 @@ onMounted(() => {
           step="0.01"
           @input="doCalculate"
         />
+        <div class="property-range-hint">
+          {{ pressureUnit === 'mbar' ? 'Range: 0.01 – 1,013.25 mbar' : 'Range: 0.01 – 760.00 mmHg' }}
+        </div>
       </div>
 
       <div class="input-group">
@@ -268,6 +345,10 @@ onMounted(() => {
           <span class="property-input-unit" v-if="PROPERTY_DEFS[selectedProperty]?.unit">
             {{ PROPERTY_DEFS[selectedProperty].unit }}
           </span>
+        </div>
+        <div v-if="propertyRange" class="property-range-hint">
+          Valid range: {{ formatRangeValue(propertyRange.min) }} – {{ formatRangeValue(propertyRange.max) }}
+          {{ PROPERTY_DEFS[selectedProperty]?.unit || '' }}
         </div>
       </div>
 

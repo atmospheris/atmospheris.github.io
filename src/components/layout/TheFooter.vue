@@ -24,9 +24,8 @@ const year = new Date().getFullYear()
           <router-link to="/calculator">Calculator</router-link>
           <router-link to="/library">Library Docs</router-link>
           <router-link to="/iso-2533">ISO 2533</router-link>
-          <router-link to="/symbols">Symbols & Variables</router-link>
+          <router-link to="/symbols">Symbols &amp; Variables</router-link>
           <router-link to="/references">References</router-link>
-          <router-link to="/about">About</router-link>
         </div>
 
         <div class="footer-column">

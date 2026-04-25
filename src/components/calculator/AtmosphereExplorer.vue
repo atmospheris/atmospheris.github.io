@@ -101,6 +101,10 @@ watch(() => props.altitude, (newAlt) => {
   const y = altToY(newAlt || 0)
   if (altitudeMarker) altitudeMarker.position.y = y
   if (markerGlow) markerGlow.position.y = y
+  // Follow the marker with the camera target
+  if (controls) {
+    controls.target.y = y
+  }
   if (newAlt !== undefined && newAlt !== null) {
     overlayData.value = getOverlayData(newAlt || 0)
   }
@@ -201,6 +205,14 @@ async function buildScene(THREE) {
 
     if (altitudeMarker) altitudeMarker.position.y = y
     if (markerGlow) markerGlow.position.y = y
+
+    // Update overlay data immediately during drag (not just via watcher)
+    overlayData.value = getOverlayData(clamped)
+
+    // Follow the marker with the camera target so it stays visible
+    if (controls) {
+      controls.target.y = y
+    }
 
     emit('update:altitude', clamped)
   }
