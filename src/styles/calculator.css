@@ -540,6 +540,14 @@
   min-width: 50px;
 }
 
+.property-range-hint {
+  margin-top: var(--spacing-xs);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-light);
+  opacity: 0.8;
+  font-style: italic;
+}
+
 /* Divider between input sections and presets */
 .calc-divider {
   border: none;

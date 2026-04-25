@@ -5,6 +5,7 @@ import { useTheme } from '@/composables/useTheme'
 const { isDark, toggle } = useTheme()
 const scrolled = ref(false)
 const mobileOpen = ref(false)
+const refDropdownOpen = ref(false)
 
 function onScroll() {
   scrolled.value = window.scrollY > 10
@@ -18,8 +19,18 @@ function closeMobile() {
   mobileOpen.value = false
 }
 
-onMounted(() => window.addEventListener('scroll', onScroll, { passive: true }))
-onUnmounted(() => window.removeEventListener('scroll', onScroll))
+function closeDropdown() {
+  refDropdownOpen.value = false
+}
+
+onMounted(() => {
+  window.addEventListener('scroll', onScroll, { passive: true })
+  document.addEventListener('click', closeDropdown)
+})
+onUnmounted(() => {
+  window.removeEventListener('scroll', onScroll)
+  document.removeEventListener('click', closeDropdown)
+})
 </script>
 
 <template>
@@ -38,10 +49,19 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
       <nav class="header-nav">
         <router-link to="/calculator">Calculator</router-link>
         <router-link to="/library">Library</router-link>
-        <router-link to="/iso-2533">ISO 2533</router-link>
-        <router-link to="/symbols">Symbols</router-link>
-        <router-link to="/references">References</router-link>
-        <router-link to="/about">About</router-link>
+        <div class="nav-dropdown" @click.stop="refDropdownOpen = !refDropdownOpen">
+          <button class="nav-dropdown-trigger" :class="{ active: refDropdownOpen }">
+            Reference
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="nav-dropdown-menu" v-if="refDropdownOpen">
+            <router-link to="/iso-2533" @click="closeDropdown">ISO 2533</router-link>
+            <router-link to="/symbols" @click="closeDropdown">Symbols &amp; Variables</router-link>
+            <router-link to="/references" @click="closeDropdown">References</router-link>
+            <div class="nav-dropdown-divider"></div>
+            <router-link to="/about" @click="closeDropdown">About</router-link>
+          </div>
+        </div>
       </nav>
 
       <div class="header-right">
@@ -65,9 +85,10 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
   <nav class="mobile-nav" :class="{ open: mobileOpen }">
     <router-link to="/calculator" @click="closeMobile">Calculator</router-link>
     <router-link to="/library" @click="closeMobile">Library</router-link>
-    <router-link to="/iso-2533" @click="closeMobile">ISO 2533</router-link>
-    <router-link to="/symbols" @click="closeMobile">Symbols</router-link>
-    <router-link to="/references" @click="closeMobile">References</router-link>
-    <router-link to="/about" @click="closeMobile">About</router-link>
+    <div class="mobile-nav-section">Reference</div>
+    <router-link to="/iso-2533" @click="closeMobile" class="mobile-nav-sub">ISO 2533</router-link>
+    <router-link to="/symbols" @click="closeMobile" class="mobile-nav-sub">Symbols &amp; Variables</router-link>
+    <router-link to="/references" @click="closeMobile" class="mobile-nav-sub">References</router-link>
+    <router-link to="/about" @click="closeMobile" class="mobile-nav-sub">About</router-link>
   </nav>
 </template>
