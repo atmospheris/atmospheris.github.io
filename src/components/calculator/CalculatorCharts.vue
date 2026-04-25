@@ -3,11 +3,13 @@ import { ref, onMounted, onUnmounted, watch } from 'vue'
 import { IsaAlgorithms, TEMPERATURE_LAYERS } from 'atmospheris'
 
 const props = defineProps({
-  altitude: { type: Number, default: 0 }
+  altitude: { type: Number, default: -2000 }
 })
 
 const chartType = ref('temperature')
 const altUnit = ref('m')
+const altType = ref('H') // 'H' = geopotential, 'h' = geometric
+const R = 6356766
 const containerRef = ref(null)
 
 // Compare mode: which properties to overlay
@@ -41,7 +43,7 @@ function getLayerBoundaries() {
 // Property configs for compare mode
 const COMPARE_PROPS = {
   temperature: { label: 'Temperature', unit: 'K', fn: (isa, h) => isa.temperatureFromGeopotential(h), color: '#ef4444' },
-  pressure: { label: 'Pressure', unit: 'Pa', fn: (isa, h) => isa.pressureFromGeopotential(h), color: '#6366f1' },
+  pressure: { label: 'Pressure', unit: 'Pa', fn: (isa, h) => isa.pressureFromGeopotential(h), color: '#2c84bf' },
   density: { label: 'Density', unit: 'kg/m³', fn: (isa, h) => isa.densityFromGeopotential(h), color: '#10b981' },
   speedOfSound: { label: 'Speed of Sound', unit: 'm/s', fn: (isa, h) => isa.speedOfSound(h), color: '#f59e0b' },
 }
@@ -51,8 +53,8 @@ function renderChart() {
 
   const isa = new IsaAlgorithms()
   const isDark = document.documentElement.getAttribute('data-theme') === 'dark'
-  const gridColor = isDark ? 'rgba(129,140,248,0.15)' : 'rgba(99,102,241,0.1)'
-  const textColor = isDark ? '#a5b4fc' : '#64748b'
+  const gridColor = isDark ? 'rgba(122,186,229,0.15)' : 'rgba(44,132,191,0.1)'
+  const textColor = isDark ? '#a8d2ec' : '#64748b'
 
   // Compare mode: overlay multiple properties
   if (chartType.value === 'compare') {
@@ -85,15 +87,19 @@ function renderChart() {
       break
   }
 
-  const xLabel = altUnit.value === 'm' ? 'Altitude (m)' : 'Altitude (ft)'
-  const altitudes = altUnit.value === 'm' ? data.alts : data.alts.map(a => a * 3.280839895)
-  const currentAlt = altUnit.value === 'm' ? (props.altitude || 0) : (props.altitude || 0) * 3.280839895
+  const isGeometric = altType.value === 'h'
+  const altLabel = isGeometric ? 'h' : 'H'
+  const xLabel = altUnit.value === 'm' ? `${altLabel} (m)` : `${altLabel} (ft)`
+  const toDisplayAlt = (h) => {
+    const val = isGeometric && h > 0 ? R * h / (R - h) : h
+    return altUnit.value === 'm' ? val : val * 3.280839895
+  }
+  const altitudes = data.alts.map(toDisplayAlt)
+  const currentAlt = toDisplayAlt(props.altitude ?? -2000)
 
-  const layerAlts = altUnit.value === 'm'
-    ? getLayerBoundaries()
-    : getLayerBoundaries().map(a => a * 3.280839895)
+  const layerAlts = getLayerBoundaries().map(toDisplayAlt)
 
-  const isaAlt = props.altitude || 0
+  const isaAlt = props.altitude ?? -2000
   let currentVal
   switch (chartType.value) {
     case 'temperature': currentVal = isa.temperatureFromGeopotential(isaAlt); break
@@ -106,8 +112,8 @@ function renderChart() {
     {
       label: yLabel,
       data: altitudes.map((a, i) => ({ x: a, y: data.vals[i] })),
-      borderColor: '#6366f1',
-      backgroundColor: 'rgba(99,102,241,0.1)',
+      borderColor: '#2c84bf',
+      backgroundColor: 'rgba(44,132,191,0.1)',
       borderWidth: 2,
       fill: true,
       pointRadius: 0,
@@ -135,7 +141,7 @@ function renderChart() {
         const x = xScale.getPixelForValue(alt)
         if (x < xScale.left || x > xScale.right) return
         ctx.save()
-        ctx.strokeStyle = 'rgba(129,140,248,0.3)'
+        ctx.strokeStyle = 'rgba(122,186,229,0.3)'
         ctx.lineWidth = 1
         ctx.setLineDash([4, 4])
         ctx.beginPath()
@@ -171,10 +177,10 @@ function renderChart() {
       plugins: {
         legend: { display: false },
         tooltip: {
-          backgroundColor: isDark ? '#1e1b4b' : '#0f172a',
+          backgroundColor: isDark ? '#1a2c3e' : '#0f172a',
           titleColor: '#fff',
           bodyColor: '#e2e8f0',
-          borderColor: 'rgba(99,102,241,0.3)',
+          borderColor: 'rgba(44,132,191,0.3)',
           borderWidth: 1,
           callbacks: {
             label: (ctx) => {
@@ -194,9 +200,15 @@ function renderChart() {
 }
 
 function renderCompareChart(isa, isDark, gridColor, textColor) {
-  const xLabel = altUnit.value === 'm' ? 'Altitude (m)' : 'Altitude (ft)'
-  const currentAlt = altUnit.value === 'm' ? (props.altitude || 0) : (props.altitude || 0) * 3.280839895
-  const isaAlt = props.altitude || 0
+  const isGeometric = altType.value === 'h'
+  const altLabel = isGeometric ? 'h' : 'H'
+  const xLabel = altUnit.value === 'm' ? `${altLabel} (m)` : `${altLabel} (ft)`
+  const toDisplayAlt = (h) => {
+    const val = isGeometric && h > 0 ? R * h / (R - h) : h
+    return altUnit.value === 'm' ? val : val * 3.280839895
+  }
+  const currentAlt = toDisplayAlt(props.altitude ?? -2000)
+  const isaAlt = props.altitude ?? -2000
 
   const selected = [...compareSelected.value]
   if (selected.length === 0) {
@@ -215,7 +227,7 @@ function renderCompareChart(isa, isDark, gridColor, textColor) {
     const range = max - min || 1
     ranges[key] = { min, max, range }
     allData[key] = {
-      alts: altUnit.value === 'm' ? rawData.alts : rawData.alts.map(a => a * 3.280839895),
+      alts: rawData.alts.map(toDisplayAlt),
       vals,
       normalized: vals.map(v => ((v - min) / range) * 100) // 0-100 scale
     }
@@ -224,9 +236,7 @@ function renderCompareChart(isa, isDark, gridColor, textColor) {
   // Use first selected property's altitude array
   const altitudes = allData[selected[0]].alts
 
-  const layerAlts = altUnit.value === 'm'
-    ? getLayerBoundaries()
-    : getLayerBoundaries().map(a => a * 3.280839895)
+  const layerAlts = getLayerBoundaries().map(toDisplayAlt)
 
   const datasets = selected.map(key => {
     const prop = COMPARE_PROPS[key]
@@ -270,7 +280,7 @@ function renderCompareChart(isa, isDark, gridColor, textColor) {
         const x = xScale.getPixelForValue(alt)
         if (x < xScale.left || x > xScale.right) return
         ctx.save()
-        ctx.strokeStyle = 'rgba(129,140,248,0.3)'
+        ctx.strokeStyle = 'rgba(122,186,229,0.3)'
         ctx.lineWidth = 1
         ctx.setLineDash([4, 4])
         ctx.beginPath()
@@ -410,10 +420,10 @@ function renderCompareChart(isa, isDark, gridColor, textColor) {
           }
         },
         tooltip: {
-          backgroundColor: isDark ? '#1e1b4b' : '#0f172a',
+          backgroundColor: isDark ? '#1a2c3e' : '#0f172a',
           titleColor: '#fff',
           bodyColor: '#e2e8f0',
-          borderColor: 'rgba(99,102,241,0.3)',
+          borderColor: 'rgba(44,132,191,0.3)',
           borderWidth: 1,
           mode: 'index',
           intersect: false,
@@ -441,7 +451,7 @@ function toggleCompareProp(key) {
   renderChart()
 }
 
-watch([chartType, altUnit, () => props.altitude], () => {
+watch([chartType, altUnit, altType, () => props.altitude], () => {
   renderChart()
 })
 
@@ -476,7 +486,14 @@ onUnmounted(() => {
     </div>
     <div class="chart-controls">
       <label>
-        Altitude unit:
+        Altitude type:
+        <select v-model="altType">
+          <option value="H">H — Geopotential</option>
+          <option value="h">h — Geometric</option>
+        </select>
+      </label>
+      <label>
+        Unit:
         <select v-model="altUnit">
           <option value="m">meters</option>
           <option value="ft">feet</option>

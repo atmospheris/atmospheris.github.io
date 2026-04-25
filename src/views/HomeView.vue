@@ -12,12 +12,29 @@ useSeo({
   schema: buildWebApplicationSchema()
 })
 
-const sliderAltitude = ref(0)
+const sliderAltitude = ref(-2000)
+const altUnit = ref('m')
+
+const altRange = computed(() => {
+  return altUnit.value === 'm'
+    ? { min: -2000, max: 80000, step: 100 }
+    : { min: -6562, max: 262467, step: 328 }
+})
+
+const altitudeInMeters = computed(() => {
+  return altUnit.value === 'ft' ? Math.round(sliderAltitude.value * 0.3048) : sliderAltitude.value
+})
+
+function setAltUnit(u) {
+  const currentMeters = altUnit.value === 'ft' ? sliderAltitude.value * 0.3048 : sliderAltitude.value
+  altUnit.value = u
+  sliderAltitude.value = u === 'ft' ? Math.round(currentMeters / 0.3048) : Math.round(currentMeters)
+}
 
 const props = computed(() => {
   try {
     return getAllProperties({
-      value: sliderAltitude.value,
+      value: altitudeInMeters.value,
       unit: 'meters',
       type: 'geopotential',
       precision: 'normal'
@@ -100,10 +117,15 @@ puts result.density               #=> 0.4135 kg/m³`
       <div class="inline-calc animate-on-scroll">
         <h3 class="inline-calc-title">Quick Calculator</h3>
         <div class="inline-calc-input">
-          <label>Altitude (m)</label>
-          <input type="number" v-model.number="sliderAltitude" min="-2000" max="80000" step="100" />
-          <input type="range" v-model.number="sliderAltitude" min="-2000" max="80000" step="100" />
-          <span class="inline-calc-value">{{ sliderAltitude }} m</span>
+          <label>Altitude <span class="range-hint">(-2,000 to 80,000)</span></label>
+          <div class="inline-input-composite">
+            <input type="number" v-model.number="sliderAltitude" :min="altRange.min" :max="altRange.max" :step="altRange.step" />
+            <div class="inline-unit-seg">
+              <button :class="{ active: altUnit === 'm' }" @click="setAltUnit('m')">m</button>
+              <button :class="{ active: altUnit === 'ft' }" @click="setAltUnit('ft')">ft</button>
+            </div>
+          </div>
+          <input type="range" v-model.number="sliderAltitude" :min="altRange.min" :max="altRange.max" :step="altRange.step" />
         </div>
         <div class="props-grid" v-if="displayProps.length">
           <div class="prop-item" v-for="p in displayProps" :key="p.label">
@@ -197,24 +219,6 @@ puts result.density               #=> 0.4135 kg/m³`
       </div>
       <div class="quickstart-cta">
         <router-link to="/library" class="btn btn-outline-dark">Full Documentation &rarr;</router-link>
-      </div>
-    </div>
-  </section>
-
-  <!-- Trust Badges -->
-  <section class="section">
-    <div class="trust-badges">
-      <div class="trust-badge">
-        <span class="badge-icon">&#9989;</span>
-        <span>Reference implementation for ISO 2533:2026</span>
-      </div>
-      <div class="trust-badge">
-        <span class="badge-icon">&#127961;</span>
-        <span>Published by Ribose</span>
-      </div>
-      <div class="trust-badge">
-        <span class="badge-icon">&#128220;</span>
-        <span>BSD-2-Clause License</span>
       </div>
     </div>
   </section>

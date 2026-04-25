@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { useSeo, buildWebApplicationSchema } from '@/composables/useSeo'
 import CalculatorForm from '@/components/calculator/CalculatorForm.vue'
@@ -20,16 +20,19 @@ const route = useRoute()
 
 const result = ref(null)
 const calcMode = ref('altitude')
-const activeTab = ref('calculator')
-const currentAltitude = ref(0)
+const currentAltitude = ref(-2000)
 const altitudeUnit = ref('meters')
 
 const tabs = [
-  { key: 'calculator', label: 'Calculator' },
-  { key: 'explorer', label: 'Explorer 3D' },
-  { key: 'table', label: 'Table' },
-  { key: 'charts', label: 'Charts' },
+  { key: '', label: 'Calculator', path: '/calculator' },
+  { key: 'explorer', label: 'Explorer 3D', path: '/calculator/explorer' },
+  { key: 'table', label: 'Table', path: '/calculator/table' },
+  { key: 'charts', label: 'Charts', path: '/calculator/charts' },
 ]
+
+const activeTab = computed(() => {
+  return route.meta?.tab || 'calculator'
+})
 
 function handleCalculate(input) {
   calcMode.value = input.mode
@@ -99,12 +102,6 @@ function handleExplorerAltitude(alt) {
 }
 
 onMounted(() => {
-  // Check URL hash for tab
-  const hash = window.location.hash.replace('#', '')
-  if (tabs.some(t => t.key === hash)) {
-    activeTab.value = hash
-  }
-
   // Auto-calculate on load (or from URL params)
   const q = route.query
   if (q.prop) {
@@ -122,7 +119,7 @@ onMounted(() => {
       precision: q.prec || 'normal'
     })
   } else {
-    const alt = q.alt !== undefined ? Number(q.alt) : 0
+    const alt = q.alt !== undefined ? Number(q.alt) : -2000
     handleCalculate({
       mode: 'altitude',
       value: alt,
@@ -144,12 +141,19 @@ onMounted(() => {
     <div class="calculator-body">
       <!-- Tab navigation -->
       <div class="calc-tabs">
-        <button
+        <router-link
           v-for="tab in tabs"
           :key="tab.key"
-          :class="{ active: activeTab === tab.key }"
-          @click="activeTab = tab.key"
-        >{{ tab.label }}</button>
+          :to="tab.path"
+          custom
+          v-slot="{ navigate }"
+        >
+          <button
+            class="calc-tab-btn"
+            :class="{ active: activeTab === (tab.key || 'calculator') }"
+            @click="navigate"
+          >{{ tab.label }}</button>
+        </router-link>
       </div>
 
       <!-- Tab content -->

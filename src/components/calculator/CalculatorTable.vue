@@ -2,18 +2,20 @@
 import { ref, watch, nextTick } from 'vue'
 import { IsaAlgorithms } from 'atmospheris'
 
-const startAlt = ref(0)
-const endAlt = ref(20000)
-const stepSize = ref(1000)
+const startAlt = ref(-2000)
+const endAlt = ref(80000)
+const stepSize = ref(2000)
 const altUnit = ref('meters')
 const loading = ref(false)
 const tableData = ref([])
 
 const presets = [
+  { label: 'Full Range', start: -2000, end: 80000, step: 2000 },
+  { label: 'Below Sea Level', start: -2000, end: 0, step: 200 },
   { label: 'Troposphere', start: 0, end: 11000, step: 500 },
   { label: 'Aviation (0–15 km)', start: 0, end: 15000, step: 500 },
   { label: 'Stratosphere', start: 11000, end: 32000, step: 1000 },
-  { label: 'Full Range', start: -2000, end: 80000, step: 2000 },
+  { label: 'Upper Atmosphere', start: 32000, end: 80000, step: 2000 },
 ]
 
 const toastMsg = ref('')
@@ -43,9 +45,11 @@ function generateTableData() {
     return
   }
 
+  const R = 6356766 // Nominal Earth radius
   const rows = []
   for (let h = start; h <= end + step * 0.01; h += step) {
     const geoH = h
+    const geoZ = R * geoH / (R - geoH) // Geometric from geopotential
     const temp = isa.temperatureFromGeopotential(geoH)
     const pres = isa.pressureFromGeopotential(geoH)
     const dens = isa.densityFromGeopotential(geoH)
@@ -57,8 +61,10 @@ function generateTableData() {
     const presMbar = isa.pressureMbarFromGeopotential(geoH)
 
     rows.push({
-      alt: geoH,
-      altFt: geoH * 3.280839895,
+      geoH,
+      geoH_ft: geoH * 3.280839895,
+      geoZ,
+      geoZ_ft: geoZ * 3.280839895,
       temp,
       tempC: temp - 273.15,
       pres,
@@ -92,22 +98,22 @@ function fmt(val, digits = 2) {
 }
 
 function copyCSV() {
-  const headers = ['Altitude (m)', 'Altitude (ft)', 'Temp (K)', 'Temp (°C)', 'Pressure (Pa)', 'Pressure (mbar)', 'Density (kg/m³)', 'Speed of Sound (m/s)', 'Gravity (m/s²)', 'Dynamic Viscosity (Pa·s)', 'Kinematic Viscosity (m²/s)', 'Mean Free Path (m)']
+  const headers = ['H (m)', 'H (ft)', 'h (m)', 'h (ft)', 'Temp (K)', 'Temp (°C)', 'Pressure (Pa)', 'Pressure (mbar)', 'Density (kg/m³)', 'Speed of Sound (m/s)', 'Gravity (m/s²)']
   const csv = [
     headers.join(','),
     ...tableData.value.map(r =>
-      [r.alt, r.altFt.toFixed(0), fmt(r.temp), fmt(r.tempC), fmt(r.pres), fmt(r.presMbar), fmt(r.dens), fmt(r.sos), fmt(r.grav), fmt(r.dv), fmt(r.kv), fmt(r.mfp)].join(',')
+      [r.geoH, r.geoH_ft.toFixed(0), r.geoZ.toFixed(2), r.geoZ_ft.toFixed(0), fmt(r.temp), fmt(r.tempC), fmt(r.pres), fmt(r.presMbar), fmt(r.dens), fmt(r.sos), fmt(r.grav)].join(',')
     )
   ].join('\n')
   navigator.clipboard.writeText(csv).then(() => showToast('CSV copied to clipboard'))
 }
 
 function downloadCSV() {
-  const headers = ['Altitude (m)', 'Altitude (ft)', 'Temp (K)', 'Temp (°C)', 'Pressure (Pa)', 'Pressure (mbar)', 'Density (kg/m³)', 'Speed of Sound (m/s)', 'Gravity (m/s²)', 'Dynamic Viscosity (Pa·s)', 'Kinematic Viscosity (m²/s)', 'Mean Free Path (m)']
+  const headers = ['H (m)', 'H (ft)', 'h (m)', 'h (ft)', 'Temp (K)', 'Temp (°C)', 'Pressure (Pa)', 'Pressure (mbar)', 'Density (kg/m³)', 'Speed of Sound (m/s)', 'Gravity (m/s²)']
   const csv = [
     headers.join(','),
     ...tableData.value.map(r =>
-      [r.alt, r.altFt.toFixed(0), fmt(r.temp), fmt(r.tempC), fmt(r.pres), fmt(r.presMbar), fmt(r.dens), fmt(r.sos), fmt(r.grav), fmt(r.dv), fmt(r.kv), fmt(r.mfp)].join(',')
+      [r.geoH, r.geoH_ft.toFixed(0), r.geoZ.toFixed(2), r.geoZ_ft.toFixed(0), fmt(r.temp), fmt(r.tempC), fmt(r.pres), fmt(r.presMbar), fmt(r.dens), fmt(r.sos), fmt(r.grav)].join(',')
     )
   ].join('\n')
   const blob = new Blob([csv], { type: 'text/csv' })
@@ -121,11 +127,11 @@ function downloadCSV() {
 }
 
 function copyTSV() {
-  const headers = ['Altitude (m)', 'Altitude (ft)', 'Temp (K)', 'Temp (°C)', 'Pressure (Pa)', 'Pressure (mbar)', 'Density (kg/m³)', 'Speed of Sound (m/s)']
+  const headers = ['H (m)', 'H (ft)', 'h (m)', 'h (ft)', 'Temp (K)', 'Temp (°C)', 'Pressure (Pa)', 'Pressure (mbar)', 'Density (kg/m³)', 'Speed of Sound (m/s)']
   const tsv = [
     headers.join('\t'),
     ...tableData.value.map(r =>
-      [r.alt, r.altFt.toFixed(0), fmt(r.temp), fmt(r.tempC), fmt(r.pres), fmt(r.presMbar), fmt(r.dens), fmt(r.sos)].join('\t')
+      [r.geoH, r.geoH_ft.toFixed(0), r.geoZ.toFixed(2), r.geoZ_ft.toFixed(0), fmt(r.temp), fmt(r.tempC), fmt(r.pres), fmt(r.presMbar), fmt(r.dens), fmt(r.sos)].join('\t')
     )
   ].join('\n')
   navigator.clipboard.writeText(tsv).then(() => showToast('TSV copied (paste into spreadsheet)'))
@@ -166,6 +172,14 @@ function copyTSV() {
       </div>
     </div>
 
+    <div class="table-legend">
+      <span><strong>H</strong> = Geopotential altitude</span>
+      <span class="table-legend-divider"></span>
+      <span><strong>h</strong> = Geometric altitude</span>
+      <span class="table-legend-divider"></span>
+      <span class="table-legend-note">h = r₀·H / (r₀ − H), r₀ = 6,356,766 m</span>
+    </div>
+
     <div class="table-scroll-container" :class="{ 'table-loading': loading }">
       <div v-if="loading" class="table-spinner">
         <div class="spinner"></div>
@@ -174,8 +188,10 @@ function copyTSV() {
       <table class="gen-table">
         <thead>
           <tr>
-            <th>Alt (m)</th>
-            <th>Alt (ft)</th>
+            <th>H (m)</th>
+            <th>H (ft)</th>
+            <th>h (m)</th>
+            <th>h (ft)</th>
             <th>Temp (K)</th>
             <th>Temp (°C)</th>
             <th>Pres (Pa)</th>
@@ -187,8 +203,10 @@ function copyTSV() {
         </thead>
         <tbody>
           <tr v-for="(row, i) in tableData" :key="i">
-            <td>{{ row.alt >= 0 ? '+' : '' }}{{ row.alt.toLocaleString() }}</td>
-            <td>{{ row.altFt.toFixed(0) }}</td>
+            <td>{{ row.geoH >= 0 ? '+' : '' }}{{ row.geoH.toLocaleString() }}</td>
+            <td>{{ row.geoH_ft.toFixed(0) }}</td>
+            <td>{{ row.geoZ >= 0 ? '+' : '' }}{{ row.geoZ.toLocaleString() }}</td>
+            <td>{{ row.geoZ_ft.toFixed(0) }}</td>
             <td>{{ fmt(row.temp) }}</td>
             <td>{{ fmt(row.tempC) }}</td>
             <td>{{ fmt(row.pres) }}</td>
