@@ -9,36 +9,36 @@ useSeo({
 
 const references = [
   {
+    title: 'ISO 2533:2026 (forthcoming)',
+    org: 'International Organization for Standardization',
+    year: '2026',
+    description: 'Second edition of Standard Atmosphere. Cancels and replaces ISO 2533:1975 and incorporates Addendum 1, Addendum 2, and errata. Covers -5 km to 80 km, includes hypsometrical tables in hPa, and recalculates all values using modern computational methods with improved accuracy.',
+    relationship: 'Current revision — supersedes ISO 2533:1975 and all addenda.',
+    link: 'https://www.iso.org/standard/90293.html'
+  },
+  {
     title: 'ISO 2533:1975',
     org: 'International Organization for Standardization',
     year: '1975',
-    description: 'Standard Atmosphere. Defines the reference atmospheric model from -2,000 m to 80,000 m geopotential altitude, specifying temperature, pressure, density, and other thermodynamic properties.',
-    relationship: 'Foundation document — the primary standard this site implements.',
+    description: 'First edition of Standard Atmosphere. Identical with the ICAO and WMO Standard Atmospheres from -2 km to 32 km, extended to 80 km using atmospheric research data. Specifies temperature, pressure, density, and other thermodynamic properties as functions of geometric and geopotential altitude.',
+    relationship: 'Original standard — the primary document this site implements.',
     link: 'https://www.iso.org/standard/7472.html'
   },
   {
     title: 'ISO 2533:1975/Add 1:1985',
     org: 'International Organization for Standardization',
     year: '1985',
-    description: 'Standard Atmosphere — Addendum 1: Hypsometrical tables. Provides hypsometrical tables as a supplement to the base standard.',
-    relationship: 'Addendum to ISO 2533:1975, providing additional hypsometrical reference tables.',
+    description: 'Addendum 1: Hypsometrical tables. Relates geopotential altitude to atmospheric pressure for calibration of aneroid and manometer-type instruments. Covers pressure in hPa (0.01 hPa intervals) and mmHg (0.01 mmHg intervals), plus altitude-to-pressure lookup tables.',
+    relationship: 'Supplement to ISO 2533:1975 for instrument calibration.',
     link: 'https://www.iso.org/standard/7473.html'
   },
   {
     title: 'ISO 2533:1975/Add 2:1997',
     org: 'International Organization for Standardization',
     year: '1997',
-    description: 'Standard Atmosphere — Addendum 2: Extension to -5,000 m and standard atmosphere as a function of altitude in feet.',
-    relationship: 'Addendum to ISO 2533:1975, extending the altitude range and adding foot-based altitude definitions.',
+    description: 'Addendum 2: Extension to -5,000 m and standard atmosphere as a function of altitude in feet. Extends the lower altitude range from -2,000 m to -5,000 m, and provides atmosphere tables in 200 ft and 500 ft steps from -16,500 ft to 262,500 ft.',
+    relationship: 'Supplement to ISO 2533:1975 extending range and adding foot-based tables.',
     link: 'https://www.iso.org/standard/7474.html'
-  },
-  {
-    title: 'ISO 2533:2026 (forthcoming)',
-    org: 'International Organization for Standardization',
-    year: '2026',
-    description: 'Revised edition of the Standard Atmosphere currently in development. Updates the 1975 standard with modern constants, improved computational methods, and extended altitude coverage.',
-    relationship: 'Modern revision of ISO 2533:1975, currently in preparation.',
-    link: 'https://www.iso.org/standard/90293.html'
   },
   {
     title: 'ICAO Doc 7488/3',

@@ -48,10 +48,36 @@ useSeo({
         the international standard for atmospheric reference conditions.
       </p>
       <ul class="content-list">
-        <li><strong>ISO 2533:1975</strong> &mdash; First edition of the standard (<a href="https://www.iso.org/standard/7472.html" target="_blank" rel="noopener">ISO Store</a>)</li>
-        <li><strong>Addendum 1:1985</strong> &mdash; Hypsometrical tables (<a href="https://www.iso.org/standard/7473.html" target="_blank" rel="noopener">ISO Store</a>)</li>
-        <li><strong>Addendum 2:1997</strong> &mdash; Extension to &minus;5,000 m and atmosphere as a function of altitude in feet (<a href="https://www.iso.org/standard/7474.html" target="_blank" rel="noopener">ISO Store</a>)</li>
-        <li><strong>ISO 2533:2026</strong> &mdash; Upcoming revision incorporating all addenda and modernizing the presentation (<a href="https://www.iso.org/standard/90293.html" target="_blank" rel="noopener">ISO Store</a>)</li>
+        <li>
+          <strong>ISO 2533:1975</strong> &mdash;
+          Standard Atmosphere, identical with the ICAO and WMO Standard Atmospheres
+          from &minus;2 km to 32 km, extended to 80 km using data from recent research.
+          It specifies temperature, pressure, density, and other thermodynamic properties
+          as functions of geometric and geopotential altitude.
+          <a href="https://www.iso.org/standard/7472.html" target="_blank" rel="noopener">ISO&nbsp;Store&nbsp;&nearr;</a>
+        </li>
+        <li>
+          <strong>Addendum&nbsp;1:1985</strong> &mdash;
+          Hypsometrical tables relating geopotential altitude to atmospheric pressure,
+          intended for calibration of aneroid and manometer-type instruments.
+          Covers pressure ranges in hPa and mmHg at fine intervals.
+          <a href="https://www.iso.org/standard/7473.html" target="_blank" rel="noopener">ISO&nbsp;Store&nbsp;&nearr;</a>
+        </li>
+        <li>
+          <strong>Addendum&nbsp;2:1997</strong> &mdash;
+          Extension of the altitude range to &minus;5,000 m (from &minus;2,000 m),
+          and standard atmosphere tables as a function of altitude in feet
+          (&minus;16,500 ft to 262,500 ft).
+          <a href="https://www.iso.org/standard/7474.html" target="_blank" rel="noopener">ISO&nbsp;Store&nbsp;&nearr;</a>
+        </li>
+        <li>
+          <strong>ISO 2533:2026</strong> &mdash;
+          Second edition that cancels and replaces the 1975 first edition.
+          Incorporates all addenda and errata, extends the lower altitude range to
+          &minus;5 km, adds hypsometrical tables in hPa, and recalculates all values
+          using modern computational methods with improved accuracy.
+          <a href="https://www.iso.org/standard/90293.html" target="_blank" rel="noopener">ISO&nbsp;Store&nbsp;&nearr;</a>
+        </li>
       </ul>
     </section>
 
@@ -407,24 +433,58 @@ useSeo({
           <div>
             <h2>Get the Official Standard</h2>
             <p>
-              Purchase the ISO 2533 Standard Atmosphere documents from the ISO Store
-              for the complete specification, all equations, and authoritative reference tables.
+              Purchase the ISO 2533 documents from the ISO Store for the complete specification,
+              all equations, and authoritative reference tables.
             </p>
           </div>
         </div>
-        <div class="iso-purchase-links">
-          <a href="https://www.iso.org/standard/90293.html" target="_blank" rel="noopener" class="btn btn-primary iso-purchase-btn">
-            Purchase ISO/DIS 2533
-          </a>
-          <a href="https://www.iso.org/standard/7472.html" target="_blank" rel="noopener" class="btn btn-primary iso-purchase-btn">
-            Purchase ISO 2533:1975
-          </a>
-          <a href="https://www.iso.org/standard/7473.html" target="_blank" rel="noopener" class="btn btn-primary iso-purchase-btn">
-            Purchase Addendum 1 (1985)
-          </a>
-          <a href="https://www.iso.org/standard/7474.html" target="_blank" rel="noopener" class="btn btn-primary iso-purchase-btn">
-            Purchase Addendum 2 (1997)
-          </a>
+
+        <!-- Latest revision -->
+        <div class="iso-purchase-group">
+          <h3 class="iso-purchase-group-title">Current revision</h3>
+          <div class="iso-purchase-item">
+            <div class="iso-purchase-item-desc">
+              <strong>ISO/DIS 2533</strong> &mdash;
+              Second edition that cancels and replaces ISO 2533:1975 and all its addenda.
+              Covers &minus;5 km to 80 km, includes hypsometrical tables, and recalculates
+              all values using modern computational methods.
+            </div>
+            <a href="https://www.iso.org/standard/90293.html" target="_blank" rel="noopener" class="btn btn-primary iso-purchase-btn">
+              Purchase ISO/DIS 2533
+            </a>
+          </div>
+        </div>
+
+        <!-- Legacy documents -->
+        <div class="iso-purchase-group iso-purchase-legacy">
+          <h3 class="iso-purchase-group-title">Previous edition (superseded by ISO/DIS 2533)</h3>
+          <div class="iso-purchase-item">
+            <div class="iso-purchase-item-desc">
+              <strong>ISO 2533:1975</strong> &mdash;
+              First edition. Standard Atmosphere from &minus;2 km to 80 km geopotential altitude.
+            </div>
+            <a href="https://www.iso.org/standard/7472.html" target="_blank" rel="noopener" class="btn btn-outline iso-purchase-btn-legacy">
+              ISO Store
+            </a>
+          </div>
+          <div class="iso-purchase-item">
+            <div class="iso-purchase-item-desc">
+              <strong>Addendum 1:1985</strong> &mdash;
+              Hypsometrical tables for instrument calibration (pressure to altitude in hPa and mmHg).
+            </div>
+            <a href="https://www.iso.org/standard/7473.html" target="_blank" rel="noopener" class="btn btn-outline iso-purchase-btn-legacy">
+              ISO Store
+            </a>
+          </div>
+          <div class="iso-purchase-item">
+            <div class="iso-purchase-item-desc">
+              <strong>Addendum 2:1997</strong> &mdash;
+              Extension to &minus;5,000 m and atmosphere tables in feet.
+            </div>
+            <a href="https://www.iso.org/standard/7474.html" target="_blank" rel="noopener" class="btn btn-outline iso-purchase-btn-legacy">
+              ISO Store
+            </a>
+          </div>
         </div>
       </div>
     </section>
