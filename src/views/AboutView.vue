@@ -1,68 +1,218 @@
 <script setup>
+import { ref } from 'vue'
 import { useSeo } from '@/composables/useSeo'
 
 useSeo({
   title: 'About Atmospheris',
-  description: 'About Atmospheris — the open-source reference implementation of ISO 2533 Standard Atmosphere, published by Ribose.',
+  description: 'Atmospheris — Atmosphere + International Standard. The open-source reference implementation of ISO 2533 Standard Atmosphere, published by Ribose.',
   path: '/about'
 })
+
+const expanded = ref(new Set())
+
+function toggle(key) {
+  const s = new Set(expanded.value)
+  if (s.has(key)) s.delete(key)
+  else s.add(key)
+  expanded.value = s
+}
 </script>
 
 <template>
-  <div class="content-page">
-    <h1>About Atmospheris</h1>
-    <p class="content-lead">
-      Atmospheris is the open-source reference implementation of the
-      ISO 2533 Standard Atmosphere model, providing accurate atmospheric
-      property calculations for engineers, scientists, and developers.
-    </p>
-
-    <section class="section">
-      <div class="about-card">
-        <h2 class="section-title">The Project</h2>
-        <p>
-          Atmospheris started as a Ruby gem implementing the complete set of ISA calculations
-          defined in ISO 2533. It provides a comprehensive API for computing atmospheric
-          properties at any altitude, supporting both normal and reduced precision modes,
-          multiple unit systems, and reverse pressure-to-altitude lookup.
-        </p>
-        <p>
-          A TypeScript library extends the same calculations to JavaScript environments,
-          enabling web applications, Node.js services, and interactive calculators like this one.
-        </p>
-        <p>
-          The library is cited in the upcoming ISO 2533:2026 revision as the reference
-          implementation, making it the authoritative source for programmatic ISA calculations.
+  <div>
+    <!-- Hero: Name Origin -->
+    <section class="about-hero">
+      <div class="about-hero-content">
+        <p class="about-eyebrow">About</p>
+        <h1 class="about-name">Atmospher<span class="name-accent">is</span></h1>
+        <div class="name-etymology">
+          <span class="etym-from">Atmospher<sup>e</sup></span>
+          <span class="etym-plus">+</span>
+          <span class="etym-accent">IS</span>
+        </div>
+        <p class="etym-note">International Standard</p>
+        <p class="about-tagline">
+          Serving atmospheric resources compliant with international standards.
         </p>
       </div>
     </section>
 
-    <section class="section">
-      <div class="about-card">
-        <h2 class="section-title">Ribose</h2>
-        <p>
-          Ribose is a technology company specializing in standards development and
-          open-source software. Ribose develops and maintains Atmospheris as part of
-          its commitment to making international standards more accessible and practically
-          useful for the engineering and scientific community.
+    <!-- Mission -->
+    <section class="about-section">
+      <div class="about-section-inner">
+        <h2 class="about-section-title">Our Mission</h2>
+        <p class="about-mission-text">
+          Atmospheris provides the authoritative open-source implementation of the
+          ISO 2533 Standard Atmosphere model &mdash; a reference framework used worldwide
+          in aerospace engineering, atmospheric science, and industrial applications.
         </p>
         <p>
-          <a href="https://www.ribose.com" target="_blank" rel="noopener">ribose.com</a>
+          We make the International Standard Atmosphere accessible through
+          interactive calculation tools, comprehensive libraries, and transparent,
+          verifiable algorithms that anyone can inspect, use, and contribute to.
         </p>
       </div>
     </section>
 
-    <section class="section">
-      <div class="about-card">
-        <h2 class="section-title">Open Source</h2>
+    <!-- Three Pillars -->
+    <section class="about-section about-section-alt">
+      <div class="about-section-inner">
+        <h2 class="about-section-title">What We Build</h2>
+        <div class="pillars-grid">
+          <div class="pillar-card">
+            <div class="pillar-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+            </div>
+            <h3>Open-Source Libraries</h3>
+            <p>Reference implementations in Ruby and TypeScript, providing the complete set of ISA calculations defined in ISO 2533.</p>
+            <div class="pillar-detail">
+              <button class="pillar-toggle" @click="toggle('libs')">
+                {{ expanded.has('libs') ? 'Show less' : 'Learn more' }}
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline :points="expanded.has('libs') ? '18 15 12 9 6 15' : '6 9 12 15 18 9'"/></svg>
+              </button>
+              <div v-if="expanded.has('libs')" class="pillar-expanded">
+                <ul>
+                  <li>19+ atmospheric properties computed per altitude</li>
+                  <li>Altitude range: &minus;2,000&thinsp;m to 80,000&thinsp;m geopotential</li>
+                  <li>Normal and reduced precision modes</li>
+                  <li>Reverse pressure-to-altitude lookup</li>
+                  <li>Multiple unit systems (SI, imperial, aviation)</li>
+                  <li>Cited in the upcoming ISO 2533:2026 revision</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div class="pillar-card">
+            <div class="pillar-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+            </div>
+            <h3>Interactive Calculator</h3>
+            <p>A professional web calculator with 3D atmosphere visualization, 2D charts, table generation, and unit-aware property display.</p>
+            <div class="pillar-detail">
+              <button class="pillar-toggle" @click="toggle('calc')">
+                {{ expanded.has('calc') ? 'Show less' : 'Learn more' }}
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline :points="expanded.has('calc') ? '18 15 12 9 6 15' : '6 9 12 15 18 9'"/></svg>
+              </button>
+              <div v-if="expanded.has('calc')" class="pillar-expanded">
+                <ul>
+                  <li>Altitude-to-properties and pressure-to-altitude modes</li>
+                  <li>3D interactive atmosphere column (Three.js)</li>
+                  <li>2D scientific charts (temperature, pressure, density vs altitude)</li>
+                  <li>Custom table generator with configurable ranges</li>
+                  <li>Per-row unit toggles (metric / imperial)</li>
+                  <li>Export to CSV, copy-to-clipboard, print layout</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div class="pillar-card">
+            <div class="pillar-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8"/></svg>
+            </div>
+            <h3>Standards Documentation</h3>
+            <p>Comprehensive reference materials covering ISO 2533 constants, formulas, temperature layers, symbols, and related standards.</p>
+            <div class="pillar-detail">
+              <button class="pillar-toggle" @click="toggle('docs')">
+                {{ expanded.has('docs') ? 'Show less' : 'Learn more' }}
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline :points="expanded.has('docs') ? '18 15 12 9 6 15' : '6 9 12 15 18 9'"/></svg>
+              </button>
+              <div v-if="expanded.has('docs')" class="pillar-expanded">
+                <ul>
+                  <li>Complete symbol and variable reference</li>
+                  <li>All 8 temperature layers with base values</li>
+                  <li>Pressure and temperature formulas per layer type</li>
+                  <li>Related standards comparison (ICAO, US 1976, WMO)</li>
+                  <li>Bibliography of key references</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Standards Compliance -->
+    <section class="about-section">
+      <div class="about-section-inner">
+        <h2 class="about-section-title">Standards Compliance</h2>
+        <div class="standards-banner">
+          <p class="standards-banner-highlight">
+            Atmospheris is cited in the upcoming <strong>ISO 2533:2026</strong> revision
+            as the reference implementation for programmatic ISA calculations.
+          </p>
+          <p>
+            The implementation follows the complete specification of ISO 2533:1975
+            (including Addenda 1:1985 and 2:1997), providing results identical to
+            the published reference tables.
+          </p>
+          <router-link to="/iso-2533" class="btn btn-outline-dark about-cta">
+            Learn about ISO 2533
+          </router-link>
+        </div>
+      </div>
+    </section>
+
+    <!-- Published by Ribose -->
+    <section class="about-section about-section-alt">
+      <div class="about-section-inner">
+        <h2 class="about-section-title">Published by</h2>
+        <div class="ribose-card">
+          <a href="https://www.ribose.com" target="_blank" rel="noopener" class="ribose-logo-link" aria-label="Ribose">
+            <svg class="ribose-logo" viewBox="0 0 800 200.4" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+              <path d="M72.4,12.5h14.5l7.2,12.5h14.5l7.2,12.5-7.2,12.6,7.2,12.5-7.2,12.5,7.2,12.5-7.2,12.5h-14.5l-7.2,12.5,7.2,12.5h14.5l7.2,12.6-7.2,12.5,7.2,12.5-7.2,12.5,7.2,12.5-7,12.5h-14.5l-7.5-12.5,7.2-12.5-7.2-12.5,7.2-12.5-7.2-12.5h-14.5l-7.2-12.6h-14.4l-7.2-12.5h-14.5l-7.2,12.5,7.2,12.6-7.2,12.5,7.2,12.5-7.2,12.5,7.2,12.5-7,12.5H7.5L0,187.9l7.2-12.5L0,162.8l7.2-12.5L0,137.8l7.2-12.6L0,112.7l7.2-12.5L0,87.7l7.2-12.5L0,62.6l7.2-12.5L0,37.6l7.2-12.5h14.5l7.2-12.5h14.5L50.7,0h14.4l7.2,12.5ZM50.7,100.2h14.4l7.2-12.5h14.5l7.2-12.5-7.2-12.5,7.2-12.5-7.2-12.6h-14.5l-7.2-12.5h-14.4l-7.2,12.5h-14.5l-7.2,12.6,7.2,12.5-7.2,12.5,7.2,12.5h14.5l7.2,12.5Z"/>
+              <path d="M188.1,37.6l-7.2,12.6h-14.4l-7.2-12.6,7.2-12.5h14.4l7.2,12.5ZM188.1,87.7l-7.2,12.5,7.2,12.5-7.2,12.5,7.2,12.6-7.2,12.5,7.2,12.5-7.2,12.5,7.2,12.5-7,12.5h-14.4l-7.5-12.5,7.2-12.5-7.2-12.5,7.2-12.5-7.2-12.5,7.2-12.6-7.2-12.5,7.2-12.5-7.2-12.5,7.2-12.5h14.4l7.2,12.5Z"/>
+              <path d="M264,12.5l-7.2,12.5,7.2,12.5-7.2,12.6,7.2,12.5-7.2,12.5,7.2,12.5h14.5l7.2-12.5h14.5l7.2,12.5h14.5l7.2,12.5h14.4l7.2,12.5-7.2,12.5,7.2,12.6-7.2,12.5,7.2,12.5-7.2,12.5h-14.4l-7.2,12.5h-14.5l-7,12.5h-14.5l-7.5-12.5h-14.5l-7,12.5h-14.5l-7.5-12.5,7.2-12.5-7.2-12.5,7.2-12.5-7.2-12.5,7.2-12.6-7.2-12.5,7.2-12.5-7.2-12.5,7.2-12.5-7.2-12.5,7.2-12.5-7.2-12.6,7.2-12.5-7.2-12.5L242.3,0h14.4l7.2,12.5ZM329.1,150.3l-7.2-12.5,7.2-12.6-7.2-12.5h-14.5l-7.2-12.5h-14.5l-7.2,12.5h-14.5l-7.2,12.5,7.2,12.6-7.2,12.5,7.2,12.5h14.5l7.2,12.5h14.5l7.2-12.5h14.5l7.2-12.5Z"/>
+              <path d="M413.8,87.7h14.5l7.2-12.5h14.4l7.2,12.5h14.5l7.2,12.5h14.5l7.2,12.5-7.2,12.5,7.2,12.6-7.2,12.5,7.2,12.5-7.2,12.5h-14.5l-7.2,12.5h-14.5l-7,12.5h-14.4l-7.5-12.5h-14.5l-7.2-12.5h-14.5l-7.2-12.5,7.2-12.5-7.2-12.5,7.2-12.6-7.2-12.5,7.2-12.5h14.5l7.2-12.5ZM413.8,137.8l-7.2,12.5,7.2,12.5h14.5l7.2,12.5h14.4l7.2-12.5h14.5l7.2-12.5-7.2-12.5,7.2-12.6-7.2-12.5h-14.5l-7.2-12.5h-14.4l-7.2,12.5h-14.5l-7.2,12.5,7.2,12.6Z"/>
+              <path d="M563.2,87.7h14.5l7.2-12.5h14.5l7.2,12.5h14.5l7.2,12.5h14.5l7.2,12.5-7.2,12.5h-14.5l-7.2-12.5h-14.5l-7.2-12.5h-14.5l-7.2,12.5,7.2,12.5h14.5l7.2,12.6h14.5l7.2,12.5h14.5l7.2,12.5-7.2,12.5h-14.5l-7.2,12.5h-14.5l-7,12.5h-14.5l-7.5-12.5h-14.5l-7.2-12.5h-14.5l-7.2-12.5,7.2-12.5h14.5l7.2,12.5h14.5l7.2,12.5h14.5l7.2-12.5-7.2-12.5h-14.5l-7.2-12.5h-14.5l-7.2-12.6h-14.5l-7.2-12.5,7.2-12.5h14.5l7.2-12.5Z"/>
+              <path d="M713.2,87.7h14.5l7.2-12.5h14.5l7.2,12.5h14.5l7.2,12.5h14.5l7.2,12.5-7.2,12.5h-14.5l-7.2,12.6h-14.5l-7.2,12.5h-14.5l-7.2-12.5,7.2-12.6h14.5l7.2-12.5-7.2-12.5h-14.5l-7.2,12.5h-14.5l-7.2,12.5,7.2,12.6-7.2,12.5,7.2,12.5h14.5l7.2,12.5h14.5l7.2-12.5h14.5l7.2-12.5h14.5l7.2,12.5-7.2,12.5h-14.5l-7.2,12.5h-14.5l-6.9,12.5h-14.5l-7.5-12.5h-14.5l-7.2-12.5h-14.5l-7.2-12.5,7.2-12.5-7.2-12.5,7.2-12.6-7.2-12.5,7.2-12.5h14.5l7.2-12.5Z"/>
+            </svg>
+          </a>
+          <div class="ribose-text">
+            <p>
+              Ribose is a technology company specializing in standards development and
+              open-source software. Ribose develops and maintains Atmospheris as part of
+              its commitment to making international standards more accessible and practically
+              useful for the engineering and scientific community.
+            </p>
+            <p>
+              Ribose is also the author of Metanorma, UniDoc, Plurimath, and other
+              open-source tools that bridge the gap between international standards and software.
+            </p>
+            <a href="https://www.ribose.com" target="_blank" rel="noopener" class="about-external-link">
+              ribose.com
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3"/></svg>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Open Source -->
+    <section class="about-section">
+      <div class="about-section-inner">
+        <h2 class="about-section-title">Open Source</h2>
         <p>
-          Atmospheris is released under the BSD-2-Clause license, allowing free use in
-          both open-source and commercial projects.
+          Atmospheris is released under the <strong>BSD-2-Clause</strong> license, allowing
+          free use in both open-source and commercial projects.
         </p>
-        <ul class="content-list">
-          <li><a href="https://github.com/riboseinc/atmospheris" target="_blank" rel="noopener">Ruby gem on GitHub</a></li>
-          <li><a href="https://www.npmjs.com/package/atmospheris" target="_blank" rel="noopener">TypeScript package on npm</a></li>
-        </ul>
+        <div class="oss-links">
+          <a href="https://github.com/riboseinc/atmospheris" target="_blank" rel="noopener" class="oss-link-card">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+            <div>
+              <strong>Ruby Gem on GitHub</strong>
+              <span>riboseinc/atmospheris</span>
+            </div>
+          </a>
+          <a href="https://www.npmjs.com/package/atmospheris" target="_blank" rel="noopener" class="oss-link-card">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+            <div>
+              <strong>TypeScript on npm</strong>
+              <span>npmjs.com/atmospheris</span>
+            </div>
+          </a>
+        </div>
       </div>
     </section>
   </div>
