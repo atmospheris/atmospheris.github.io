@@ -90,7 +90,7 @@ puts result.density               #=> 0.4135 kg/m³`
     </p>
     <div class="hero-actions">
       <router-link to="/calculator" class="btn btn-primary">Open Calculator</router-link>
-      <a href="https://github.com/riboseinc/atmospheris" target="_blank" rel="noopener" class="btn btn-outline">View on GitHub</a>
+      <a href="https://github.com/atmospheris/" target="_blank" rel="noopener" class="btn btn-outline">View on GitHub</a>
     </div>
   </HeroSection>
 

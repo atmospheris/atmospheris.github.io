@@ -31,7 +31,7 @@ const year = new Date().getFullYear()
 
         <div class="footer-column">
           <h4>Development</h4>
-          <a href="https://github.com/riboseinc/atmospheris" target="_blank" rel="noopener">Ruby Gem</a>
+          <a href="https://github.com/atmospheris/" target="_blank" rel="noopener">Ruby Gem</a>
           <a href="https://www.npmjs.com/package/atmospheris" target="_blank" rel="noopener">npm Package</a>
           <a href="https://github.com/riboseinc" target="_blank" rel="noopener">Ribose GitHub</a>
         </div>
