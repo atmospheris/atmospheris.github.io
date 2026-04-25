@@ -683,13 +683,23 @@
   width: 100%;
 }
 
+.altitude-type-label {
+  font-size: 9px;
+  color: rgba(255, 255, 255, 0.4);
+  font-family: var(--font-mono);
+  white-space: nowrap;
+  margin-bottom: 4px;
+  text-align: center;
+}
+
 .altitude-slider {
   writing-mode: vertical-lr;
   direction: rtl;
-  -webkit-appearance: none;
-  appearance: none;
+  -webkit-appearance: slider-vertical;
+  appearance: slider-vertical;
   background: transparent;
   width: 20px;
+  height: 100%;
   flex-shrink: 0;
   cursor: pointer;
   margin: 4px 0;

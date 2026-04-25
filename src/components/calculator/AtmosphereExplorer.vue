@@ -440,6 +440,7 @@ onUnmounted(() => {
 
     <!-- Side controls: altitude slider + number input -->
     <div v-if="!fallback" class="explorer-controls">
+      <div class="altitude-type-label">H (geopotential)</div>
       <div class="altitude-slider-track">
         <input
           type="range"
@@ -475,7 +476,7 @@ onUnmounted(() => {
 
     <!-- Overlay with current altitude properties -->
     <div v-if="overlayData && !fallback" class="explorer-overlay">
-      <h4>Current Altitude</h4>
+      <h4>Geopotential Altitude (H)</h4>
       <div class="altitude-display">
         {{ overlayData.altitude.toLocaleString() }} m
         <span class="altitude-ft">({{ overlayData.altitudeFt.toLocaleString() }} ft)</span>

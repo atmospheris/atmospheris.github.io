@@ -37,8 +37,24 @@ const year = new Date().getFullYear()
       </div>
 
       <div class="footer-bottom">
-        <span>&copy; {{ year }} Ribose Inc. All rights reserved. BSD-2-Clause License.</span>
-        <span>Published by <a href="https://www.ribose.com" target="_blank" rel="noopener" class="footer-link">Ribose</a></span>
+        <div class="footer-bottom-left">
+          <span class="footer-copyright">&copy; {{ year }}</span>
+          <a href="https://www.ribose.com" target="_blank" rel="noopener" class="footer-ribose-link">
+            <img src="/ribose-logo.svg" alt="Ribose" class="footer-ribose-logo">
+          </a>
+        </div>
+        <div class="footer-bottom-center">
+          <span class="footer-standard-badge">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            Reference implementation for ISO 2533:2026
+          </span>
+        </div>
+        <div class="footer-bottom-right">
+          <a href="https://opensource.org/licenses/BSD-2-Clause" target="_blank" rel="noopener" class="footer-license-link">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg>
+            BSD-2-Clause License
+          </a>
+        </div>
       </div>
     </div>
   </footer>
