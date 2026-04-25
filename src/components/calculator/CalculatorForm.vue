@@ -8,7 +8,7 @@ const emit = defineEmits(['calculate'])
 const route = useRoute()
 
 const mode = ref('altitude')
-const altitudeValue = ref(0)
+const altitudeValue = ref(-2000)
 const altitudeUnit = ref('meters')
 const altitudeType = ref('geopotential')
 const pressureValue = ref(1013.25)
@@ -100,6 +100,12 @@ const presets = [
 const altitudeRange = computed(() => {
   if (altitudeUnit.value === 'meters') return { min: -2000, max: 80000, step: 100 }
   return { min: -6562, max: 262467, step: 328 }
+})
+
+const altitudeRangeHint = computed(() => {
+  return altitudeUnit.value === 'meters'
+    ? '(-2,000 to 80,000 m)'
+    : '(-6,562 to 262,467 ft)'
 })
 
 // Property groups for the dropdown
@@ -225,22 +231,20 @@ onMounted(() => {
     <!-- Altitude mode -->
     <template v-if="mode === 'altitude'">
       <div class="input-group">
-        <label>Altitude</label>
-        <input
-          type="number"
-          v-model.number="altitudeValue"
-          :min="altitudeRange.min"
-          :max="altitudeRange.max"
-          :step="altitudeRange.step"
-          @input="doCalculate"
-        />
-      </div>
-
-      <div class="input-group">
-        <label>Unit</label>
-        <div class="radio-pills">
-          <button :class="{ active: altitudeUnit === 'meters' }" @click="altitudeUnit = 'meters'; doCalculate()">m</button>
-          <button :class="{ active: altitudeUnit === 'feet' }" @click="altitudeUnit = 'feet'; doCalculate()">ft</button>
+        <label>Altitude <span class="range-hint">{{ altitudeRangeHint }}</span></label>
+        <div class="input-composite">
+          <input
+            type="number"
+            v-model.number="altitudeValue"
+            :min="altitudeRange.min"
+            :max="altitudeRange.max"
+            :step="altitudeRange.step"
+            @input="doCalculate"
+          />
+          <div class="unit-segment">
+            <button :class="{ active: altitudeUnit === 'meters' }" @click="altitudeUnit = 'meters'; doCalculate()">m</button>
+            <button :class="{ active: altitudeUnit === 'feet' }" @click="altitudeUnit = 'feet'; doCalculate()">ft</button>
+          </div>
         </div>
       </div>
 
@@ -291,23 +295,18 @@ onMounted(() => {
     <!-- Pressure mode -->
     <template v-else-if="mode === 'pressure'">
       <div class="input-group">
-        <label>Pressure</label>
-        <input
-          type="number"
-          v-model.number="pressureValue"
-          step="0.01"
-          @input="doCalculate"
-        />
-        <div class="property-range-hint">
-          {{ pressureUnit === 'mbar' ? 'Range: 0.01 – 1,013.25 mbar' : 'Range: 0.01 – 760.00 mmHg' }}
-        </div>
-      </div>
-
-      <div class="input-group">
-        <label>Unit</label>
-        <div class="radio-pills">
-          <button :class="{ active: pressureUnit === 'mbar' }" @click="pressureUnit = 'mbar'; doCalculate()">mbar</button>
-          <button :class="{ active: pressureUnit === 'mmHg' }" @click="pressureUnit = 'mmHg'; doCalculate()">mmHg</button>
+        <label>Pressure <span class="range-hint">{{ pressureUnit === 'mbar' ? '0.01 – 1,013.25 mbar' : '0.01 – 760.00 mmHg' }}</span></label>
+        <div class="input-composite">
+          <input
+            type="number"
+            v-model.number="pressureValue"
+            step="0.01"
+            @input="doCalculate"
+          />
+          <div class="unit-segment">
+            <button :class="{ active: pressureUnit === 'mbar' }" @click="pressureUnit = 'mbar'; doCalculate()">mbar</button>
+            <button :class="{ active: pressureUnit === 'mmHg' }" @click="pressureUnit = 'mmHg'; doCalculate()">mmHg</button>
+          </div>
         </div>
       </div>
 

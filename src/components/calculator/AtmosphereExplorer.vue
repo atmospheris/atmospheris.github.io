@@ -3,7 +3,7 @@ import { ref, onMounted, onUnmounted, watch } from 'vue'
 import { IsaAlgorithms, kelvinToCelsius, paToMbar, mToFeet } from 'atmospheris'
 
 const props = defineProps({
-  altitude: { type: Number, default: 0 },
+  altitude: { type: Number, default: -2000 },
   unit: { type: String, default: 'meters' }
 })
 
@@ -12,6 +12,8 @@ const emit = defineEmits(['update:altitude'])
 const containerRef = ref(null)
 const fallback = ref(false)
 const overlayData = ref(null)
+const altType = ref('H') // 'H' = geopotential, 'h' = geometric
+const R = 6356766 // Nominal Earth radius
 
 let THREE = null
 let scene, camera, renderer, controls
@@ -23,6 +25,8 @@ let isHovering = false
 let raycaster = null
 let raycastTargets = []
 let isTouchPrimary = false
+let resizeObserver = null
+let sliderObserver = null
 
 // Drag state
 let dragStartClientY = 0
@@ -41,13 +45,13 @@ function altToY(alt) {
 }
 
 const layers = [
-  { name: 'Troposphere', from: -2000, to: 11000, color: 0x3b82f6, opacity: 0.25 },
-  { name: 'Tropopause', from: 11000, to: 20000, color: 0x6366f1, opacity: 0.15 },
-  { name: 'Stratosphere', from: 20000, to: 32000, color: 0x8b5cf6, opacity: 0.2 },
-  { name: 'Upper Strat.', from: 32000, to: 47000, color: 0xa855f7, opacity: 0.2 },
-  { name: 'Stratopause', from: 47000, to: 51000, color: 0xc084fc, opacity: 0.15 },
-  { name: 'Mesosphere', from: 51000, to: 71000, color: 0x1e1b4b, opacity: 0.25 },
-  { name: 'Thermosphere', from: 71000, to: 80000, color: 0x0f0b2e, opacity: 0.3 },
+  { name: 'Troposphere', from: -2000, to: 11000, color: 0x2c84bf, opacity: 0.25 },
+  { name: 'Tropopause', from: 11000, to: 20000, color: 0x33588e, opacity: 0.15 },
+  { name: 'Stratosphere', from: 20000, to: 32000, color: 0x33588e, opacity: 0.2 },
+  { name: 'Upper Strat.', from: 32000, to: 47000, color: 0x1f2b3e, opacity: 0.2 },
+  { name: 'Stratopause', from: 47000, to: 51000, color: 0x33588e, opacity: 0.15 },
+  { name: 'Mesosphere', from: 51000, to: 71000, color: 0x1f2b3e, opacity: 0.25 },
+  { name: 'Thermosphere', from: 71000, to: 80000, color: 0x15202e, opacity: 0.3 },
 ]
 
 const milestones = [
@@ -64,9 +68,12 @@ function getOverlayData(altMeters) {
   const pres = isa.pressureFromGeopotential(altMeters)
   const dens = isa.densityFromGeopotential(altMeters)
   const sos = isa.speedOfSound(altMeters)
+  const geoZ = altMeters > 0 ? R * altMeters / (R - altMeters) : altMeters
   return {
-    altitude: altMeters,
-    altitudeFt: mToFeet(altMeters),
+    geoH: altMeters,
+    geoH_ft: mToFeet(altMeters),
+    geoZ,
+    geoZ_ft: mToFeet(geoZ),
     temperature: temp.toFixed(1),
     tempC: kelvinToCelsius(temp).toFixed(1),
     pressure: paToMbar(pres).toFixed(2),
@@ -98,7 +105,8 @@ function adjustZoom(factor) {
 
 watch(() => props.altitude, (newAlt) => {
   if (isDragging) return
-  const y = altToY(newAlt || 0)
+  const alt = newAlt ?? -2000
+  const y = altToY(alt)
   if (altitudeMarker) altitudeMarker.position.y = y
   if (markerGlow) markerGlow.position.y = y
   // Follow the marker with the camera target
@@ -106,7 +114,7 @@ watch(() => props.altitude, (newAlt) => {
     controls.target.y = y
   }
   if (newAlt !== undefined && newAlt !== null) {
-    overlayData.value = getOverlayData(newAlt || 0)
+    overlayData.value = getOverlayData(newAlt ?? -2000)
   }
 }, { immediate: true })
 
@@ -116,6 +124,8 @@ onMounted(async () => {
     window.matchMedia('(hover: none)').matches
   try {
     THREE = await import('three')
+    // Wait for layout to settle — ensures containerRef has correct dimensions
+    await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)))
     await buildScene(THREE)
   } catch (e) {
     console.warn('WebGL not available:', e)
@@ -124,21 +134,33 @@ onMounted(async () => {
 })
 
 async function buildScene(THREE) {
+  // Ensure container has dimensions
+  if (!containerRef.value || containerRef.value.clientHeight < 10) {
+    await new Promise(resolve => setTimeout(resolve, 50))
+  }
+  const cw = containerRef.value.clientWidth
+  const ch = containerRef.value.clientHeight
+  if (cw < 10 || ch < 10) {
+    console.warn('Explorer container too small:', cw, 'x', ch)
+    fallback.value = true
+    return
+  }
+
   scene = new THREE.Scene()
-  scene.background = new THREE.Color(0x030712)
+  scene.background = new THREE.Color(0x0a1520)
 
   camera = new THREE.PerspectiveCamera(
     50,
-    containerRef.value.clientWidth / containerRef.value.clientHeight,
+    cw / ch,
     0.1,
     100
   )
-  const markerY = altToY(props.altitude || 0)
+  const markerY = altToY(props.altitude ?? -2000)
   camera.position.set(8, markerY, 8)
   camera.lookAt(0, markerY, 0)
 
   renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false })
-  renderer.setSize(containerRef.value.clientWidth, containerRef.value.clientHeight)
+  renderer.setSize(cw, ch)
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
   renderer.domElement.style.touchAction = 'none'
   containerRef.value.appendChild(renderer.domElement)
@@ -156,7 +178,7 @@ async function buildScene(THREE) {
     if (e.pointerType === 'touch') {
       isDragging = true
       dragStartClientY = e.clientY
-      dragStartAlt = props.altitude || 0
+      dragStartAlt = props.altitude ?? -2000
       el.setPointerCapture(e.pointerId)
       if (altitudeMarker) altitudeMarker.material.opacity = 1.0
       if (markerGlow) markerGlow.material.opacity = 0.3
@@ -166,21 +188,20 @@ async function buildScene(THREE) {
       return
     }
 
-    // Desktop: right-click or middle-click → pass to OrbitControls
+    // Desktop: right-click or middle-click → let OrbitControls handle it
     if (e.button !== 0) return
 
     // Desktop: left-click → altitude drag (entire canvas)
+    // Disable OrbitControls so it ignores this left-click
     isDragging = true
     if (controls) controls.enabled = false
     dragStartClientY = e.clientY
-    dragStartAlt = props.altitude || 0
+    dragStartAlt = props.altitude ?? -2000
     el.style.cursor = 'grabbing'
     el.setPointerCapture(e.pointerId)
     if (altitudeMarker) altitudeMarker.material.opacity = 1.0
     if (markerGlow) markerGlow.material.opacity = 0.3
     if (handleMesh) handleMesh.scale.setScalar(1.4)
-    e.stopImmediatePropagation()
-    e.preventDefault()
   }
 
   function onPointerMove(e) {
@@ -220,12 +241,15 @@ async function buildScene(THREE) {
   function onPointerUp(e) {
     if (!isDragging) return
     isDragging = false
-    if (controls) controls.enabled = true
     el.style.cursor = 'default'
     try { el.releasePointerCapture(e.pointerId) } catch (_) {}
     if (altitudeMarker) altitudeMarker.material.opacity = 0.9
     if (markerGlow) markerGlow.material.opacity = 0.12
     if (handleMesh) handleMesh.scale.setScalar(1.0)
+    // Re-enable controls after OrbitControls has processed its own pointerup
+    if (controls) {
+      queueMicrotask(() => { controls.enabled = true })
+    }
   }
 
   function onPointerLeave() {
@@ -254,6 +278,13 @@ async function buildScene(THREE) {
   controls.maxPolarAngle = Math.PI * 0.8
   controls.minPolarAngle = Math.PI * 0.2
   controls.target.set(0, markerY, 0)
+  // Remap mouse buttons: right-click = orbit, left-click handled by our altitude drag
+  // Use numeric constants: ROTATE=0, DOLLY=1, PAN=2
+  controls.mouseButtons = {
+    LEFT: -1,
+    MIDDLE: 1,
+    RIGHT: 0
+  }
 
   // Touch devices: disable orbit entirely (altitude via swipe, zoom via buttons)
   if (isTouchPrimary) {
@@ -262,7 +293,7 @@ async function buildScene(THREE) {
   }
 
   // Lights
-  scene.add(new THREE.AmbientLight(0x6366f1, 0.4))
+  scene.add(new THREE.AmbientLight(0x33588e, 0.4))
   const dirLight = new THREE.DirectionalLight(0xffffff, 0.6)
   dirLight.position.set(5, 10, 7)
   scene.add(dirLight)
@@ -291,7 +322,7 @@ async function buildScene(THREE) {
   boundaryAlts.forEach(alt => {
     const y = altToY(alt)
     const lineGeo = new THREE.BoxGeometry(COLUMN_WIDTH + 0.6, 0.015, COLUMN_DEPTH + 0.2)
-    const lineMat = new THREE.MeshBasicMaterial({ color: 0x818cf8, transparent: true, opacity: 0.35 })
+    const lineMat = new THREE.MeshBasicMaterial({ color: 0x7abae5, transparent: true, opacity: 0.35 })
     const line = new THREE.Mesh(lineGeo, lineMat)
     line.position.y = y
     column.add(line)
@@ -305,7 +336,7 @@ async function buildScene(THREE) {
     label.position.set(-COLUMN_WIDTH / 2 - 2.5, y, 0)
     column.add(label)
     const dotGeo = new THREE.SphereGeometry(0.05, 8, 8)
-    const dotMat = new THREE.MeshBasicMaterial({ color: 0x818cf8 })
+    const dotMat = new THREE.MeshBasicMaterial({ color: 0x7abae5 })
     const dot = new THREE.Mesh(dotGeo, dotMat)
     dot.position.set(-COLUMN_WIDTH / 2, y, 0)
     column.add(dot)
@@ -323,7 +354,7 @@ async function buildScene(THREE) {
   const particleGeo = new THREE.BufferGeometry()
   particleGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3))
   const particleMat = new THREE.PointsMaterial({
-    color: 0x818cf8, size: 0.04, transparent: true, opacity: 0.6,
+    color: 0x7abae5, size: 0.04, transparent: true, opacity: 0.6,
     sizeAttenuation: true, blending: THREE.AdditiveBlending, depthWrite: false
   })
   particleSystem = new THREE.Points(particleGeo, particleMat)
@@ -336,7 +367,7 @@ async function buildScene(THREE) {
     color: 0xf59e0b, transparent: true, opacity: 0.9, side: THREE.DoubleSide
   })
   altitudeMarker = new THREE.Mesh(markerGeo, markerMat)
-  altitudeMarker.position.y = altToY(props.altitude || 0)
+  altitudeMarker.position.y = altToY(props.altitude ?? -2000)
   scene.add(altitudeMarker)
 
   // Handle sphere
@@ -367,16 +398,33 @@ async function buildScene(THREE) {
   markerGlow.position.y = altitudeMarker.position.y
   scene.add(markerGlow)
 
-  // Resize
-  function onResize() {
-    if (!containerRef.value) return
-    const w = containerRef.value.clientWidth
-    const h = containerRef.value.clientHeight
-    camera.aspect = w / h
-    camera.updateProjectionMatrix()
-    renderer.setSize(w, h)
+  // Resize — use ResizeObserver for reliable dimension tracking
+  resizeObserver = new ResizeObserver(entries => {
+    for (const entry of entries) {
+      const w = entry.contentRect.width
+      const h = entry.contentRect.height
+      if (w > 0 && h > 0 && camera && renderer) {
+        camera.aspect = w / h
+        camera.updateProjectionMatrix()
+        renderer.setSize(w, h)
+      }
+    }
+  })
+  resizeObserver.observe(containerRef.value)
+
+  // Sync vertical slider width to track container height
+  function syncSliderSize() {
+    const track = containerRef.value?.querySelector('.altitude-slider-track')
+    const slider = containerRef.value?.querySelector('.altitude-slider')
+    if (track && slider && track.clientHeight > 0) {
+      slider.style.width = track.clientHeight + 'px'
+    }
   }
-  window.addEventListener('resize', onResize)
+  syncSliderSize()
+  // Also sync on container resize
+  sliderObserver = new ResizeObserver(syncSliderSize)
+  const trackEl = containerRef.value?.querySelector('.altitude-slider-track')
+  if (trackEl) sliderObserver.observe(trackEl)
 
   // Animate
   function animate() {
@@ -394,7 +442,7 @@ async function buildScene(THREE) {
   }
   animate()
 
-  overlayData.value = getOverlayData(props.altitude || 0)
+  overlayData.value = getOverlayData(props.altitude ?? -2000)
 }
 
 function makeTextSprite(THREE, text, opts = {}) {
@@ -418,6 +466,14 @@ function makeTextSprite(THREE, text, opts = {}) {
 
 onUnmounted(() => {
   if (animFrameId) cancelAnimationFrame(animFrameId)
+  if (resizeObserver) {
+    resizeObserver.disconnect()
+    resizeObserver = null
+  }
+  if (sliderObserver) {
+    sliderObserver.disconnect()
+    sliderObserver = null
+  }
   if (renderer) {
     renderer.dispose()
     if (renderer.domElement && renderer.domElement.parentNode) {
@@ -440,7 +496,7 @@ onUnmounted(() => {
 
     <!-- Side controls: altitude slider + number input -->
     <div v-if="!fallback" class="explorer-controls">
-      <div class="altitude-type-label">H (geopotential)</div>
+      <div class="altitude-type-label">{{ altType === 'H' ? 'H (geopotential)' : 'h (geometric)' }}</div>
       <div class="altitude-slider-track">
         <input
           type="range"
@@ -449,7 +505,6 @@ onUnmounted(() => {
           :max="MAX_ALT"
           :value="Math.round(altitude)"
           step="100"
-          orient="vertical"
           @input="onSliderInput"
         />
         <div class="slider-ticks">
@@ -476,10 +531,14 @@ onUnmounted(() => {
 
     <!-- Overlay with current altitude properties -->
     <div v-if="overlayData && !fallback" class="explorer-overlay">
-      <h4>Geopotential Altitude (H)</h4>
+      <div class="overlay-alt-type-toggle">
+        <button :class="{ active: altType === 'H' }" @click="altType = 'H'">H</button>
+        <button :class="{ active: altType === 'h' }" @click="altType = 'h'">h</button>
+      </div>
+      <h4>{{ altType === 'H' ? 'Geopotential Altitude (H)' : 'Geometric Altitude (h)' }}</h4>
       <div class="altitude-display">
-        {{ overlayData.altitude.toLocaleString() }} m
-        <span class="altitude-ft">({{ overlayData.altitudeFt.toLocaleString() }} ft)</span>
+        {{ (altType === 'H' ? overlayData.geoH : overlayData.geoZ).toLocaleString() }} m
+        <span class="altitude-ft">({{ (altType === 'H' ? overlayData.geoH_ft : overlayData.geoZ_ft).toLocaleString() }} ft)</span>
       </div>
       <div class="overlay-props">
         <div class="property-row">

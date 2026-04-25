@@ -9,7 +9,26 @@ const routes = [
   {
     path: '/calculator',
     name: 'Calculator',
-    component: () => import('@/views/CalculatorView.vue')
+    component: () => import('@/views/CalculatorView.vue'),
+    meta: { tab: 'calculator' }
+  },
+  {
+    path: '/calculator/explorer',
+    name: 'Explorer',
+    component: () => import('@/views/CalculatorView.vue'),
+    meta: { tab: 'explorer' }
+  },
+  {
+    path: '/calculator/table',
+    name: 'Table',
+    component: () => import('@/views/CalculatorView.vue'),
+    meta: { tab: 'table' }
+  },
+  {
+    path: '/calculator/charts',
+    name: 'Charts',
+    component: () => import('@/views/CalculatorView.vue'),
+    meta: { tab: 'charts' }
   },
   {
     path: '/library',

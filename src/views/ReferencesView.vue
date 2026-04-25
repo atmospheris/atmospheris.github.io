@@ -91,8 +91,8 @@ const references = [
 ]
 
 const standardsComparison = [
-  { standard: 'ISO 2533:1975', range: '-2 km to 32 km', relation: 'Foundation document', color: '#6366f1' },
-  { standard: 'ISO 2533:2026', range: 'TBD', relation: 'Modern revision (in progress)', color: '#818cf8' },
+  { standard: 'ISO 2533:1975', range: '-2 km to 32 km', relation: 'Foundation document', color: '#2c84bf' },
+  { standard: 'ISO 2533:2026', range: 'TBD', relation: 'Modern revision (in progress)', color: '#7abae5' },
   { standard: 'ICAO Doc 7488/3', range: '-2 km to 80 km', relation: 'Extends ISA to 80 km', color: '#a855f7' },
   { standard: 'US Std Atm 1976', range: '-2 km to 1,000 km', relation: 'Identical to 32 km', color: '#3b82f6' },
   { standard: 'WMO', range: '-2 km to 32 km', relation: 'Identical to ISA', color: '#06b6d4' },

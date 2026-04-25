@@ -37,18 +37,13 @@ onUnmounted(() => {
   <header class="header" :class="{ scrolled }">
     <div class="header-inner">
       <router-link to="/" class="header-logo">
-        <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <circle cx="14" cy="14" r="13" stroke="currentColor" stroke-width="2"/>
-          <path d="M7 18 C10 12, 18 12, 21 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/>
-          <path d="M7 14 C10 8, 18 8, 21 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/>
-          <circle cx="14" cy="7" r="1.5" fill="currentColor"/>
-        </svg>
-        Atmospheris
+        <img src="@/assets/images/atmospheris-logo.svg" alt="" width="28" height="28" />
+        <span>Atmospher<span class="brand-is">is</span></span>
       </router-link>
 
       <nav class="header-nav">
         <router-link to="/calculator">Calculator</router-link>
-        <router-link to="/library">Library</router-link>
+        <router-link to="/library">Use API</router-link>
         <div class="nav-dropdown" @click.stop="refDropdownOpen = !refDropdownOpen">
           <button class="nav-dropdown-trigger" :class="{ active: refDropdownOpen }">
             Reference
@@ -84,7 +79,7 @@ onUnmounted(() => {
 
   <nav class="mobile-nav" :class="{ open: mobileOpen }">
     <router-link to="/calculator" @click="closeMobile">Calculator</router-link>
-    <router-link to="/library" @click="closeMobile">Library</router-link>
+    <router-link to="/library" @click="closeMobile">Use API</router-link>
     <div class="mobile-nav-section">Reference</div>
     <router-link to="/iso-2533" @click="closeMobile" class="mobile-nav-sub">ISO 2533</router-link>
     <router-link to="/symbols" @click="closeMobile" class="mobile-nav-sub">Symbols &amp; Variables</router-link>
