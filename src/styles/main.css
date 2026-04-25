@@ -963,10 +963,18 @@ pre code {
   margin-bottom: 0;
 }
 
+.iso-purchase-links {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-lg);
+}
+
 .iso-purchase-btn {
   background: #fff;
   color: #0f172a;
   font-weight: var(--font-weight-semibold);
+  text-align: center;
 }
 
 .iso-purchase-btn:hover {
@@ -1346,6 +1354,10 @@ pre code {
 .ribose-logo {
   width: 200px;
   height: auto;
+}
+
+[data-theme="dark"] .ribose-logo {
+  filter: brightness(0) invert(1);
 }
 
 .ribose-text p {

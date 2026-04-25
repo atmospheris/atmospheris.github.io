@@ -48,10 +48,10 @@ useSeo({
         the international standard for atmospheric reference conditions.
       </p>
       <ul class="content-list">
-        <li><strong>ISO 2533:1975</strong> &mdash; First edition of the standard</li>
-        <li><strong>Addendum 1:1985</strong> &mdash; Extended altitude range and additional properties</li>
-        <li><strong>Addendum 2:1997</strong> &mdash; Further refinements and corrections</li>
-        <li><strong>ISO 2533:2026</strong> &mdash; Upcoming revision incorporating all addenda and modernizing the presentation</li>
+        <li><strong>ISO 2533:1975</strong> &mdash; First edition of the standard (<a href="https://www.iso.org/standard/7472.html" target="_blank" rel="noopener">ISO Store</a>)</li>
+        <li><strong>Addendum 1:1985</strong> &mdash; Hypsometrical tables (<a href="https://www.iso.org/standard/7473.html" target="_blank" rel="noopener">ISO Store</a>)</li>
+        <li><strong>Addendum 2:1997</strong> &mdash; Extension to &minus;5,000 m and atmosphere as a function of altitude in feet (<a href="https://www.iso.org/standard/7474.html" target="_blank" rel="noopener">ISO Store</a>)</li>
+        <li><strong>ISO 2533:2026</strong> &mdash; Upcoming revision incorporating all addenda and modernizing the presentation (<a href="https://www.iso.org/standard/90293.html" target="_blank" rel="noopener">ISO Store</a>)</li>
       </ul>
     </section>
 
@@ -407,17 +407,25 @@ useSeo({
           <div>
             <h2>Get the Official Standard</h2>
             <p>
-              Purchase the official ISO 2533:1975 Standard Atmosphere document from the ISO Store
+              Purchase the ISO 2533 Standard Atmosphere documents from the ISO Store
               for the complete specification, all equations, and authoritative reference tables.
             </p>
           </div>
         </div>
-        <a href="https://www.iso.org/standard/90293.html" target="_blank" rel="noopener" class="btn btn-primary iso-purchase-btn">
-          Purchase ISO/DIS 2533
-        </a>
-        <a href="https://www.iso.org/standard/7472.html" target="_blank" rel="noopener" class="btn btn-primary iso-purchase-btn">
-          Purchase ISO 2533:1975
-        </a>
+        <div class="iso-purchase-links">
+          <a href="https://www.iso.org/standard/90293.html" target="_blank" rel="noopener" class="btn btn-primary iso-purchase-btn">
+            Purchase ISO/DIS 2533
+          </a>
+          <a href="https://www.iso.org/standard/7472.html" target="_blank" rel="noopener" class="btn btn-primary iso-purchase-btn">
+            Purchase ISO 2533:1975
+          </a>
+          <a href="https://www.iso.org/standard/7473.html" target="_blank" rel="noopener" class="btn btn-primary iso-purchase-btn">
+            Purchase Addendum 1 (1985)
+          </a>
+          <a href="https://www.iso.org/standard/7474.html" target="_blank" rel="noopener" class="btn btn-primary iso-purchase-btn">
+            Purchase Addendum 2 (1997)
+          </a>
+        </div>
       </div>
     </section>
   </div>

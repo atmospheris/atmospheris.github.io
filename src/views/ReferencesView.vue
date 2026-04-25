@@ -17,12 +17,28 @@ const references = [
     link: 'https://www.iso.org/standard/7472.html'
   },
   {
+    title: 'ISO 2533:1975/Add 1:1985',
+    org: 'International Organization for Standardization',
+    year: '1985',
+    description: 'Standard Atmosphere — Addendum 1: Hypsometrical tables. Provides hypsometrical tables as a supplement to the base standard.',
+    relationship: 'Addendum to ISO 2533:1975, providing additional hypsometrical reference tables.',
+    link: 'https://www.iso.org/standard/7473.html'
+  },
+  {
+    title: 'ISO 2533:1975/Add 2:1997',
+    org: 'International Organization for Standardization',
+    year: '1997',
+    description: 'Standard Atmosphere — Addendum 2: Extension to -5,000 m and standard atmosphere as a function of altitude in feet.',
+    relationship: 'Addendum to ISO 2533:1975, extending the altitude range and adding foot-based altitude definitions.',
+    link: 'https://www.iso.org/standard/7474.html'
+  },
+  {
     title: 'ISO 2533:2026 (forthcoming)',
     org: 'International Organization for Standardization',
     year: '2026',
     description: 'Revised edition of the Standard Atmosphere currently in development. Updates the 1975 standard with modern constants, improved computational methods, and extended altitude coverage.',
     relationship: 'Modern revision of ISO 2533:1975, currently in preparation.',
-    link: null
+    link: 'https://www.iso.org/standard/90293.html'
   },
   {
     title: 'ICAO Doc 7488/3',
