@@ -1293,6 +1293,10 @@ pre code {
   align-items: start;
 }
 
+.quickstart-grid > * {
+  min-width: 0;
+}
+
 .quickstart-grid h3 {
   margin-bottom: var(--spacing-sm);
 }

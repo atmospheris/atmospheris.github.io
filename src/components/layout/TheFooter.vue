@@ -11,7 +11,7 @@ const year = new Date().getFullYear()
             <img src="@/assets/images/atmospheris-logo.svg" alt="" width="24" height="24" />
             <strong class="footer-brand-name"><span>Atmospher<span class="brand-is">is</span></span></strong>
           </div>
-          <p>Reference implementation of the ISO 2533 Standard Atmosphere model. Open-source atmospheric property calculations for engineers and scientists.</p>
+          <p>Open-source implementations of ISO atmospheric reference standards. Standard atmosphere models, wind distributions, and atmospheric property calculations for engineers and scientists.</p>
         </div>
 
         <div class="footer-column">
@@ -19,6 +19,7 @@ const year = new Date().getFullYear()
           <router-link to="/calculator">Calculator</router-link>
           <router-link to="/library">Use API</router-link>
           <router-link to="/iso-2533">ISO 2533</router-link>
+          <router-link to="/iso-5878">ISO 5878</router-link>
           <router-link to="/symbols">Symbols &amp; Variables</router-link>
           <router-link to="/references">References</router-link>
         </div>

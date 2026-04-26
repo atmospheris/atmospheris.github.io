@@ -7,7 +7,7 @@ import { getAllProperties, roundToSigFigs, paToMbar } from 'atmospheris'
 
 useSeo({
   title: null,
-  description: 'Interactive ISO 2533 Standard Atmosphere calculator, Ruby gem, and TypeScript library for atmospheric property computations.',
+  description: 'Open-source standard atmosphere models. Interactive calculator for ISO 2533 atmospheric properties and ISO 5878 wind distributions, with Ruby gem and TypeScript library.',
   path: '/',
   schema: buildWebApplicationSchema()
 })
@@ -96,14 +96,15 @@ puts result.density               #=> 0.4135 kg/m³`
 
 <template>
   <HeroSection>
-    <p class="hero-eyebrow">Reference implementation for ISO 2533:2026</p>
+    <p class="hero-eyebrow">Open-source standard atmosphere models</p>
     <h1 class="hero-title">
       Calculate the <span class="gradient-text">Standard Atmosphere</span>
     </h1>
     <p class="hero-description">
-      Atmospheris provides the authoritative open-source implementation of the
-      ISO 2533 Standard Atmosphere model, with an interactive calculator,
-      Ruby gem, and TypeScript library.
+      Atmospheris provides open-source implementations of ISO atmospheric
+      reference standards &mdash; from the baseline ISA (ISO 2533) to observed
+      reference atmospheres and wind models (ISO 5878) &mdash; with interactive
+      calculators, a Ruby gem, and a TypeScript library.
     </p>
     <div class="hero-actions">
       <router-link to="/calculator" class="btn btn-primary">Open Calculator</router-link>
@@ -136,6 +137,37 @@ puts result.density               #=> 0.4135 kg/m³`
         <div class="inline-calc-cta">
           <router-link to="/calculator" class="btn btn-outline-dark">Open Full Calculator &rarr;</router-link>
         </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Standards -->
+  <section class="section">
+    <div class="container">
+      <h2 class="section-title">Standards</h2>
+      <div class="standards-grid">
+        <router-link to="/iso-2533" class="standard-card glass-card animate-on-scroll">
+          <div class="standard-card-badge">Foundation</div>
+          <h3>ISO 2533</h3>
+          <p class="standard-card-subtitle">Standard Atmosphere</p>
+          <p>
+            The International Standard Atmosphere &mdash; a reference model defining
+            temperature, pressure, density, and derived properties from
+            &minus;5 km to 80 km altitude.
+          </p>
+          <span class="card-link">Explore ISO 2533 <span>&rarr;</span></span>
+        </router-link>
+        <router-link to="/iso-5878" class="standard-card glass-card animate-on-scroll">
+          <div class="standard-card-badge standard-card-badge--alt">Aerospace</div>
+          <h3>ISO 5878</h3>
+          <p class="standard-card-subtitle">Reference Atmospheres for Aerospace Use</p>
+          <p>
+            Observed atmospheric conditions by latitude zone and season &mdash;
+            temperature profiles, wind distributions (Rice model), and humidity
+            data for real-world aerospace applications.
+          </p>
+          <span class="card-link">Explore ISO 5878 <span>&rarr;</span></span>
+        </router-link>
       </div>
     </div>
   </section>
@@ -223,3 +255,59 @@ puts result.density               #=> 0.4135 kg/m³`
     </div>
   </section>
 </template>
+
+<style scoped>
+.standards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: var(--spacing-lg);
+}
+
+.standard-card {
+  display: flex;
+  flex-direction: column;
+  text-decoration: none;
+  color: var(--color-text);
+  padding: var(--spacing-lg);
+}
+
+.standard-card h3 {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  margin-bottom: var(--spacing-xs);
+}
+
+.standard-card-subtitle {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-light);
+  margin-bottom: var(--spacing-md);
+}
+
+.standard-card p:last-of-type {
+  flex: 1;
+  margin-bottom: var(--spacing-md);
+}
+
+.standard-card-badge {
+  display: inline-block;
+  width: fit-content;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.2em 0.6em;
+  border-radius: var(--radius-md);
+  margin-bottom: var(--spacing-sm);
+  background: var(--color-accent-subtle);
+  color: var(--color-accent-dark);
+}
+
+.standard-card-badge--alt {
+  background: color-mix(in srgb, var(--color-accent) 12%, transparent);
+  color: var(--color-accent);
+}
+
+.standard-card .card-link {
+  margin-top: auto;
+}
+</style>

@@ -11,11 +11,11 @@ const SITE_URL = 'https://www.atmospheris.org'
 
 export function useSeo({ title, description, path = '', schema = null }) {
   const fullTitle = computed(() =>
-    title ? `${title} — ${SITE_NAME}` : `${SITE_NAME} — ISO 2533 Standard Atmosphere`
+    title ? `${title} — ${SITE_NAME}` : `${SITE_NAME} — Standard Atmosphere Models`
   )
 
   const canonicalUrl = `${SITE_URL}${path}`
-  const defaultDescription = 'Reference implementation of the ISO 2533 Standard Atmosphere. Interactive calculator, Ruby gem, and TypeScript library for atmospheric property computations.'
+  const defaultDescription = 'Open-source standard atmosphere models. Interactive calculators for ISO 2533 atmospheric properties and ISO 5878 wind distributions, with Ruby gem and TypeScript library.'
 
   useHead({
     title: fullTitle,

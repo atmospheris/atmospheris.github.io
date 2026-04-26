@@ -400,6 +400,11 @@ useSeo({
               <td>TBD</td>
               <td>Modern revision (in progress)</td>
             </tr>
+            <tr>
+              <td class="property-name"><router-link to="/iso-5878">ISO 5878</router-link></td>
+              <td>Reference atmospheres for aerospace use</td>
+              <td>Companion: observed conditions by latitude and season</td>
+            </tr>
           </tbody>
         </table>
       </div>

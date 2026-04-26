@@ -27,7 +27,7 @@ export default defineConfig({
     script: 'async',
     formatting: 'minify',
     includedRoutes() {
-      return ['/', '/calculator', '/calculator/explorer', '/calculator/table', '/calculator/charts', '/library', '/iso-2533', '/references', '/symbols', '/about']
+      return ['/', '/calculator', '/calculator/explorer', '/calculator/table', '/calculator/charts', '/library', '/iso-2533', '/iso-5878', '/references', '/symbols', '/about']
     },
     sitemap: {
       hostname: 'https://www.atmospheris.org',
