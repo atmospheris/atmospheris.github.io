@@ -178,6 +178,8 @@ const latitudeZones = [
       <p>
         Enter observed wind parameters to compute derived wind characteristics
         using the Rice distribution per ISO 5878.
+        For the full-featured calculator with PDF/CDF visualization, presets, and percentile charts,
+        see the <router-link to="/calculator/wind">Wind Calculator</router-link>.
       </p>
 
       <div class="wind-calc-card">

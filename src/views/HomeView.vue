@@ -7,7 +7,7 @@ import { getAllProperties, roundToSigFigs, paToMbar } from 'atmospheris'
 
 useSeo({
   title: null,
-  description: 'Open-source standard atmosphere models. Interactive calculator for ISO 2533 atmospheric properties and ISO 5878 wind distributions, with Ruby gem and TypeScript library.',
+  description: 'Open-source standard atmosphere and wind models. Interactive calculators for ISO 2533 atmospheric properties and ISO 5878 wind distributions, with Ruby gem and TypeScript library.',
   path: '/',
   schema: buildWebApplicationSchema()
 })
@@ -63,12 +63,13 @@ const featureIcons = {
   altitude: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5M5 12l7-7 7 7"/></svg>',
   pressure: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>',
   precision: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/></svg>',
+  wind: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9.59 4.59A2 2 0 1111 8H2M12.59 19.41A2 2 0 1014 16H2M17.73 7.73A2.5 2.5 0 1119.5 12H2"/></svg>',
   export: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8"/></svg>',
   tables: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18"/></svg>',
   units: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3H5a2 2 0 00-2 2v3m18 0V5a2 2 0 00-2-2h-3m0 18h3a2 2 0 002-2v-3M3 16v3a2 2 0 002 2h3"/></svg>',
 }
 
-const tsCode = `import { getAllProperties } from "atmospheris"
+const tsCode = `import { getAllProperties, computeWindDerived } from "atmospheris"
 
 // Get all properties at 10,000 m geopotential altitude
 const result = getAllProperties({
@@ -80,7 +81,10 @@ const result = getAllProperties({
 
 console.log(result.temperature.celsius)  // -49.898 °C
 console.log(result.pressure.mbar)        // 264.36 mbar
-console.log(result.density)              // 0.4135 kg/m³`
+
+// Wind distribution per ISO 5878
+const wind = computeWindDerived(-3.9, -1.2, 5.9)
+console.log(wind.Vsc)  // 6.03 m/s — scalar mean wind speed`
 
 const rubyCode = `require "atmospheris"
 
@@ -91,7 +95,10 @@ result.realize_values!
 
 puts result.temperature_celsius   #=> -50.0 °C
 puts result.pressure_mbar         #=> 264.36 mbar
-puts result.density               #=> 0.4135 kg/m³`
+
+# Wind distribution per ISO 5878
+wind = Atmospheris::Iso5878.compute_wind_derived(-3.9, -1.2, 5.9)
+puts wind.vsc  #=> 6.03 m/s`
 </script>
 
 <template>
@@ -103,8 +110,9 @@ puts result.density               #=> 0.4135 kg/m³`
     <p class="hero-description">
       Atmospheris provides open-source implementations of ISO atmospheric
       reference standards &mdash; from the baseline ISA (ISO 2533) to observed
-      reference atmospheres and wind models (ISO 5878) &mdash; with interactive
-      calculators, a Ruby gem, and a TypeScript library.
+      reference atmospheres, wind distributions, and humidity models
+      (ISO 5878) &mdash; with interactive calculators, a Ruby gem, and a
+      TypeScript library.
     </p>
     <div class="hero-actions">
       <router-link to="/calculator" class="btn btn-primary">Open Calculator</router-link>
@@ -192,6 +200,13 @@ puts result.density               #=> 0.4135 kg/m³`
           linkTo="/calculator"
         />
         <FeatureCard
+          :icon="featureIcons.wind"
+          title="Wind Distributions"
+          description="Compute scalar mean wind speed and percentile speeds from observed vector components using the Rice distribution (ISO 5878)."
+          link-text="Calculator"
+          linkTo="/iso-5878"
+        />
+        <FeatureCard
           :icon="featureIcons.precision"
           title="Dual Precision"
           description="Normal precision for engineering or reduced precision for quick estimates, dynamically calculated per ISO 2533 formulas."
@@ -212,13 +227,6 @@ puts result.density               #=> 0.4135 kg/m³`
           link-text="See constants"
           linkTo="/iso-2533"
         />
-        <FeatureCard
-          :icon="featureIcons.units"
-          title="Multiple Units"
-          description="Input in meters or feet, geopotential or geometric. Results in SI and common engineering units."
-          link-text="Calculator"
-          linkTo="/calculator"
-        />
       </div>
     </div>
   </section>
@@ -231,7 +239,7 @@ puts result.density               #=> 0.4135 kg/m³`
         <div>
           <h3>TypeScript / JavaScript</h3>
           <p class="quickstart-desc">
-            Install via npm and calculate atmospheric properties in just a few lines of TypeScript or JavaScript.
+            Install via npm and calculate atmospheric properties and wind distributions in just a few lines.
           </p>
           <div class="code-block code-dark">
             <div class="code-tab">npm install atmospheris</div>
@@ -241,7 +249,7 @@ puts result.density               #=> 0.4135 kg/m³`
         <div>
           <h3>Ruby</h3>
           <p class="quickstart-desc">
-            The reference implementation — a comprehensive Ruby gem for all ISA calculations.
+            The reference implementation — a comprehensive Ruby gem for ISA calculations and wind modeling.
           </p>
           <div class="code-block code-dark">
             <div class="code-tab">gem install atmospheris</div>

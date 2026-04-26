@@ -7,6 +7,7 @@ import CalculatorResults from '@/components/calculator/CalculatorResults.vue'
 import AtmosphereExplorer from '@/components/calculator/AtmosphereExplorer.vue'
 import CalculatorCharts from '@/components/calculator/CalculatorCharts.vue'
 import CalculatorTable from '@/components/calculator/CalculatorTable.vue'
+import WindCalculator from '@/components/calculator/WindCalculator.vue'
 import { getAllProperties, getAltitudeFromPressure, getAltitudeFromProperty } from 'atmospheris'
 
 useSeo({
@@ -27,6 +28,7 @@ const altitudeUnit = ref('meters')
 const tabs = [
   { key: '', label: 'Calculator', path: '/calculator' },
   { key: 'explorer', label: 'Explorer 3D', path: '/calculator/explorer' },
+  { key: 'wind', label: 'Wind', path: '/calculator/wind' },
   { key: 'table', label: 'Table', path: '/calculator/table' },
   { key: 'charts', label: 'Charts', path: '/calculator/charts' },
 ]
@@ -184,6 +186,11 @@ onMounted(() => {
             :unit="altitudeUnit"
             @update:altitude="handleExplorerAltitude"
           />
+        </div>
+
+        <!-- Wind Tab -->
+        <div v-else-if="activeTab === 'wind'">
+          <WindCalculator />
         </div>
 
         <!-- Table Tab -->
