@@ -28,6 +28,7 @@
 }
 
 .calculator-header h1 {
+  font-family: var(--font-display);
   font-size: var(--font-size-3xl);
   color: #fff;
   margin-bottom: var(--spacing-sm);
@@ -119,7 +120,7 @@
 .calc-tab-btn.active {
   background: var(--color-accent);
   color: white;
-  box-shadow: 0 2px 8px rgba(44, 132, 191, 0.3);
+  box-shadow: 0 2px 8px rgba(44, 132, 191, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.15);
 }
 
 .calc-tab-content {

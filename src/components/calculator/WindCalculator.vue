@@ -419,6 +419,7 @@ onUnmounted(() => {
   border: 1px solid var(--color-border);
   border-radius: var(--radius-xl);
   padding: var(--spacing-xl);
+  box-shadow: var(--shadow-glass);
 }
 
 .wind-calc-layout {
@@ -435,6 +436,7 @@ onUnmounted(() => {
 }
 
 .wind-section-label {
+  font-family: var(--font-display);
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-semibold);
   text-transform: uppercase;
@@ -486,6 +488,19 @@ onUnmounted(() => {
   cursor: pointer;
   transition: all var(--transition-fast);
   text-align: left;
+  position: relative;
+  overflow: hidden;
+}
+
+.wind-preset-btn::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: transparent;
+  transition: background var(--transition-fast);
 }
 
 .wind-preset-btn:hover {
@@ -493,10 +508,18 @@ onUnmounted(() => {
   color: var(--color-accent);
 }
 
+.wind-preset-btn:hover::before {
+  background: var(--color-accent);
+}
+
 .wind-preset-btn.active {
   background: var(--color-accent-subtle);
   border-color: var(--color-accent);
   color: var(--color-accent-dark);
+}
+
+.wind-preset-btn.active::before {
+  background: var(--color-accent);
 }
 
 .wind-preset-name {
@@ -555,15 +578,30 @@ onUnmounted(() => {
   background: var(--color-surface-elevated);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
-  border-top: 3px solid var(--color-accent-subtle);
+  position: relative;
+  overflow: hidden;
+}
+
+.wind-stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--color-accent-subtle);
+}
+
+.wind-stat-highlight::before {
+  background: linear-gradient(90deg, var(--color-accent), var(--color-accent-light));
 }
 
 .wind-stat-highlight {
-  border-top-color: var(--color-accent);
   background: color-mix(in srgb, var(--color-accent) 4%, var(--color-surface-elevated));
 }
 
 .wind-stat-label {
+  font-family: var(--font-display);
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-semibold);
   text-transform: uppercase;
@@ -622,12 +660,26 @@ onUnmounted(() => {
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
   padding: var(--spacing-lg);
+  position: relative;
+}
+
+.wind-chart-section::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius-lg);
+  pointer-events: none;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+[data-theme="dark"] .wind-chart-section::after {
+  box-shadow: inset 0 1px 0 rgba(122, 186, 229, 0.05);
 }
 
 .wind-chart-wrapper {
   position: relative;
   width: 100%;
-  height: 280px;
+  height: 300px;
 }
 
 .wind-chart-wrapper canvas {
