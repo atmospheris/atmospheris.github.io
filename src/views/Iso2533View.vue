@@ -72,6 +72,21 @@ const seaLevelCharacteristics = [
         real-world condition &mdash; for observed conditions by latitude and season, see
         <router-link to="/iso-5878">ISO 5878</router-link>.
       </p>
+
+      <!-- Data Provenance -->
+      <div class="data-callout">
+        <h4>Model-Only Data</h4>
+        <p>
+          ISO 2533 is a <strong>purely deterministic mathematical model</strong> &mdash; it contains
+          no empirical observations. Every value in this standard is either a defined constant or
+          calculated from defined constants using exact equations. Given any altitude, the same
+          atmospheric properties will always be produced.
+        </p>
+        <div class="data-legend">
+          <span><span class="provenance-badge provenance-defined">Defined</span> Fixed physical or conventional constants (e.g. <em>g</em><sub>n</sub>, <em>R</em>*, <em>&kappa;</em>)</span>
+          <span><span class="provenance-badge provenance-calculated">Calculated</span> Derived from defined constants via thermodynamic equations (e.g. <em>T</em>, <em>p</em>, <em>&rho;</em> at altitude)</span>
+        </div>
+      </div>
     </section>
 
     <!-- History -->
@@ -156,6 +171,7 @@ const seaLevelCharacteristics = [
       <p>
         The following fundamental constants define the Standard Atmosphere model. These are
         fixed physical and conventional values used in all ISA calculations.
+        <span class="provenance-badge provenance-defined">Defined</span>
       </p>
 
       <dl class="constants-list">
@@ -413,8 +429,9 @@ const seaLevelCharacteristics = [
       <h2 class="section-title">Sea-level Characteristics</h2>
       <p>
         In addition to the primary constants, ISO 2533:2026 Table 3 defines the following
-        derived physical characteristics at mean sea level (H&nbsp;=&nbsp;0), calculated from
-        the fundamental constants.
+        derived physical characteristics at mean sea level (H&nbsp;=&nbsp;0).
+        <span class="provenance-badge provenance-calculated">Calculated</span>
+        Each value below is computed from the defined constants above &mdash; none are measured.
       </p>
       <div class="table-responsive">
         <table class="results-table layer-table">
@@ -446,6 +463,8 @@ const seaLevelCharacteristics = [
         altitude, base temperature, and vertical temperature gradient
         (<math><msub><mi>&beta;</mi><mi>s</mi></msub></math>).
         A gradient of zero indicates an isothermal layer.
+        <span class="provenance-badge provenance-defined">Defined</span>
+        Layer boundaries and gradients are specified by the standard.
       </p>
 
       <div class="table-responsive">
@@ -488,6 +507,9 @@ const seaLevelCharacteristics = [
       <p>
         The ISA formulas are implemented in our open-source library. Below is a summary
         of the approach used for each layer type.
+        <span class="provenance-badge provenance-calculated">Calculated</span>
+        All atmospheric properties at altitude are computed from the defined constants
+        and layer parameters using these exact equations.
       </p>
 
       <h3>Non-isothermal layers (<math><msub><mi>&beta;</mi><mi>s</mi></msub><mo>&ne;</mo><mn>0</mn></math>)</h3>

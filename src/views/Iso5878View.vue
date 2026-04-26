@@ -30,6 +30,34 @@ function fmt(v) {
   return v.toFixed(1)
 }
 
+// --- Globe Visualization ---
+const G = { cx: 155, cy: 188, r: 142 }
+const toRad = d => d * Math.PI / 180
+const latY = lat => G.cy - G.r * Math.sin(toRad(lat))
+const latHW = lat => G.r * Math.cos(toRad(lat))
+
+const hoveredZone = ref(null)
+
+const latitudeLines = [0, 15, 30, 45, 60, 80].map(lat => ({
+  y: latY(lat),
+  hw: latHW(lat),
+  label: lat === 0 ? '0° (Equator)' : `${lat}°N`,
+}))
+
+const latitudeBands = computed(() => {
+  const lats = [0, 15, 30, 45, 60, 80]
+  const colors = ['#fbbf24', '#fb923c', '#38bdf8', '#818cf8', '#6366f1']
+  return lats.slice(0, -1).map((_, i) => ({
+    top: latY(lats[i + 1]),
+    bottom: latY(lats[i]),
+    color: colors[i],
+  }))
+})
+
+const meridians = [-60, -30, 0, 30, 60].map(lon => ({
+  rx: Math.max(1, G.r * Math.cos(toRad(Math.abs(lon)))),
+}))
+
 // --- Surface Conditions (from ISO 5878 Table 2) ---
 const surfaceConditions = [
   { latitude: '15°', g0: 9.78381, radius: 6337.84, tDec: 299.650, tJun: 299.650, pDec: 1013.250, pJun: 1013.250 },
@@ -41,11 +69,11 @@ const surfaceConditions = [
 
 // Latitude zone descriptions
 const latitudeZones = [
-  { zone: '15°', name: 'Tropical', description: 'Annual model (no seasonal distinction). Warm, stable conditions year-round near the equator.' },
-  { zone: '30°N', name: 'Subtropical', description: 'January: cool, dry conditions. July: warm, monsoonal influences. Strong seasonal contrast.' },
-  { zone: '45°N', name: 'Mid-latitude', description: 'January: cold winter conditions. July: warm summer. Significant seasonal temperature swing (~18.5 K).' },
-  { zone: '60°N', name: 'Subarctic', description: 'January: very cold winter. July: mild summer. Largest seasonal temperature range (~26 K).' },
-  { zone: '80°N', name: 'Arctic', description: 'January: extremely cold polar conditions. July: cool summer with significant warming from winter.' },
+  { zone: '15°', name: 'Tropical', color: '#fbbf24', description: 'Annual model (no seasonal distinction). Warm, stable conditions year-round near the equator.' },
+  { zone: '30°N', name: 'Subtropical', color: '#fb923c', description: 'January: cool, dry conditions. July: warm, monsoonal influences. Strong seasonal contrast.' },
+  { zone: '45°N', name: 'Mid-latitude', color: '#38bdf8', description: 'January: cold winter conditions. July: warm summer. Significant seasonal temperature swing (~18.5 K).' },
+  { zone: '60°N', name: 'Subarctic', color: '#818cf8', description: 'January: very cold winter. July: mild summer. Largest seasonal temperature range (~26 K).' },
+  { zone: '80°N', name: 'Arctic', color: '#6366f1', description: 'January: extremely cold polar conditions. July: cool summer with significant warming from winter.' },
 ]
 </script>
 
@@ -90,6 +118,21 @@ const latitudeZones = [
           zones and seasonal models.
         </li>
       </ul>
+
+      <!-- Data Provenance -->
+      <div class="data-callout">
+        <h4>Data Sources in ISO 5878</h4>
+        <p>
+          Unlike <router-link to="/iso-2533">ISO 2533</router-link>, which is a purely deterministic mathematical model,
+          ISO 5878 combines <strong>empirical observations</strong> with <strong>statistical models</strong>.
+          Understanding which values are measured vs. calculated is essential for correct interpretation.
+        </p>
+        <div class="data-legend">
+          <span><span class="provenance-badge provenance-observed">Observed</span> Empirical measurements from weather stations, radiosondes, and rocketsondes</span>
+          <span><span class="provenance-badge provenance-calculated">Calculated</span> Derived from mathematical models using observed inputs</span>
+          <span><span class="provenance-badge provenance-defined">Defined</span> Fixed values specified by the standard</span>
+        </div>
+      </div>
     </section>
 
     <!-- Latitude Zones -->
@@ -101,12 +144,92 @@ const latitudeZones = [
         (tropical conditions vary little seasonally), while the other four zones provide
         separate January and July seasonal profiles.
       </p>
-      <div class="zone-cards">
-        <div v-for="z in latitudeZones" :key="z.zone" class="zone-card">
-          <div class="zone-lat">{{ z.zone }}</div>
-          <div class="zone-body">
-            <h3>{{ z.name }}</h3>
-            <p>{{ z.description }}</p>
+      <div class="zone-layout">
+        <!-- Globe SVG -->
+        <div class="globe-container">
+          <svg viewBox="0 0 310 376" class="globe-svg" role="img" aria-label="Orthographic projection of Earth showing latitude zones from equator to 80°N">
+            <!-- Ocean fill -->
+            <circle :cx="G.cx" :cy="G.cy" :r="G.r" fill="var(--color-surface-elevated)" stroke="var(--color-border)" stroke-width="1.5"/>
+
+            <!-- Colored latitude bands clipped to globe -->
+            <clipPath id="globe-clip">
+              <circle :cx="G.cx" :cy="G.cy" :r="G.r - 1"/>
+            </clipPath>
+            <g clip-path="url(#globe-clip)">
+              <rect
+                v-for="(band, i) in latitudeBands"
+                :key="i"
+                :x="G.cx - band.hw"
+                :y="band.top"
+                :width="band.hw * 2"
+                :height="band.bottom - band.top"
+                :fill="band.color"
+                :opacity="hoveredZone === i ? 0.5 : 0.2"
+                class="globe-band"
+                @mouseenter="hoveredZone = i"
+                @mouseleave="hoveredZone = null"
+              />
+            </g>
+
+            <!-- Meridians (vertical ellipses for 3D effect) -->
+            <ellipse
+              v-for="(m, i) in meridians"
+              :key="'m' + i"
+              :cx="G.cx"
+              :cy="G.cy"
+              :rx="m.rx"
+              :ry="G.r"
+              fill="none"
+              stroke="var(--color-border)"
+              stroke-width="0.5"
+              stroke-dasharray="4 3"
+            />
+
+            <!-- Latitude lines -->
+            <line
+              v-for="(ll, i) in latitudeLines"
+              :key="'l' + i"
+              :x1="G.cx - ll.hw"
+              :y1="ll.y"
+              :x2="G.cx + ll.hw"
+              :y2="ll.y"
+              stroke="var(--color-text-light)"
+              stroke-width="0.7"
+              stroke-dasharray="3 2"
+            />
+
+            <!-- Labels on right -->
+            <text
+              v-for="(ll, i) in latitudeLines"
+              :key="'t' + i"
+              :x="G.cx + ll.hw + 6"
+              :y="ll.y + 3.5"
+              class="globe-label"
+            >{{ ll.label }}</text>
+
+            <!-- Globe outline (top layer) -->
+            <circle :cx="G.cx" :cy="G.cy" :r="G.r" fill="none" stroke="var(--color-border)" stroke-width="1.5"/>
+
+            <!-- Pole label -->
+            <text :x="G.cx" :y="G.cy - G.r - 8" text-anchor="middle" class="globe-label">North Pole (90°N)</text>
+          </svg>
+        </div>
+
+        <!-- Zone cards -->
+        <div class="zone-cards">
+          <div
+            v-for="(z, i) in latitudeZones"
+            :key="z.zone"
+            class="zone-card"
+            :class="{ 'zone-card-active': hoveredZone === i }"
+            @mouseenter="hoveredZone = i"
+            @mouseleave="hoveredZone = null"
+          >
+            <div class="zone-lat" :style="{ color: z.color }">{{ z.zone }}</div>
+            <div class="zone-body">
+              <h3>{{ z.name }}</h3>
+              <p>{{ z.description }}</p>
+            </div>
           </div>
         </div>
       </div>
@@ -118,8 +241,14 @@ const latitudeZones = [
       <p>
         Wind is a vector quantity. ISO 5878 models wind speed distributions using
         the <strong>circular normal distribution</strong> (also known as the
-        <strong>Rice distribution</strong>), where the probability density function
-        is given by:
+        <strong>Rice distribution</strong>).
+        <span class="provenance-badge provenance-observed">Observed</span>
+        Zonal and meridional wind components are measured from radiosonde and radar observations.
+        <span class="provenance-badge provenance-calculated">Calculated</span>
+        The Rice PDF, scalar mean speed, and percentile values are derived from the observed parameters.
+      </p>
+      <p>
+        The probability density function is given by:
       </p>
       <div class="math-block">
         <math display="block">
@@ -183,6 +312,11 @@ const latitudeZones = [
       </p>
 
       <div class="wind-calc-card">
+        <div class="wind-calc-header">
+          <span class="provenance-badge provenance-observed">Observed inputs</span>
+          <span class="wind-calc-header-sep">&rarr;</span>
+          <span class="provenance-badge provenance-calculated">Calculated outputs</span>
+        </div>
         <div class="wind-calc-grid">
           <label class="wind-input-group">
             <span class="wind-input-label">
@@ -279,6 +413,13 @@ const latitudeZones = [
       <h2 class="section-title">Humidity Models</h2>
       <p>
         ISO 5878 provides humidity profiles for each latitude zone and seasonal model.
+        <span class="provenance-badge provenance-observed">Observed</span>
+        Mixing ratio values are measured from radiosonde data at meteorological stations.
+        <span class="provenance-badge provenance-calculated">Calculated</span>
+        Vapour pressure, saturation vapour pressure, dew-point temperature, and relative humidity
+        are derived from the observed mixing ratios using thermodynamic formulae.
+      </p>
+      <p>
         The <strong>humidity mixing ratio</strong> <math><mi>r</mi></math> is the primary
         humidity characteristic &mdash; it is the ratio of water vapour mass to dry air
         mass in the same volume, expressed in g/kg:
@@ -381,8 +522,11 @@ const latitudeZones = [
       <p>
         In Arctic and sub-Arctic regions, sudden warmings and coolings of the winter
         stratosphere and mesosphere produce large changes in the vertical structure of
-        the atmosphere. Observed 35 km temperatures have a range of roughly
-        <strong>75 K in winter</strong> compared with only <strong>20 K in summer</strong>.
+        the atmosphere.
+        <span class="provenance-badge provenance-observed">Observed</span>
+        The 35 km temperature range of roughly
+        <strong>75 K in winter</strong> compared with only <strong>20 K in summer</strong>
+        comes from empirical radiosonde and rocketsonde data.
       </p>
       <p>
         The winter temperature distributions in this region are <em>bimodal</em> &mdash;
@@ -477,6 +621,14 @@ const latitudeZones = [
         <math><msub><mi>r</mi><mi>&phi;</mi></msub></math>,
         and sea-level temperature and pressure for each latitudinal and seasonal model.
       </p>
+      <div class="provenance-note">
+        <span class="provenance-badge provenance-calculated">Calculated</span>
+        <math><msub><mi>g</mi><mn>0</mn></msub></math> and
+        <math><msub><mi>r</mi><mi>&phi;</mi></msub></math>
+        are calculated from geophysical formulae.
+        <span class="provenance-badge provenance-observed">Observed</span>
+        Temperature and pressure values are empirical measurements from meteorological stations.
+      </div>
       <div class="table-responsive">
         <table class="results-table layer-table">
           <thead>
@@ -624,6 +776,63 @@ const latitudeZones = [
 </template>
 
 <style scoped>
+/* --- Globe Visualization --- */
+.zone-layout {
+  display: grid;
+  grid-template-columns: 310px 1fr;
+  gap: var(--spacing-lg);
+  margin-top: var(--spacing-lg);
+  align-items: start;
+}
+
+.globe-container {
+  position: sticky;
+  top: 80px;
+}
+
+.globe-svg {
+  width: 100%;
+  height: auto;
+}
+
+.globe-label {
+  font-size: 9px;
+  fill: var(--color-text-light);
+  font-family: var(--font-mono);
+}
+
+.globe-band {
+  transition: opacity 0.2s ease;
+  cursor: pointer;
+}
+
+.zone-card-active {
+  border-color: var(--color-accent) !important;
+  box-shadow: 0 0 0 1px var(--color-accent);
+}
+
+.provenance-note {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-light);
+  margin-bottom: var(--spacing-md);
+}
+
+.wind-calc-header {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
+}
+
+.wind-calc-header-sep {
+  color: var(--color-text-light);
+  font-size: var(--font-size-lg);
+}
+
 /* Wind calculator card */
 .wind-calc-card {
   background: var(--color-surface);
@@ -798,6 +1007,16 @@ const latitudeZones = [
   .zone-card {
     flex-direction: column;
     gap: var(--spacing-sm);
+  }
+
+  .zone-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .globe-container {
+    position: static;
+    max-width: 310px;
+    margin: 0 auto;
   }
 }
 
