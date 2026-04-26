@@ -12,7 +12,7 @@ useSeo({
   schema: buildWebApplicationSchema()
 })
 
-const sliderAltitude = ref(-2000)
+const sliderAltitude = ref(0)
 const altUnit = ref('m')
 
 const altRange = computed(() => {
