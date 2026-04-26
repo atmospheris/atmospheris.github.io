@@ -171,9 +171,12 @@ interface PressureResult {
       <h2 class="section-title">Resources</h2>
       <ul class="content-list">
         <li><a href="https://github.com/atmospheris/" target="_blank" rel="noopener">Ruby gem on GitHub</a></li>
+        <li><a href="https://rubygems.org/gems/atmospheris" target="_blank" rel="noopener">atmospheris on RubyGems</a></li>
         <li><a href="https://www.npmjs.com/package/atmospheris" target="_blank" rel="noopener">atmospheris on npm</a></li>
         <li><router-link to="/calculator">Interactive Calculator</router-link></li>
-        <li><router-link to="/iso-2533">About ISO 2533</router-link></li>
+        <li><router-link to="/iso-2533">ISO 2533 — Standard Atmosphere</router-link></li>
+        <li><router-link to="/iso-5878">ISO 5878 — Reference Atmospheres</router-link></li>
+        <li><router-link to="/symbols">Symbols &amp; Variables</router-link></li>
       </ul>
     </section>
   </div>

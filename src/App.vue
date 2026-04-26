@@ -33,9 +33,10 @@ onMounted(() => {
 </script>
 
 <template>
+  <a href="#main-content" class="skip-link">Skip to content</a>
   <div class="reading-progress" :style="{ width: progress + '%' }" />
   <TheHeader />
-  <main>
+  <main id="main-content">
     <router-view />
   </main>
   <TheFooter />

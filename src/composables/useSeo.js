@@ -23,12 +23,14 @@ export function useSeo({ title, description, path = '', schema = null }) {
       { name: 'description', content: description || defaultDescription },
       { property: 'og:title', content: fullTitle },
       { property: 'og:description', content: description || defaultDescription },
+      { property: 'og:image', content: `${SITE_URL}/og-image.svg` },
       { property: 'og:url', content: canonicalUrl },
       { property: 'og:site_name', content: SITE_NAME },
       { property: 'og:type', content: 'website' },
-      { name: 'twitter:card', content: 'summary' },
+      { name: 'twitter:card', content: 'summary_large_image' },
       { name: 'twitter:title', content: fullTitle },
-      { name: 'twitter:description', content: description || defaultDescription }
+      { name: 'twitter:description', content: description || defaultDescription },
+      { name: 'twitter:image', content: `${SITE_URL}/og-image.svg` }
     ],
     link: [
       { rel: 'canonical', href: canonicalUrl }

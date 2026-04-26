@@ -185,7 +185,7 @@ useSeo({
     <section class="section">
       <h2 class="section-title">Temperature Layers</h2>
       <p>
-        The atmosphere is divided into 8 layers, each characterized by a base geopotential
+        The atmosphere is divided into 9 layers, each characterized by a base geopotential
         altitude, base temperature, and vertical temperature gradient
         (<math><msub><mi>&beta;</mi><mi>s</mi></msub></math>).
         A gradient of zero indicates an isothermal layer.
@@ -397,8 +397,8 @@ useSeo({
             </tr>
             <tr>
               <td class="property-name">ISO 2533:2026</td>
-              <td>TBD</td>
-              <td>Modern revision (in progress)</td>
+              <td>&minus;5 km to 80 km</td>
+              <td>Modern revision</td>
             </tr>
             <tr>
               <td class="property-name"><router-link to="/iso-5878">ISO 5878</router-link></td>

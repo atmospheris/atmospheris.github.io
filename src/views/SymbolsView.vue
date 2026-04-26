@@ -39,15 +39,14 @@ const temperatureLayers = [
 
 <template>
   <div class="content-page">
-    <div class="content-hero">
-      <h1>Symbols & Variables</h1>
-      <p>Mathematical symbols and physical constants used in the ISO 2533 Standard Atmosphere model.</p>
-    </div>
+    <h1>Symbols & Variables</h1>
+    <p class="content-lead">
+      Mathematical symbols and physical constants used in the ISO 2533 Standard Atmosphere model.
+    </p>
 
-    <div class="content-body">
-      <!-- Key Concepts -->
-      <section class="content-section">
-        <h2>Geopotential vs Geometric Altitude</h2>
+    <!-- Key Concepts -->
+    <section class="section">
+      <h2 class="section-title">Geopotential vs Geometric Altitude</h2>
         <p>A critical distinction in the Standard Atmosphere is between <strong>geopotential altitude (H)</strong> and <strong>geometric altitude (h)</strong>.</p>
 
         <div class="formula-block">
@@ -58,9 +57,9 @@ const temperatureLayers = [
         <p>Geopotential altitude accounts for the variation of gravitational acceleration with altitude. At sea level they are equal; at high altitudes, geometric altitude exceeds geopotential altitude. The Standard Atmosphere defines all properties as functions of geopotential altitude.</p>
       </section>
 
-      <!-- Symbols Table -->
-      <section class="content-section">
-        <h2>Symbol Reference</h2>
+    <!-- Symbols Table -->
+    <section class="section">
+      <h2 class="section-title">Symbol Reference</h2>
         <div class="table-responsive">
           <table class="layer-table">
             <thead>
@@ -85,9 +84,9 @@ const temperatureLayers = [
         </div>
       </section>
 
-      <!-- Temperature Layers -->
-      <section class="content-section">
-        <h2>Temperature Layers</h2>
+    <!-- Temperature Layers -->
+    <section class="section">
+      <h2 class="section-title">Temperature Layers</h2>
         <p>The atmosphere is divided into concentric layers, each with a defined temperature gradient β<sub>s</sub> (lapse rate).</p>
 
         <div class="table-responsive">
@@ -121,6 +120,20 @@ const temperatureLayers = [
           <p class="formula-desc">Temperature in an isothermal layer (β<sub>s</sub> = 0)</p>
         </div>
       </section>
-    </div>
+
+    <!-- Next Steps -->
+    <section class="section">
+      <div class="cta-card">
+        <h2>Next Steps</h2>
+        <p>
+          Use these symbols in the interactive calculator or explore the full
+          standard documentation.
+        </p>
+        <div class="cta-links">
+          <router-link to="/calculator" class="btn btn-primary">Open Calculator</router-link>
+          <router-link to="/iso-2533" class="btn btn-outline-dark">ISO 2533 Details</router-link>
+        </div>
+      </div>
+    </section>
   </div>
 </template>
