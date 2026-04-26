@@ -20,7 +20,8 @@ const route = useRoute()
 
 const result = ref(null)
 const calcMode = ref('altitude')
-const currentAltitude = ref(-2000)
+const currentAltitude = ref(0)
+const calcError = ref(null)
 const altitudeUnit = ref('meters')
 
 const tabs = [
@@ -37,6 +38,7 @@ const activeTab = computed(() => {
 function handleCalculate(input) {
   calcMode.value = input.mode
   altitudeUnit.value = input.unit || 'meters'
+  calcError.value = null
   try {
     if (input.mode === 'altitude') {
       currentAltitude.value = input.unit === 'feet' ? input.value / 3.280839895 : input.value
@@ -82,8 +84,12 @@ function handleCalculate(input) {
         calcMode.value = 'property'
       }
     }
+    if (!result.value) {
+      calcError.value = 'No result for the given input. Check that the value is within the valid range.'
+    }
   } catch (e) {
     result.value = null
+    calcError.value = e.message || 'Calculation error. Please check your input values.'
   }
 }
 
@@ -119,7 +125,7 @@ onMounted(() => {
       precision: q.prec || 'normal'
     })
   } else {
-    const alt = q.alt !== undefined ? Number(q.alt) : -2000
+    const alt = q.alt !== undefined ? Number(q.alt) : 0
     handleCalculate({
       mode: 'altitude',
       value: alt,
@@ -135,7 +141,8 @@ onMounted(() => {
   <div class="calculator-page">
     <div class="calculator-header">
       <h1>Standard Atmosphere Calculator</h1>
-      <p>Calculate atmospheric properties from -2,000 m to 80,000 m following the ISO 2533 Standard Atmosphere model.</p>
+      <p>Calculate atmospheric properties from &minus;2,000 m to 80,000 m following the ISO 2533 Standard Atmosphere model.</p>
+      <p class="calculator-subtitle">The International Standard Atmosphere (ISA) defines a reference vertical profile of temperature, pressure, density, and derived properties &mdash; used in aerospace engineering, meteorology, and scientific research worldwide.</p>
     </div>
 
     <div class="calculator-body">
@@ -166,7 +173,7 @@ onMounted(() => {
             <CalculatorForm @calculate="handleCalculate" />
           </div>
           <div class="calc-results-panel">
-            <CalculatorResults :result="result" :mode="calcMode" />
+            <CalculatorResults :result="result" :mode="calcMode" :error="calcError" />
           </div>
         </div>
 

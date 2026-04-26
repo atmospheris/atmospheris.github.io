@@ -139,6 +139,34 @@ const standardsComparison = [
       Bibliography and related standards for the ISO Standard Atmosphere models.
     </p>
 
+    <!-- What is the ISA? -->
+    <section class="section">
+      <h2 class="section-title">About the Standard Atmosphere</h2>
+      <p>
+        The <strong>International Standard Atmosphere (ISA)</strong> is a static, deterministic
+        model that defines temperature, pressure, density, and viscosity as functions of altitude.
+        It is not a forecast or an average &mdash; it is a fixed reference used for:
+      </p>
+      <ul class="content-list">
+        <li><strong>Aircraft performance</strong> &mdash; ISA conditions define baseline aircraft
+          performance metrics (e.g. service ceiling, takeoff distance).</li>
+        <li><strong>Altimeter calibration</strong> &mdash; Pressure altimeters are calibrated to
+          ISA pressure values. The difference between ISA and actual temperature determines
+          altimeter error.</li>
+        <li><strong>Scientific research</strong> &mdash; A common baseline enables reproducible
+          comparison of experimental results across locations and times.</li>
+        <li><strong>Industrial applications</strong> &mdash; HVAC, chemical processing, and
+          aerospace manufacturing use ISA conditions as design references.</li>
+      </ul>
+      <p>
+        The ISA assumes dry air as a perfect gas, a constant gravitational acceleration, and a
+        fixed atmospheric composition. These simplifications make the model deterministic and
+        reproducible, but mean it does not represent any specific real-world location or weather
+        condition. For observed conditions, see
+        <router-link to="/iso-5878">ISO 5878</router-link>.
+      </p>
+    </section>
+
     <!-- Standards Family Comparison -->
     <section class="section">
       <h2 class="section-title">Standards Family</h2>
@@ -198,8 +226,8 @@ const standardsComparison = [
         </p>
         <div class="cta-links">
           <router-link to="/calculator" class="btn btn-primary">Open Calculator</router-link>
-          <router-link to="/iso-2533" class="btn btn-outline-dark">ISO 2533</router-link>
-          <router-link to="/iso-5878" class="btn btn-outline-dark">ISO 5878</router-link>
+          <router-link to="/iso-2533" class="btn btn-outline">ISO 2533</router-link>
+          <router-link to="/iso-5878" class="btn btn-outline">ISO 5878</router-link>
         </div>
       </div>
     </section>

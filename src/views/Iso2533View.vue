@@ -7,6 +7,34 @@ useSeo({
   description: 'The ISO 2533 Standard Atmosphere model defines a reference vertical distribution of atmospheric properties. Key constants, temperature layers, and formulas.',
   path: '/iso-2533'
 })
+
+// Atmospheric composition from ISO 2533:2026 Table 2
+const atmosphericComposition = [
+  { gas: 'N\u2082', name: 'Nitrogen', volume: '78.084', molarMass: '28.0134' },
+  { gas: 'O\u2082', name: 'Oxygen', volume: '20.9476', molarMass: '31.9988' },
+  { gas: 'Ar', name: 'Argon', volume: '0.934', molarMass: '39.948' },
+  { gas: 'CO\u2082', name: 'Carbon dioxide', volume: '0.0427', molarMass: '44.00995' },
+  { gas: 'Ne', name: 'Neon', volume: '0.00182', molarMass: '20.183' },
+  { gas: 'He', name: 'Helium', volume: '0.000524', molarMass: '4.0026' },
+  { gas: 'CH\u2084', name: 'Methane', volume: '0.000192', molarMass: '16.04303' },
+  { gas: 'Kr', name: 'Krypton', volume: '0.000114', molarMass: '83.80' },
+  { gas: 'H\u2082', name: 'Hydrogen', volume: '0.000055', molarMass: '2.01594' },
+  { gas: 'N\u2082O', name: 'Nitrous oxide', volume: '0.0000339', molarMass: '44.0128' },
+]
+
+// Sea-level physical characteristics from ISO 2533:2026 Table 3
+const seaLevelCharacteristics = [
+  { symbol: '<math><msub><mi>a</mi><mi>n</mi></msub></math>', value: '340.294', unit: 'm/s', desc: 'Speed of sound' },
+  { symbol: '<math><msub><mi>H</mi><mrow><mi>p</mi><mi>n</mi></mrow></msub></math>', value: '8434.5', unit: 'm', desc: 'Pressure scale height' },
+  { symbol: '<math><msub><mi>l</mi><mi>n</mi></msub></math>', value: '66.328 &times; 10\u207B\u2079', unit: 'm', desc: 'Mean free path of air particles' },
+  { symbol: '<math><msub><mi>n</mi><mi>n</mi></msub></math>', value: '25.471 &times; 10\u00B2\u2074', unit: 'm\u207B\u00B3', desc: 'Air number density' },
+  { symbol: '<math><mover><mi>v</mi><mo>\u0305</mo></mover><msub><mi>n</mi></msub></math>', value: '458.94', unit: 'm/s', desc: 'Mean air-particle speed' },
+  { symbol: '<math><msub><mi>&gamma;</mi><mi>n</mi></msub></math>', value: '12.013', unit: 'N/m\u00B3', desc: 'Specific weight' },
+  { symbol: '<math><msub><mi>&nu;</mi><mi>n</mi></msub></math>', value: '14.607 &times; 10\u207B\u2076', unit: 'm\u00B2/s', desc: 'Kinematic viscosity' },
+  { symbol: '<math><msub><mi>&lambda;</mi><mi>n</mi></msub></math>', value: '25.343 &times; 10\u207B\u00B3', unit: 'W/(m\u00B7K)', desc: 'Thermal conductivity' },
+  { symbol: '<math><msub><mi>&mu;</mi><mi>n</mi></msub></math>', value: '17.894 &times; 10\u207B\u2076', unit: 'Pa\u00B7s', desc: 'Dynamic viscosity' },
+  { symbol: '<math><msub><mi>&omega;</mi><mi>n</mi></msub></math>', value: '6.9193 &times; 10\u2079', unit: 's\u207B\u00B9', desc: 'Collision frequency' },
+]
 </script>
 
 <template>
@@ -15,7 +43,7 @@ useSeo({
     <p class="content-lead">
       The International Standard Atmosphere (ISA) is a reference model that defines the vertical
       distribution of atmospheric temperature, pressure, density, and other properties from
-      sea level to 80 km altitude.
+      &minus;5 km to 80 km altitude.
     </p>
 
     <!-- What is the Standard Atmosphere -->
@@ -36,6 +64,13 @@ useSeo({
         ISO 2533 specifies these layers, the associated physical constants, and the equations
         that relate altitude to atmospheric properties. The result is a deterministic model:
         given any valid altitude, all atmospheric properties can be calculated precisely.
+      </p>
+      <p>
+        The model assumes dry air as a perfect gas free from moisture and dust, with conventional
+        initial values of temperature, pressure, and density at mean sea level. These
+        simplifications make the model reproducible but mean it does not represent any specific
+        real-world condition &mdash; for observed conditions by latitude and season, see
+        <router-link to="/iso-5878">ISO 5878</router-link>.
       </p>
     </section>
 
@@ -101,7 +136,7 @@ useSeo({
             </math>
           </dt>
           <dd>{{ CONSTANTS.g_n }} m/s&sup2;</dd>
-          <dd class="constant-desc">Standard gravitational acceleration</dd>
+          <dd class="constant-desc">Standard acceleration of free fall</dd>
         </div>
         <div class="constant-item">
           <dt>
@@ -119,7 +154,7 @@ useSeo({
             </math>
           </dt>
           <dd>{{ CONSTANTS.p_n }} Pa</dd>
-          <dd class="constant-desc">Standard pressure</dd>
+          <dd class="constant-desc">Standard air pressure at sea level</dd>
         </div>
         <div class="constant-item">
           <dt>
@@ -128,7 +163,7 @@ useSeo({
             </math>
           </dt>
           <dd>{{ CONSTANTS.rho_n }} kg/m&sup3;</dd>
-          <dd class="constant-desc">Standard density</dd>
+          <dd class="constant-desc">Standard air density</dd>
         </div>
         <div class="constant-item">
           <dt>
@@ -137,7 +172,7 @@ useSeo({
             </math>
           </dt>
           <dd>{{ CONSTANTS.T_n }} K</dd>
-          <dd class="constant-desc">Standard temperature</dd>
+          <dd class="constant-desc">Standard thermodynamic air temperature at sea level (15 &deg;C)</dd>
         </div>
         <div class="constant-item">
           <dt>
@@ -155,14 +190,39 @@ useSeo({
             </math>
           </dt>
           <dd>{{ CONSTANTS.radius }} m</dd>
-          <dd class="constant-desc">Nominal Earth radius</dd>
+          <dd class="constant-desc">Nominal Earth radius (at 45&deg;32'33" latitude)</dd>
         </div>
         <div class="constant-item">
           <dt>
             <math><mi>&kappa;</mi></math>
           </dt>
           <dd>{{ CONSTANTS.kappa }}</dd>
-          <dd class="constant-desc">Adiabatic index / heat capacity ratio</dd>
+          <dd class="constant-desc">Adiabatic index (ratio of specific heats)</dd>
+        </div>
+        <div class="constant-item">
+          <dt>
+            <math><mi>S</mi></math>
+          </dt>
+          <dd>110.4 K</dd>
+          <dd class="constant-desc">Sutherland's temperature (for dynamic viscosity)</dd>
+        </div>
+        <div class="constant-item">
+          <dt>
+            <math>
+              <msub><mi>&beta;</mi><mi>s</mi></msub>
+            </math>
+          </dt>
+          <dd>1.468 &times; 10<sup>&minus;6</sup> kg/(m&middot;s&middot;K<sup>&frac12;</sup>)</dd>
+          <dd class="constant-desc">Sutherland's empirical coefficient</dd>
+        </div>
+        <div class="constant-item">
+          <dt>
+            <math>
+              <mi>&sigma;</mi>
+            </math>
+          </dt>
+          <dd>0.365 &times; 10<sup>&minus;9</sup> m</dd>
+          <dd class="constant-desc">Effective collision diameter of an air molecule</dd>
         </div>
         <div class="constant-item">
           <dt>
@@ -175,10 +235,75 @@ useSeo({
           <dt>
             <math><mi>R</mi></math>
           </dt>
-          <dd>{{ DERIVED_CONSTANTS.R.toFixed(3) }} J/(kg&middot;K)</dd>
+          <dd>{{ DERIVED_CONSTANTS.R.toFixed(5) }} J/(kg&middot;K)</dd>
           <dd class="constant-desc">Specific gas constant for air (derived)</dd>
         </div>
       </dl>
+    </section>
+
+    <!-- Atmospheric Composition -->
+    <section class="section">
+      <h2 class="section-title">Atmospheric Composition</h2>
+      <p>
+        Dry clean air composition remains practically constant up to altitudes of 90&ndash;95 km.
+        The ISA uses the following composition near sea level (from ISO 2533:2026 Table 2).
+        CO&#8322; content is updated from NOAA Global Monthly Mean data (December 2025).
+      </p>
+      <div class="table-responsive">
+        <table class="results-table layer-table">
+          <thead>
+            <tr>
+              <th>Gas</th>
+              <th>Name</th>
+              <th class="text-right">Volume %</th>
+              <th class="text-right">Molar Mass (kg/kmol)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="gas in atmosphericComposition" :key="gas.gas">
+              <td class="property-name"><strong>{{ gas.gas }}</strong></td>
+              <td>{{ gas.name }}</td>
+              <td class="property-value">{{ gas.volume }}</td>
+              <td class="property-value">{{ gas.molarMass }}</td>
+            </tr>
+            <tr class="total-row">
+              <td colspan="2"><strong>Total dry air</strong></td>
+              <td class="property-value">100</td>
+              <td class="property-value">{{ DERIVED_CONSTANTS.M.toFixed(6) }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Sea-level Characteristics -->
+    <section class="section">
+      <h2 class="section-title">Sea-level Characteristics</h2>
+      <p>
+        In addition to the primary constants, ISO 2533:2026 Table 3 defines the following
+        derived physical characteristics at mean sea level (H&nbsp;=&nbsp;0), calculated from
+        the fundamental constants.
+      </p>
+      <div class="table-responsive">
+        <table class="results-table layer-table">
+          <thead>
+            <tr>
+              <th>Property</th>
+              <th>Symbol</th>
+              <th class="text-right">Value</th>
+              <th>Unit</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="c in seaLevelCharacteristics" :key="c.desc">
+              <td>{{ c.desc }}</td>
+              <td class="property-name"><span v-html="c.symbol"></span></td>
+              <td class="property-value">{{ c.value }}</td>
+              <td><code>{{ c.unit }}</code></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </section>
 
     <!-- Temperature Layers -->
@@ -351,11 +476,18 @@ useSeo({
 
       <h3 class="api-subsection">Additional properties</h3>
       <p>
-        From temperature, pressure, and density, the model derives:
-        speed of sound, dynamic and kinematic viscosity, thermal conductivity,
-        specific weight, pressure scale height, air number density,
-        mean particle speed, mean free path, and collision frequency.
+        From temperature, pressure, and density, the model derives 16 additional properties:
       </p>
+      <ul class="content-list">
+        <li><strong>Speed of sound</strong> &mdash; <em>a</em> = &radic;(<em>&kappa;RT</em>)</li>
+        <li><strong>Dynamic viscosity</strong> &mdash; Sutherland&rsquo;s formula: <em>&mu;</em> = <em>&beta;</em><sub>s</sub> <em>T</em><sup>3/2</sup> / (<em>T</em> + <em>S</em>)</li>
+        <li><strong>Kinematic viscosity</strong> &mdash; <em>&nu;</em> = <em>&mu;</em> / <em>&rho;</em></li>
+        <li><strong>Thermal conductivity</strong> &mdash; derived from temperature</li>
+        <li><strong>Pressure scale height</strong> &mdash; <em>H</em><sub>p</sub> = <em>RT</em> / <em>g</em><sub>n</sub></li>
+        <li><strong>Air number density, mean particle speed, mean free path, collision frequency</strong>
+          &mdash; derived from kinetic theory of gases</li>
+        <li><strong>Specific weight, gravity ratio, mole volume</strong></li>
+      </ul>
     </section>
 
     <!-- Standards Family -->
@@ -418,9 +550,14 @@ useSeo({
           Compute atmospheric properties at any altitude using our interactive calculator,
           featuring 3D visualization, 2D charts, and table generation.
         </p>
-        <router-link to="/calculator" class="btn btn-primary">
-          Open Calculator
-        </router-link>
+        <div class="cta-links">
+          <router-link to="/calculator" class="btn btn-primary">
+            Open Calculator
+          </router-link>
+          <router-link to="/symbols" class="btn btn-outline">
+            Symbols &amp; Variables
+          </router-link>
+        </div>
       </div>
     </section>
 
@@ -495,3 +632,10 @@ useSeo({
     </section>
   </div>
 </template>
+
+<style scoped>
+.total-row td {
+  background: var(--color-surface-elevated);
+  font-weight: var(--font-weight-semibold);
+}
+</style>
