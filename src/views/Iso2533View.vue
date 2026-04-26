@@ -116,6 +116,36 @@ const seaLevelCharacteristics = [
       </ul>
     </section>
 
+    <!-- Why a Standard Atmosphere -->
+    <section class="section">
+      <h2 class="section-title">Why a Standard Atmosphere?</h2>
+      <p>
+        The concept of a standard atmosphere is crucial for numerous applications:
+      </p>
+      <div class="why-grid">
+        <div class="why-card">
+          <h3>Reference Framework</h3>
+          <p>A common basis for consistent and reliable characterization of atmospheric conditions, enabling accurate calculations, simulations, and assessments across industries.</p>
+        </div>
+        <div class="why-card">
+          <h3>Interoperability</h3>
+          <p>Ensures measurements, models, and simulations from different sources can be compared, promoting harmonization across international boundaries.</p>
+        </div>
+        <div class="why-card">
+          <h3>Performance Evaluation</h3>
+          <p>Enables objective assessment of aircraft performance, weather model accuracy, and system efficiency against a known baseline.</p>
+        </div>
+        <div class="why-card">
+          <h3>Safety Compliance</h3>
+          <p>Crucial for maintaining safety standards in aviation and aerospace, ensuring systems are designed to withstand expected atmospheric conditions.</p>
+        </div>
+        <div class="why-card">
+          <h3>International Collaboration</h3>
+          <p>Promotes knowledge sharing among researchers and practitioners worldwide by adopting a common reference for atmospheric phenomena.</p>
+        </div>
+      </div>
+    </section>
+
     <!-- Key Constants -->
     <section class="section">
       <h2 class="section-title">Key Constants</h2>
@@ -239,6 +269,108 @@ const seaLevelCharacteristics = [
           <dd class="constant-desc">Specific gas constant for air (derived)</dd>
         </div>
       </dl>
+    </section>
+
+    <!-- Foundational Physics -->
+    <section class="section">
+      <h2 class="section-title">Foundational Physics</h2>
+      <p>
+        The ISA model is built from a small set of fundamental equations. Understanding
+        these makes the entire model transparent.
+      </p>
+
+      <h3>The hydrostatic equation</h3>
+      <p>
+        A static atmosphere in equilibrium satisfies the relation between pressure,
+        density, gravity, and altitude:
+      </p>
+      <div class="math-block">
+        <math display="block">
+          <mrow>
+            <mo>&minus;</mo><mi>dp</mi><mo>=</mo><mi>&rho;</mi><mo>&times;</mo><mi>g</mi><mo>&times;</mo><mi>dh</mi>
+          </mrow>
+        </math>
+      </div>
+
+      <h3 class="api-subsection">The perfect gas law</h3>
+      <p>
+        At the altitudes covered by ISO 2533, air behaves as a perfect gas with constant
+        molar mass. The full form uses the universal gas constant, while the simplified
+        form uses the specific gas constant <em>R</em> = <em>R</em>&sup2;/M:
+      </p>
+      <div class="math-block">
+        <math display="block">
+          <mrow>
+            <mi>p</mi><mo>=</mo><mi>&rho;</mi><mo>&times;</mo><mi>R</mi><mo>&times;</mo><mi>T</mi>
+          </mrow>
+        </math>
+      </div>
+
+      <h3 class="api-subsection">Gravity vs. altitude</h3>
+      <p>
+        The acceleration of free fall decreases with distance from the Earth&rsquo;s centre,
+        following Newton&rsquo;s gravitation law. The nominal Earth radius
+        <em>r</em>&nbsp;=&nbsp;6,356,766 m is from the Smithsonian Meteorological Tables,
+        most accurate at latitude 45&deg;32'33":
+      </p>
+      <div class="math-block">
+        <math display="block">
+          <mrow>
+            <mi>g</mi><mo>=</mo><msub><mi>g</mi><mi>n</mi></msub>
+            <mo>&times;</mo>
+            <msup>
+              <mrow><mo>(</mo><mfrac><mi>r</mi><mrow><mi>r</mi><mo>+</mo><mi>h</mi></mrow></mfrac><mo>)</mo></mrow>
+              <mn>2</mn>
+            </msup>
+          </mrow>
+        </math>
+      </div>
+      <p>
+        This approximation differs from the more accurate equation in the US Standard
+        Atmosphere 1976 by less than 0.001% at 60,000 m.
+      </p>
+
+      <h3 class="api-subsection">Geopotential altitude</h3>
+      <p>
+        Geopotential altitude <em>H</em> is defined by integrating gravity over geometric
+        altitude, then dividing by the standard gravity <em>g</em><sub>n</sub>:
+      </p>
+      <div class="math-block">
+        <math display="block">
+          <mrow>
+            <mi>H</mi><mo>=</mo>
+            <mfrac><mn>1</mn><msub><mi>g</mi><mi>n</mi></msub></mfrac>
+            <mo>&times;</mo>
+            <msubsup><mo>&int;</mo><mn>0</mn><mi>h</mi></msubsup>
+            <mi>g</mi><mo>(</mo><mi>h</mi><mo>)</mo><mi>dh</mi>
+          </mrow>
+        </math>
+      </div>
+      <p>
+        This gives the conversion formulas between geopotential and geometric altitude:
+      </p>
+      <div class="math-block">
+        <math display="block">
+          <mtable>
+            <mtr>
+              <mtd>
+                <mrow>
+                  <mi>H</mi><mo>=</mo>
+                  <mfrac><mrow><mi>r</mi><mo>&times;</mo><mi>h</mi></mrow><mrow><mi>r</mi><mo>+</mo><mi>h</mi></mrow></mfrac>
+                </mrow>
+              </mtd>
+            </mtr>
+            <mtr>
+              <mtd>
+                <mrow>
+                  <mi>h</mi><mo>=</mo>
+                  <mfrac><mrow><mi>r</mi><mo>&times;</mo><mi>H</mi></mrow><mrow><mi>r</mi><mo>&minus;</mo><mi>H</mi></mrow></mfrac>
+                </mrow>
+              </mtd>
+            </mtr>
+          </mtable>
+        </math>
+      </div>
     </section>
 
     <!-- Atmospheric Composition -->
@@ -474,20 +606,157 @@ const seaLevelCharacteristics = [
         </math>
       </div>
 
-      <h3 class="api-subsection">Additional properties</h3>
+      <h3 class="api-subsection">Density and specific weight</h3>
       <p>
-        From temperature, pressure, and density, the model derives 16 additional properties:
+        Density is calculated from pressure and temperature via the perfect gas law:
       </p>
-      <ul class="content-list">
-        <li><strong>Speed of sound</strong> &mdash; <em>a</em> = &radic;(<em>&kappa;RT</em>)</li>
-        <li><strong>Dynamic viscosity</strong> &mdash; Sutherland&rsquo;s formula: <em>&mu;</em> = <em>&beta;</em><sub>s</sub> <em>T</em><sup>3/2</sup> / (<em>T</em> + <em>S</em>)</li>
-        <li><strong>Kinematic viscosity</strong> &mdash; <em>&nu;</em> = <em>&mu;</em> / <em>&rho;</em></li>
-        <li><strong>Thermal conductivity</strong> &mdash; derived from temperature</li>
-        <li><strong>Pressure scale height</strong> &mdash; <em>H</em><sub>p</sub> = <em>RT</em> / <em>g</em><sub>n</sub></li>
-        <li><strong>Air number density, mean particle speed, mean free path, collision frequency</strong>
-          &mdash; derived from kinetic theory of gases</li>
-        <li><strong>Specific weight, gravity ratio, mole volume</strong></li>
-      </ul>
+      <div class="math-block">
+        <math display="block">
+          <mrow>
+            <mi>&rho;</mi><mo>=</mo>
+            <mfrac><mi>p</mi><mrow><mi>R</mi><mo>&times;</mo><mi>T</mi></mrow></mfrac>
+          </mrow>
+        </math>
+      </div>
+      <p>
+        Specific weight is the weight per unit volume of air:
+      </p>
+      <div class="math-block">
+        <math display="block">
+          <mrow>
+            <mi>&gamma;</mi><mo>=</mo><mi>&rho;</mi><mo>&times;</mo><mi>g</mi>
+          </mrow>
+        </math>
+      </div>
+
+      <h3 class="api-subsection">Speed of sound</h3>
+      <p>
+        The speed of propagation of an infinitesimal perturbation in the gas.
+        Not valid for shock waves or above the altitude limits of the standard.
+      </p>
+      <div class="math-block">
+        <math display="block">
+          <mrow>
+            <mi>a</mi><mo>=</mo>
+            <msqrt><mrow><mi>&kappa;</mi><mo>&times;</mo><mi>R</mi><mo>&times;</mo><mi>T</mi></mrow></msqrt>
+            <mo>&asymp;</mo>
+            <mn>20.04676</mn><mo>&times;</mo>
+            <msqrt><mi>T</mi></msqrt>
+          </mrow>
+        </math>
+      </div>
+
+      <h3 class="api-subsection">Dynamic viscosity (Sutherland&rsquo;s formula)</h3>
+      <p>
+        Based on kinetic theory with experimentally derived constants. Invalid above 90 km altitude.
+      </p>
+      <div class="math-block">
+        <math display="block">
+          <mrow>
+            <mi>&mu;</mi><mo>=</mo>
+            <mfrac>
+              <mrow><msub><mi>&beta;</mi><mi>s</mi></msub><mo>&times;</mo><msup><mi>T</mi><mrow><mn>3</mn><mo>/</mo><mn>2</mn></mrow></msup></mrow>
+              <mrow><mi>T</mi><mo>+</mo><mi>S</mi></mrow>
+            </mfrac>
+          </mrow>
+        </math>
+      </div>
+
+      <h3 class="api-subsection">Kinematic viscosity</h3>
+      <div class="math-block">
+        <math display="block">
+          <mrow>
+            <mi>&nu;</mi><mo>=</mo>
+            <mfrac><mi>&mu;</mi><mi>&rho;</mi></mfrac>
+          </mrow>
+        </math>
+      </div>
+
+      <h3 class="api-subsection">Thermal conductivity</h3>
+      <p>
+        Calculated from an empirical formula with coefficients derived from experiments.
+      </p>
+      <div class="math-block">
+        <math display="block">
+          <mrow>
+            <mi>&lambda;</mi><mo>=</mo>
+            <mfrac>
+              <mrow><mn>2.648151</mn><mo>&times;</mo><msup><mn>10</mn><mrow><mo>&minus;</mo><mn>3</mn></mrow></msup><mo>&times;</mo><msup><mi>T</mi><mrow><mn>3</mn><mo>/</mo><mn>2</mn></mrow></msup></mrow>
+              <mrow><mi>T</mi><mo>+</mo><mn>245.4</mn><mo>&times;</mo><msup><mn>10</mn><mrow><mo>&minus;</mo><mrow><mn>12</mn><mo>/</mo><mi>T</mi></mrow></mrow></msup></mrow>
+            </mfrac>
+          </mrow>
+        </math>
+      </div>
+
+      <h3 class="api-subsection">Pressure scale height</h3>
+      <div class="math-block">
+        <math display="block">
+          <mrow>
+            <msub><mi>H</mi><mi>p</mi></msub><mo>=</mo>
+            <mfrac><mrow><mi>R</mi><mo>&times;</mo><mi>T</mi></mrow><mi>g</mi></mfrac>
+          </mrow>
+        </math>
+      </div>
+
+      <h3 class="api-subsection">Air number density</h3>
+      <p>The number of neutral air particles per unit volume:</p>
+      <div class="math-block">
+        <math display="block">
+          <mrow>
+            <mi>n</mi><mo>=</mo>
+            <mfrac>
+              <mrow><msub><mi>N</mi><mi>A</mi></msub><mo>&times;</mo><mi>p</mi></mrow>
+              <mrow><msup><mi>R</mi><mo>*</mo></msup><mo>&times;</mo><mi>T</mi></mrow>
+            </mfrac>
+          </mrow>
+        </math>
+      </div>
+
+      <h3 class="api-subsection">Mean air-particle speed</h3>
+      <p>
+        Arithmetic average of air-particle speeds from Maxwell&rsquo;s distribution of molecular speeds:
+      </p>
+      <div class="math-block">
+        <math display="block">
+          <mrow>
+            <mover><mi>v</mi><mo>&macr;</mo></mover><mo>=</mo>
+            <msqrt><mrow><mfrac><mn>8</mn><mi>&pi;</mi></mfrac><mo>&times;</mo><mi>R</mi><mo>&times;</mo><mi>T</mi></mrow></msqrt>
+            <mo>&asymp;</mo>
+            <mn>1.595769</mn><mo>&times;</mo><msqrt><mrow><mi>R</mi><mo>&times;</mo><mi>T</mi></mrow></msqrt>
+          </mrow>
+        </math>
+      </div>
+
+      <h3 class="api-subsection">Mean free path</h3>
+      <p>
+        The average distance an air particle travels between successive collisions:
+      </p>
+      <div class="math-block">
+        <math display="block">
+          <mrow>
+            <mi>l</mi><mo>=</mo>
+            <mfrac>
+              <mrow><msup><mi>R</mi><mo>*</mo></msup><mo>&times;</mo><mi>T</mi></mrow>
+              <mrow><msqrt><mn>2</mn></msqrt><mo>&times;</mo><mi>&pi;</mi><mo>&times;</mo><msub><mi>N</mi><mi>A</mi></msub><mo>&times;</mo><msup><mi>&sigma;</mi><mn>2</mn></msup><mo>&times;</mo><mi>p</mi></mrow>
+            </mfrac>
+            <mo>=</mo>
+            <mfrac><mn>1</mn><mrow><msqrt><mn>2</mn></msqrt><mo>&times;</mo><mi>&pi;</mi><mo>&times;</mo><msup><mi>&sigma;</mi><mn>2</mn></msup><mo>&times;</mo><mi>n</mi></mrow></mfrac>
+          </mrow>
+        </math>
+      </div>
+
+      <h3 class="api-subsection">Collision frequency</h3>
+      <p>The mean air-particle speed divided by the mean free path:</p>
+      <div class="math-block">
+        <math display="block">
+          <mrow>
+            <mi>&omega;</mi><mo>=</mo>
+            <mn>4</mn><mo>&times;</mo><msup><mi>&sigma;</mi><mn>2</mn></msup><mo>&times;</mo><msub><mi>N</mi><mi>A</mi></msub>
+            <mo>&times;</mo><msqrt><mfrac><mi>&pi;</mi><mrow><msup><mi>R</mi><mo>*</mo></msup><mo>&times;</mo><mi>M</mi></mrow></mfrac></msqrt>
+            <mo>&times;</mo><mfrac><mi>p</mi><msqrt><mi>T</mi></msqrt></mfrac>
+          </mrow>
+        </math>
+      </div>
     </section>
 
     <!-- Standards Family -->
@@ -637,5 +906,32 @@ const seaLevelCharacteristics = [
 .total-row td {
   background: var(--color-surface-elevated);
   font-weight: var(--font-weight-semibold);
+}
+
+.why-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-lg);
+}
+
+.why-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg);
+  border-top: 3px solid var(--color-accent);
+}
+
+.why-card h3 {
+  font-size: var(--font-size-base);
+  margin-bottom: var(--spacing-xs);
+}
+
+.why-card p {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-light);
+  line-height: var(--line-height-relaxed);
+  margin-bottom: 0;
 }
 </style>

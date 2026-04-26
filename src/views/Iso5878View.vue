@@ -304,18 +304,164 @@ const latitudeZones = [
       <ul class="content-list">
         <li><strong>Vapour pressure</strong> &mdash;
           The partial pressure of water vapour:
-          <math><mi>e&prime;</mi><mo>=</mo><mi>r</mi><mo>/</mo><mo>(</mo><mn>621.98</mn><mo>+</mo><mi>r</mi><mo>)</mo><mo>&times;</mo><mi>p</mi></math></li>
-        <li><strong>Saturation vapour pressure</strong> &mdash;
-          The vapour pressure at which moist air exists in equilibrium with its liquid phase</li>
-        <li><strong>Dew-point temperature</strong> &mdash;
-          The temperature to which air must be cooled (at constant pressure) to reach saturation</li>
-        <li><strong>Relative humidity</strong> &mdash;
-          The ratio of actual vapour pressure to saturation vapour pressure</li>
+        </li>
       </ul>
+      <div class="math-block">
+        <math display="block">
+          <mrow>
+            <mi>e&prime;</mi><mo>=</mo>
+            <mfrac><mi>r</mi><mrow><mn>621.98</mn><mo>+</mo><mi>r</mi></mrow></mfrac>
+            <mo>&times;</mo><mi>p</mi>
+          </mrow>
+        </math>
+      </div>
+
+      <ul class="content-list">
+        <li><strong>Saturation vapour pressure</strong> &mdash;
+          The vapour pressure at which moist air exists in equilibrium with its liquid phase.
+          For &minus;20&deg;C &lt; <em>t</em> &lt; 30&deg;C, the following approximation applies:
+        </li>
+      </ul>
+      <div class="math-block">
+        <math display="block">
+          <mrow>
+            <mi>e&prime;</mi><msub><mi></mi><mi>w</mi></msub><mo>=</mo>
+            <mn>6.107</mn><mo>&times;</mo>
+            <msup><mn>10</mn><mrow><mo>(</mo><mi>a</mi><mo>&times;</mo><mi>t</mi><mo>)</mo><mo>/</mo><mo>(</mo><mi>b</mi><mo>+</mo><mi>t</mi><mo>)</mo></mrow></msup>
+          </mrow>
+        </math>
+      </div>
+      <p>
+        where <em>a</em> = 7.5 K, <em>b</em> = 237.3 K for <em>t</em> &ge; 0&deg;C;
+        and <em>a</em> = 9.5 K, <em>b</em> = 265.5 K over an ice surface for <em>t</em> &lt; 0&deg;C.
+      </p>
+
+      <ul class="content-list">
+        <li><strong>Dew-point temperature</strong> &mdash;
+          The temperature to which air must be cooled at constant pressure to reach saturation:
+        </li>
+      </ul>
+      <div class="math-block">
+        <math display="block">
+          <mrow>
+            <msub><mi>t</mi><mi>d</mi></msub><mo>=</mo>
+            <mfrac>
+              <mrow><mn>237.3</mn><mo>&times;</mo><msub><mi>log</mi><mn>10</mn></msub><mo>(</mo><mi>e&prime;</mi><mo>/</mo><mn>6.1070</mn><mo>)</mo></mrow>
+              <mrow><mn>7.5</mn><mo>&minus;</mo><msub><mi>log</mi><mn>10</mn></msub><mo>(</mo><mi>e&prime;</mi><mo>/</mo><mn>6.1070</mn><mo>)</mo></mrow>
+            </mfrac>
+          </mrow>
+        </math>
+      </div>
+
+      <ul class="content-list">
+        <li><strong>Relative humidity</strong> &mdash;
+          The ratio of actual vapour pressure to saturation vapour pressure at the same temperature and pressure:
+        </li>
+      </ul>
+      <div class="math-block">
+        <math display="block">
+          <mrow>
+            <mi>U</mi><mo>=</mo><mn>100</mn><mo>&times;</mo>
+            <mfrac><mi>e&prime;</mi><mrow><mi>e&prime;</mi><msub><mi></mi><mi>w</mi></msub></mrow></mfrac>
+          </mrow>
+        </math>
+      </div>
       <p>
         Humidity profiles are provided as median values by latitude zone and meridian,
         plus percentile distributions from station data, covering altitudes from sea level
         to approximately 10 km.
+      </p>
+    </section>
+
+    <!-- Cold and Warm Regimes -->
+    <section class="section">
+      <h2 class="section-title">Cold and Warm Stratospheric Regimes</h2>
+      <p>
+        In Arctic and sub-Arctic regions, sudden warmings and coolings of the winter
+        stratosphere and mesosphere produce large changes in the vertical structure of
+        the atmosphere. Observed 35 km temperatures have a range of roughly
+        <strong>75 K in winter</strong> compared with only <strong>20 K in summer</strong>.
+      </p>
+      <p>
+        The winter temperature distributions in this region are <em>bimodal</em> &mdash;
+        temperatures are normally much lower or much higher than the seasonal mean.
+        Consequently, mean monthly or seasonal atmospheric models for the winter months
+        are of limited value for specifying temperature in Arctic and sub-Arctic regions.
+      </p>
+      <p>
+        ISO 5878 provides separate <strong>cold</strong> and <strong>warm</strong>
+        stratospheric regime profiles for 60&deg;N and 80&deg;N in December&ndash;January,
+        constructed from observations at Fort Greely (Alaska), Fort Churchill (Canada),
+        West Geirinish (Scotland), and Heiss Island (Russia):
+      </p>
+      <div class="regime-grid">
+        <div class="regime-card regime-cold">
+          <h3>Cold Regime</h3>
+          <p>Defined when the observed temperature at 45 km is near:</p>
+          <ul>
+            <li><strong>223 K</strong> at 60&deg;N (equalled or exceeded in 93&ndash;98% of observations)</li>
+            <li><strong>232 K</strong> at 80&deg;N (exceeded in 80% of observations)</li>
+          </ul>
+        </div>
+        <div class="regime-card regime-warm">
+          <h3>Warm Regime</h3>
+          <p>Defined when the observed temperature at 45 km is near:</p>
+          <ul>
+            <li><strong>267 K</strong> at both 60&deg;N and 80&deg;N</li>
+            <li>Equalled or exceeded in 1&ndash;30% of observations depending on station</li>
+          </ul>
+        </div>
+      </div>
+      <p class="regime-note">
+        Note: These definitions differ from the Sudden Stratospheric Warming (SSW) definitions
+        used in the meteorological literature.
+      </p>
+    </section>
+
+    <!-- Atmospheric Variations -->
+    <section class="section">
+      <h2 class="section-title">Atmospheric Variations</h2>
+
+      <h3>Seasonal and latitudinal variations</h3>
+      <p>
+        Maximum and minimum mean monthly temperatures do not occur at all latitudes
+        and levels in the same month. Below 25 km, temperatures follow the expected
+        June/July maximum and December/January minimum pattern. In the upper
+        stratosphere, however, semi-annual and biennial cycles complicate the annual
+        temperature cycle.
+      </p>
+      <p>
+        A notable feature is the <strong>first isopycnic level</strong> near 8 km &mdash;
+        a level of minimum seasonal density variability where density remains
+        relatively constant throughout the year regardless of geographic location.
+        The levels of <em>maximum</em> seasonal and latitudinal variability in density
+        and pressure are between 65 km and 75 km, with the greatest variability at
+        high latitudes.
+      </p>
+      <p>
+        In the mesosphere (above 60&ndash;65 km), maximum mean monthly temperatures
+        occur in December/January &mdash; reversed from lower altitudes.
+      </p>
+
+      <h3 class="api-subsection">Longitudinal variations</h3>
+      <p>
+        In summer, longitudinal variations are relatively small at all latitudes
+        up to 80 km. Isotherms parallel latitude circles and the circulation pattern
+        is symmetrical about the poles.
+      </p>
+      <p>
+        During winter, however, longitudinal variations at 60&ndash;80&deg;N become
+        as important as latitudinal and seasonal changes:
+      </p>
+      <ul class="content-list">
+        <li>Mean monthly altitudes of pressure surfaces in the lower mesosphere vary by &gt;2,500 m</li>
+        <li>Temperatures vary by 15&ndash;20 K at 20&ndash;35 km</li>
+        <li>Densities change by 15&ndash;20% at 40&ndash;60 km</li>
+      </ul>
+      <p>
+        These differences reflect the longitudinal asymmetry in the winter circulation,
+        driven by the Aleutian anticyclone and the displacement of the polar low
+        toward the Eurasian continent.
       </p>
     </section>
 
@@ -646,5 +792,54 @@ const latitudeZones = [
     flex-direction: column;
     gap: var(--spacing-sm);
   }
+}
+
+/* Regime cards */
+.regime-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-lg);
+}
+
+.regime-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg);
+  border-top: 3px solid var(--color-accent);
+}
+
+.regime-card h3 {
+  font-size: var(--font-size-base);
+  margin-bottom: var(--spacing-sm);
+}
+
+.regime-card p {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-light);
+  margin-bottom: var(--spacing-xs);
+}
+
+.regime-card ul {
+  margin: var(--spacing-xs) 0 0;
+  padding-left: var(--spacing-md);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-light);
+}
+
+.regime-cold {
+  border-top-color: #3b82f6;
+}
+
+.regime-warm {
+  border-top-color: #f59e0b;
+}
+
+.regime-note {
+  margin-top: var(--spacing-md);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-light);
+  font-style: italic;
 }
 </style>
