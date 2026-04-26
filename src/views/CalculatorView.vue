@@ -140,7 +140,7 @@ onMounted(() => {
 
     <div class="calculator-body">
       <!-- Tab navigation -->
-      <div class="calc-tabs">
+      <div class="calc-tabs" role="tablist" aria-label="Calculator views">
         <router-link
           v-for="tab in tabs"
           :key="tab.key"
@@ -149,8 +149,10 @@ onMounted(() => {
           v-slot="{ navigate }"
         >
           <button
+            role="tab"
             class="calc-tab-btn"
             :class="{ active: activeTab === (tab.key || 'calculator') }"
+            :aria-selected="activeTab === (tab.key || 'calculator')"
             @click="navigate"
           >{{ tab.label }}</button>
         </router-link>

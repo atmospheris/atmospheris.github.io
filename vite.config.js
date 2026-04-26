@@ -19,7 +19,10 @@ export default defineConfig({
     cssCodeSplit: false,
     rollupOptions: {
       output: {
-        manualChunks: undefined
+        manualChunks: {
+          'three': ['three'],
+          'chart': ['chart.js']
+        }
       }
     }
   },

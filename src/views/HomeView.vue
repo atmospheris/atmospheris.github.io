@@ -118,15 +118,15 @@ puts result.density               #=> 0.4135 kg/m³`
       <div class="inline-calc animate-on-scroll">
         <h3 class="inline-calc-title">Quick Calculator</h3>
         <div class="inline-calc-input">
-          <label>Altitude <span class="range-hint">(-2,000 to 80,000)</span></label>
+          <label for="home-alt-input">Altitude <span class="range-hint">(-2,000 to 80,000)</span></label>
           <div class="inline-input-composite">
-            <input type="number" v-model.number="sliderAltitude" :min="altRange.min" :max="altRange.max" :step="altRange.step" />
-            <div class="inline-unit-seg">
-              <button :class="{ active: altUnit === 'm' }" @click="setAltUnit('m')">m</button>
-              <button :class="{ active: altUnit === 'ft' }" @click="setAltUnit('ft')">ft</button>
+            <input id="home-alt-input" type="number" v-model.number="sliderAltitude" :min="altRange.min" :max="altRange.max" :step="altRange.step" aria-label="Altitude value" />
+            <div class="inline-unit-seg" role="group" aria-label="Altitude unit">
+              <button :class="{ active: altUnit === 'm' }" @click="setAltUnit('m')" aria-label="Meters" aria-pressed="altUnit === 'm'">m</button>
+              <button :class="{ active: altUnit === 'ft' }" @click="setAltUnit('ft')" aria-label="Feet" aria-pressed="altUnit === 'ft'">ft</button>
             </div>
           </div>
-          <input type="range" v-model.number="sliderAltitude" :min="altRange.min" :max="altRange.max" :step="altRange.step" />
+          <input type="range" v-model.number="sliderAltitude" :min="altRange.min" :max="altRange.max" :step="altRange.step" aria-label="Altitude slider" />
         </div>
         <div class="props-grid" v-if="displayProps.length">
           <div class="prop-item" v-for="p in displayProps" :key="p.label">

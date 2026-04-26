@@ -208,5 +208,32 @@ function toggle(key) {
         </div>
       </div>
     </section>
+
+    <!-- Get Started -->
+    <section class="about-section about-section-alt">
+      <div class="about-section-inner">
+        <h2 class="about-section-title">Get Started</h2>
+        <p style="margin-bottom: var(--spacing-lg);">
+          Try the interactive calculator, explore the standards, or integrate the
+          library into your project.
+        </p>
+        <div class="oss-links">
+          <router-link to="/calculator" class="oss-link-card">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/></svg>
+            <div>
+              <strong>Interactive Calculator</strong>
+              <span>Calculate atmospheric properties at any altitude</span>
+            </div>
+          </router-link>
+          <router-link to="/library" class="oss-link-card">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/></svg>
+            <div>
+              <strong>Library Documentation</strong>
+              <span>Ruby gem and TypeScript/JavaScript API</span>
+            </div>
+          </router-link>
+        </div>
+      </div>
+    </section>
   </div>
 </template>

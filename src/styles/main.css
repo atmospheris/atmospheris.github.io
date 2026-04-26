@@ -10,6 +10,27 @@
   padding: 0;
 }
 
+/* --- Skip Link --- */
+.skip-link {
+  position: absolute;
+  top: -100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--color-accent);
+  color: #fff;
+  padding: 0.5rem 1rem;
+  border-radius: 0 0 var(--radius-md) var(--radius-md);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  z-index: 9999;
+  text-decoration: none;
+  transition: top 0.15s;
+}
+
+.skip-link:focus {
+  top: 0;
+}
+
 /* --- Design Tokens (Light Mode) --- */
 :root {
   /* Colors — Atmospheric blue palette (from logo) */
@@ -375,7 +396,7 @@ pre code {
 }
 
 .nav-dropdown-menu a:hover {
-  background: var(--color-bg);
+  background: var(--color-background);
   color: var(--color-accent);
 }
 
@@ -614,6 +635,11 @@ pre code {
 
 .footer-license-link:hover {
   color: rgba(248, 250, 252, 0.8);
+}
+
+@media (max-width: 900px) {
+  .footer-grid { grid-template-columns: 1fr 1fr; gap: var(--spacing-xl); }
+  .footer-brand { grid-column: 1 / -1; }
 }
 
 @media (max-width: 768px) {
@@ -1715,7 +1741,7 @@ pre code {
 .constant-desc {
   font-size: var(--font-size-xs);
   color: var(--color-text-light);
-  font-family: var(--font-body);
+  font-family: var(--font-sans);
 }
 
 /* --- Table Responsive Wrapper --- */

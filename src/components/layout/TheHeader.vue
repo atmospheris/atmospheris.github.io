@@ -6,6 +6,7 @@ const { isDark, toggle } = useTheme()
 const scrolled = ref(false)
 const mobileOpen = ref(false)
 const refDropdownOpen = ref(false)
+const dropdownRef = ref(null)
 
 function onScroll() {
   scrolled.value = window.scrollY > 10
@@ -21,6 +22,35 @@ function closeMobile() {
 
 function closeDropdown() {
   refDropdownOpen.value = false
+}
+
+function toggleDropdown() {
+  refDropdownOpen.value = !refDropdownOpen.value
+}
+
+function onDropdownKeydown(e) {
+  if (e.key === 'Escape') {
+    closeDropdown()
+    dropdownRef.value?.querySelector('.nav-dropdown-trigger')?.focus()
+  }
+  if (e.key === 'ArrowDown') {
+    e.preventDefault()
+    const links = dropdownRef.value?.querySelectorAll('.nav-dropdown-menu a')
+    if (links?.length) {
+      const focused = document.activeElement
+      const idx = Array.from(links).indexOf(focused)
+      links[(idx + 1) % links.length].focus()
+    }
+  }
+  if (e.key === 'ArrowUp') {
+    e.preventDefault()
+    const links = dropdownRef.value?.querySelectorAll('.nav-dropdown-menu a')
+    if (links?.length) {
+      const focused = document.activeElement
+      const idx = Array.from(links).indexOf(focused)
+      links[(idx - 1 + links.length) % links.length].focus()
+    }
+  }
 }
 
 onMounted(() => {
@@ -44,12 +74,17 @@ onUnmounted(() => {
       <nav class="header-nav">
         <router-link to="/calculator">Calculator</router-link>
         <router-link to="/library">Use API</router-link>
-        <div class="nav-dropdown" @click.stop="refDropdownOpen = !refDropdownOpen">
-          <button class="nav-dropdown-trigger" :class="{ active: refDropdownOpen }">
+        <div class="nav-dropdown" ref="dropdownRef" @click.stop="toggleDropdown" @keydown="onDropdownKeydown">
+          <button
+            class="nav-dropdown-trigger"
+            :class="{ active: refDropdownOpen }"
+            :aria-expanded="refDropdownOpen"
+            aria-haspopup="true"
+          >
             Reference
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
           </button>
-          <div class="nav-dropdown-menu" v-if="refDropdownOpen">
+          <div class="nav-dropdown-menu" v-if="refDropdownOpen" role="menu">
             <router-link to="/iso-2533" @click="closeDropdown">ISO 2533</router-link>
             <router-link to="/iso-5878" @click="closeDropdown">ISO 5878</router-link>
             <router-link to="/symbols" @click="closeDropdown">Symbols &amp; Variables</router-link>

@@ -81,6 +81,38 @@ const references = [
     link: 'https://www.bipm.org/en/publications/si-brochure'
   },
   {
+    title: 'ISO/DIS 5878',
+    org: 'International Organization for Standardization',
+    year: '2025',
+    description: 'Reference atmospheres for aerospace use. Provides temperature, pressure, density, wind, and humidity profiles for five latitude zones (15° to 80°N) in seasonal models (January and July). Incorporates previous addenda on wind characteristics and humidity. Includes machine-readable XML electronic inserts.',
+    relationship: 'Companion standard — provides observed atmospheric conditions to complement the idealized ISA.',
+    link: 'https://www.iso.org/standard/90974.html'
+  },
+  {
+    title: 'ISO 5878:1982',
+    org: 'International Organization for Standardization',
+    year: '1982',
+    description: 'First edition of reference atmospheres for aerospace use. Defines temperature, pressure, and density profiles by latitude zone and season from sea level to 25 km geopotential altitude.',
+    relationship: 'Superseded by ISO/DIS 5878.',
+    link: 'https://www.iso.org/standard/12077.html'
+  },
+  {
+    title: 'ISO 5878:1982/Add 1:1983',
+    org: 'International Organization for Standardization',
+    year: '1983',
+    description: 'Wind supplement to ISO 5878. Provides zonal and meridional wind component data, scalar mean speeds, and percentile values for four latitude bands, modeled using the circular normal (Rice) distribution.',
+    relationship: 'Supplement to ISO 5878:1982 adding wind characteristic data.',
+    link: 'https://www.iso.org/standard/12078.html'
+  },
+  {
+    title: 'ISO 5878:1982/Add 2:1983',
+    org: 'International Organization for Standardization',
+    year: '1983',
+    description: 'Humidity supplement to ISO 5878. Provides water vapor pressure and mixing ratio profiles for the same latitude zones and seasonal models.',
+    relationship: 'Supplement to ISO 5878:1982 adding humidity profiles.',
+    link: 'https://www.iso.org/standard/12079.html'
+  },
+  {
     title: 'UnitsML',
     org: 'UnitsML Group',
     year: '2011',
@@ -92,24 +124,24 @@ const references = [
 
 const standardsComparison = [
   { standard: 'ISO 2533:1975', range: '-2 km to 32 km', relation: 'Foundation document', color: '#2c84bf' },
-  { standard: 'ISO 2533:2026', range: 'TBD', relation: 'Modern revision (in progress)', color: '#7abae5' },
+  { standard: 'ISO 2533:2026', range: '-5 km to 80 km', relation: 'Modern revision', color: '#7abae5' },
   { standard: 'ICAO Doc 7488/3', range: '-2 km to 80 km', relation: 'Extends ISA to 80 km', color: '#a855f7' },
   { standard: 'US Std Atm 1976', range: '-2 km to 1,000 km', relation: 'Identical to 32 km', color: '#3b82f6' },
   { standard: 'WMO', range: '-2 km to 32 km', relation: 'Identical to ISA', color: '#06b6d4' },
+  { standard: 'ISO/DIS 5878', range: '0 to 25 km', relation: 'Companion: observed conditions by latitude', color: '#f59e0b' },
 ]
 </script>
 
 <template>
   <div class="content-page">
-    <div class="content-hero">
-      <h1>References</h1>
-      <p>Bibliography and related standards for the ISO 2533 Standard Atmosphere model.</p>
-    </div>
+    <h1>References</h1>
+    <p class="content-lead">
+      Bibliography and related standards for the ISO Standard Atmosphere models.
+    </p>
 
-    <div class="content-body">
-      <!-- Standards Family Comparison -->
-      <section class="content-section">
-        <h2>Standards Family</h2>
+    <!-- Standards Family Comparison -->
+    <section class="section">
+      <h2 class="section-title">Standards Family</h2>
         <p>Several international standards define atmosphere models that are related to or derived from the ISO Standard Atmosphere.</p>
         <div class="table-responsive">
           <table class="layer-table">
@@ -134,9 +166,9 @@ const standardsComparison = [
         </div>
       </section>
 
-      <!-- Bibliography -->
-      <section class="content-section">
-        <h2>Bibliography</h2>
+    <!-- Bibliography -->
+    <section class="section">
+      <h2 class="section-title">Bibliography</h2>
         <div class="references-grid">
           <div v-for="ref in references" :key="ref.title" class="ref-card">
             <div class="ref-header">
@@ -155,6 +187,21 @@ const standardsComparison = [
           </div>
         </div>
       </section>
-    </div>
+
+    <!-- Next Steps -->
+    <section class="section">
+      <div class="cta-card">
+        <h2>Explore the Standards</h2>
+        <p>
+          Dive into the implementation details, constants, and interactive tools
+          for each standard.
+        </p>
+        <div class="cta-links">
+          <router-link to="/calculator" class="btn btn-primary">Open Calculator</router-link>
+          <router-link to="/iso-2533" class="btn btn-outline-dark">ISO 2533</router-link>
+          <router-link to="/iso-5878" class="btn btn-outline-dark">ISO 5878</router-link>
+        </div>
+      </div>
+    </section>
   </div>
 </template>
