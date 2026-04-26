@@ -628,6 +628,7 @@ const latitudeZones = [
 .wind-calc-card {
   background: var(--color-surface);
   border: 1px solid var(--color-border);
+  border-left: 3px solid var(--color-accent);
   border-radius: var(--radius-lg);
   padding: var(--spacing-lg);
   margin-top: var(--spacing-md);
@@ -694,6 +695,7 @@ const latitudeZones = [
 }
 
 .wind-results-header h3 {
+  font-family: var(--font-display);
   font-size: var(--font-size-lg);
   font-weight: var(--font-weight-semibold);
   margin-bottom: var(--spacing-md);
@@ -713,6 +715,7 @@ const latitudeZones = [
   padding: var(--spacing-sm) var(--spacing-md);
   background: var(--color-surface-elevated);
   border-radius: var(--radius-md);
+  border-left: 3px solid var(--color-accent);
 }
 
 .wind-stat-label {
@@ -732,6 +735,7 @@ const latitudeZones = [
 
 /* Percentiles */
 .wind-percentiles h4 {
+  font-family: var(--font-display);
   font-size: var(--font-size-base);
   font-weight: var(--font-weight-semibold);
   margin-bottom: var(--spacing-sm);
@@ -778,6 +782,7 @@ const latitudeZones = [
 }
 
 .zone-body h3 {
+  font-family: var(--font-display);
   font-size: var(--font-size-base);
   margin-bottom: var(--spacing-xs);
 }
@@ -809,10 +814,42 @@ const latitudeZones = [
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
   padding: var(--spacing-lg);
-  border-top: 3px solid var(--color-accent);
+  position: relative;
+  overflow: hidden;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.regime-card:hover {
+  box-shadow: var(--shadow-sm);
+}
+
+.regime-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+}
+
+.regime-cold {
+  border-top: none;
+}
+
+.regime-cold::before {
+  background: linear-gradient(90deg, #3b82f6, #93c5fd);
+}
+
+.regime-warm {
+  border-top: none;
+}
+
+.regime-warm::before {
+  background: linear-gradient(90deg, #f59e0b, #fbbf24);
 }
 
 .regime-card h3 {
+  font-family: var(--font-display);
   font-size: var(--font-size-base);
   margin-bottom: var(--spacing-sm);
 }
@@ -828,14 +865,6 @@ const latitudeZones = [
   padding-left: var(--spacing-md);
   font-size: var(--font-size-sm);
   color: var(--color-text-light);
-}
-
-.regime-cold {
-  border-top-color: #3b82f6;
-}
-
-.regime-warm {
-  border-top-color: #f59e0b;
 }
 
 .regime-note {

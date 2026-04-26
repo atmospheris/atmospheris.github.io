@@ -485,6 +485,10 @@ dist.percentile_bounds #=> { 1 => Pair, 10 => Pair, 20 => Pair }</code></pre>
   margin-top: var(--spacing-sm);
 }
 
+.install-card h3 {
+  font-family: var(--font-display);
+}
+
 .prop-group-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
@@ -497,10 +501,28 @@ dist.percentile_bounds #=> { 1 => Pair, 10 => Pair, 20 => Pair }</code></pre>
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
   padding: var(--spacing-lg);
-  border-top: 3px solid var(--color-accent);
+  position: relative;
+  overflow: hidden;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.prop-group-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--color-accent), var(--color-accent-light));
+}
+
+.prop-group-card:hover {
+  border-color: var(--color-accent);
+  box-shadow: var(--shadow-sm);
 }
 
 .prop-group-card h3 {
+  font-family: var(--font-display);
   font-size: var(--font-size-base);
   margin-bottom: var(--spacing-md);
 }
