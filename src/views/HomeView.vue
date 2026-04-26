@@ -277,9 +277,11 @@ puts wind.vsc  #=> 6.03 m/s`
   text-decoration: none;
   color: var(--color-text);
   padding: var(--spacing-lg);
+  position: relative;
 }
 
 .standard-card h3 {
+  font-family: var(--font-display);
   font-size: var(--font-size-xl);
   font-weight: var(--font-weight-bold);
   margin-bottom: var(--spacing-xs);
@@ -294,17 +296,20 @@ puts wind.vsc  #=> 6.03 m/s`
 .standard-card p:last-of-type {
   flex: 1;
   margin-bottom: var(--spacing-md);
+  line-height: var(--line-height-relaxed);
+  font-size: var(--font-size-sm);
 }
 
 .standard-card-badge {
   display: inline-block;
   width: fit-content;
+  font-family: var(--font-display);
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-semibold);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  padding: 0.2em 0.6em;
-  border-radius: var(--radius-md);
+  letter-spacing: 0.06em;
+  padding: 0.2em 0.7em;
+  border-radius: var(--radius-full);
   margin-bottom: var(--spacing-sm);
   background: var(--color-accent-subtle);
   color: var(--color-accent-dark);
