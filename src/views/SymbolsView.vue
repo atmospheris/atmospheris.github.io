@@ -445,8 +445,8 @@ const propGroups = [
             </p>
             <div class="cta-links">
               <router-link to="/calculator" class="btn btn-primary">Open Calculator</router-link>
-              <router-link to="/iso-2533" class="btn btn-outline-dark">ISO 2533 Details</router-link>
-              <router-link to="/library" class="btn btn-outline-dark">Library Docs</router-link>
+              <router-link to="/iso-2533" class="btn btn-outline">ISO 2533 Details</router-link>
+              <router-link to="/library" class="btn btn-outline">Library Docs</router-link>
             </div>
           </div>
         </div>

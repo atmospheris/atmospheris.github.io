@@ -38,6 +38,15 @@ const surfaceConditions = [
   { latitude: '60°N', g0: 9.81911, radius: 6367.10, tDec: 256.150, tJun: 282.150, pDec: 1013.000, pJun: 1010.200 },
   { latitude: '80°N', g0: 9.83051, radius: 6376.56, tDec: 248.950, tJun: 276.650, pDec: 1013.800, pJun: 1012.000 },
 ]
+
+// Latitude zone descriptions
+const latitudeZones = [
+  { zone: '15°', name: 'Tropical', description: 'Annual model (no seasonal distinction). Warm, stable conditions year-round near the equator.' },
+  { zone: '30°N', name: 'Subtropical', description: 'January: cool, dry conditions. July: warm, monsoonal influences. Strong seasonal contrast.' },
+  { zone: '45°N', name: 'Mid-latitude', description: 'January: cold winter conditions. July: warm summer. Significant seasonal temperature swing (~18.5 K).' },
+  { zone: '60°N', name: 'Subarctic', description: 'January: very cold winter. July: mild summer. Largest seasonal temperature range (~26 K).' },
+  { zone: '80°N', name: 'Arctic', description: 'January: extremely cold polar conditions. July: cool summer with significant warming from winter.' },
+]
 </script>
 
 <template>
@@ -81,6 +90,26 @@ const surfaceConditions = [
           zones and seasonal models.
         </li>
       </ul>
+    </section>
+
+    <!-- Latitude Zones -->
+    <section class="section">
+      <h2 class="section-title">Latitude Zones</h2>
+      <p>
+        ISO 5878 provides atmospheric models for five latitudinal bands, representing
+        conditions from the tropics to the Arctic. The 15° zone uses an annual model
+        (tropical conditions vary little seasonally), while the other four zones provide
+        separate January and July seasonal profiles.
+      </p>
+      <div class="zone-cards">
+        <div v-for="z in latitudeZones" :key="z.zone" class="zone-card">
+          <div class="zone-lat">{{ z.zone }}</div>
+          <div class="zone-body">
+            <h3>{{ z.name }}</h3>
+            <p>{{ z.description }}</p>
+          </div>
+        </div>
+      </div>
     </section>
 
     <!-- Wind Characteristics -->
@@ -148,7 +177,7 @@ const surfaceConditions = [
       <h2 class="section-title">Wind Distribution Calculator</h2>
       <p>
         Enter observed wind parameters to compute derived wind characteristics
-        using the Rice distribution per ISO 5878 Section 5.4.
+        using the Rice distribution per ISO 5878.
       </p>
 
       <div class="wind-calc-card">
@@ -241,6 +270,53 @@ const surfaceConditions = [
           </div>
         </div>
       </div>
+    </section>
+
+    <!-- Humidity -->
+    <section class="section">
+      <h2 class="section-title">Humidity Models</h2>
+      <p>
+        ISO 5878 provides humidity profiles for each latitude zone and seasonal model.
+        The <strong>humidity mixing ratio</strong> <math><mi>r</mi></math> is the primary
+        humidity characteristic &mdash; it is the ratio of water vapour mass to dry air
+        mass in the same volume, expressed in g/kg:
+      </p>
+      <div class="math-block">
+        <math display="block">
+          <mrow>
+            <mi>r</mi>
+            <mo>=</mo>
+            <mfrac>
+              <msub><mi>m</mi><mi>v</mi></msub>
+              <msub><mi>m</mi><mi>a</mi></msub>
+            </mfrac>
+          </mrow>
+        </math>
+      </div>
+      <p>
+        The mixing ratio is used as the primary characteristic because it is the most
+        conservative &mdash; it remains constant during vertical or horizontal air
+        movements unless condensation or evaporation occurs.
+      </p>
+      <p>
+        From the mixing ratio, the standard derives:
+      </p>
+      <ul class="content-list">
+        <li><strong>Vapour pressure</strong> &mdash;
+          The partial pressure of water vapour:
+          <math><mi>e&prime;</mi><mo>=</mo><mi>r</mi><mo>/</mo><mo>(</mo><mn>621.98</mn><mo>+</mo><mi>r</mi><mo>)</mo><mo>&times;</mo><mi>p</mi></math></li>
+        <li><strong>Saturation vapour pressure</strong> &mdash;
+          The vapour pressure at which moist air exists in equilibrium with its liquid phase</li>
+        <li><strong>Dew-point temperature</strong> &mdash;
+          The temperature to which air must be cooled (at constant pressure) to reach saturation</li>
+        <li><strong>Relative humidity</strong> &mdash;
+          The ratio of actual vapour pressure to saturation vapour pressure</li>
+      </ul>
+      <p>
+        Humidity profiles are provided as median values by latitude zone and meridian,
+        plus percentile distributions from station data, covering altitudes from sea level
+        to approximately 10 km.
+      </p>
     </section>
 
     <!-- Surface Conditions -->
@@ -520,5 +596,55 @@ const surfaceConditions = [
 .pct-hint {
   color: var(--color-text-light);
   font-size: var(--font-size-xs);
+}
+
+/* Latitude zone cards */
+.zone-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-lg);
+}
+
+.zone-card {
+  display: flex;
+  gap: var(--spacing-md);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg);
+  transition: border-color var(--transition-fast);
+}
+
+.zone-card:hover {
+  border-color: var(--color-accent);
+}
+
+.zone-lat {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-accent);
+  font-family: var(--font-mono);
+  flex-shrink: 0;
+  min-width: 50px;
+}
+
+.zone-body h3 {
+  font-size: var(--font-size-base);
+  margin-bottom: var(--spacing-xs);
+}
+
+.zone-body p {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-light);
+  line-height: var(--line-height-relaxed);
+  margin-bottom: 0;
+}
+
+@media (max-width: 640px) {
+  .zone-card {
+    flex-direction: column;
+    gap: var(--spacing-sm);
+  }
 }
 </style>

@@ -1146,6 +1146,12 @@ pre code {
   margin-bottom: var(--spacing-md);
 }
 
+.cta-links {
+  display: flex;
+  gap: var(--spacing-md);
+  flex-wrap: wrap;
+}
+
 /* --- ISO Purchase Card --- */
 .iso-purchase-card {
   background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);

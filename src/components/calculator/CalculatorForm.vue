@@ -8,7 +8,7 @@ const emit = defineEmits(['calculate'])
 const route = useRoute()
 
 const mode = ref('altitude')
-const altitudeValue = ref(-2000)
+const altitudeValue = ref(0)
 const altitudeUnit = ref('meters')
 const altitudeType = ref('geopotential')
 const pressureValue = ref(1013.25)
@@ -227,6 +227,11 @@ onMounted(() => {
       <button :class="{ active: mode === 'pressure' }" @click="setMode('pressure')">By Pressure</button>
       <button :class="{ active: mode === 'property' }" @click="setMode('property')">By Property</button>
     </div>
+    <p class="mode-desc">
+      <template v-if="mode === 'altitude'">Given an altitude (geopotential or geometric), calculate all 19 atmospheric properties.</template>
+      <template v-else-if="mode === 'pressure'">Given a pressure value, find the corresponding altitude (hypsometrical lookup).</template>
+      <template v-else>Given any atmospheric property value, find the corresponding altitude.</template>
+    </p>
 
     <!-- Altitude mode -->
     <template v-if="mode === 'altitude'">

@@ -3,7 +3,8 @@ import { computed, ref } from 'vue'
 
 const props = defineProps({
   result: { type: Object, default: null },
-  mode: { type: String, default: 'altitude' }
+  mode: { type: String, default: 'altitude' },
+  error: { type: String, default: null }
 })
 
 const copied = ref(false)
@@ -369,8 +370,13 @@ function toggleGroup(group) {
     </div>
   </div>
   <div v-else class="empty-state">
-    <svg class="empty-state-icon" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent-subtle)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-    <p>Enter an altitude or property value to calculate atmospheric properties.</p>
+    <svg v-if="error" class="empty-state-icon" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--color-error)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+    <svg v-else class="empty-state-icon" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent-subtle)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+    <p v-if="error" class="calc-error">{{ error }}</p>
+    <template v-else>
+      <p>Enter an altitude or property value to calculate atmospheric properties.</p>
+      <p class="empty-hint">Use the presets on the left to jump to key altitudes, or enter a custom value.</p>
+    </template>
   </div>
 
   <!-- Toast -->
