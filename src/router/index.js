@@ -41,6 +41,11 @@ const routes = [
     component: () => import('@/views/Iso2533View.vue')
   },
   {
+    path: '/iso-5878',
+    name: 'ISO5878',
+    component: () => import('@/views/Iso5878View.vue')
+  },
+  {
     path: '/references',
     name: 'References',
     component: () => import('@/views/ReferencesView.vue')

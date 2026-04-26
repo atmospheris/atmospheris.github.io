@@ -51,6 +51,7 @@ onUnmounted(() => {
           </button>
           <div class="nav-dropdown-menu" v-if="refDropdownOpen">
             <router-link to="/iso-2533" @click="closeDropdown">ISO 2533</router-link>
+            <router-link to="/iso-5878" @click="closeDropdown">ISO 5878</router-link>
             <router-link to="/symbols" @click="closeDropdown">Symbols &amp; Variables</router-link>
             <router-link to="/references" @click="closeDropdown">References</router-link>
             <div class="nav-dropdown-divider"></div>
@@ -82,6 +83,7 @@ onUnmounted(() => {
     <router-link to="/library" @click="closeMobile">Use API</router-link>
     <div class="mobile-nav-section">Reference</div>
     <router-link to="/iso-2533" @click="closeMobile" class="mobile-nav-sub">ISO 2533</router-link>
+    <router-link to="/iso-5878" @click="closeMobile" class="mobile-nav-sub">ISO 5878</router-link>
     <router-link to="/symbols" @click="closeMobile" class="mobile-nav-sub">Symbols &amp; Variables</router-link>
     <router-link to="/references" @click="closeMobile" class="mobile-nav-sub">References</router-link>
     <router-link to="/about" @click="closeMobile" class="mobile-nav-sub">About</router-link>
