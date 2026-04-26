@@ -1302,6 +1302,25 @@ pre code {
   color: var(--color-text-light);
   margin-bottom: var(--spacing-2xl);
   max-width: 70ch;
+  line-height: var(--line-height-relaxed);
+}
+
+/* Content page h1 accent */
+.content-page h1 {
+  position: relative;
+  display: inline-block;
+  padding-bottom: var(--spacing-md);
+}
+
+.content-page h1::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 56px;
+  height: 3px;
+  background: var(--hero-gradient);
+  border-radius: 2px;
 }
 
 /* --- Content Lists --- */
@@ -1419,7 +1438,16 @@ pre code {
   content: '';
   position: absolute;
   top: 0; left: 0; right: 0; bottom: 0;
-  background: var(--hero-glow);
+  background: var(--hero-glow), var(--hero-glow-top);
+  pointer-events: none;
+}
+
+.about-hero::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  opacity: 0.03;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   pointer-events: none;
 }
 
@@ -1519,6 +1547,8 @@ pre code {
 
 .about-section-alt {
   background: var(--color-surface-elevated);
+  border-top: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border);
 }
 
 .about-section-inner {
@@ -1533,7 +1563,8 @@ pre code {
   color: var(--color-primary);
   margin-bottom: var(--spacing-xl);
   padding-bottom: var(--spacing-sm);
-  border-bottom: 2px solid var(--color-accent);
+  border-bottom: 2px solid transparent;
+  border-image: linear-gradient(90deg, var(--color-accent), transparent) 1;
 }
 
 .about-mission-text {
@@ -1565,13 +1596,19 @@ pre code {
 .pillar-icon {
   width: 48px;
   height: 48px;
-  border-radius: 50%;
+  border-radius: 12px;
   background: var(--color-accent-subtle);
   display: flex;
   align-items: center;
   justify-content: center;
   color: var(--color-accent);
   margin-bottom: var(--spacing-md);
+  transition: background var(--transition-fast), transform var(--transition-fast);
+}
+
+.pillar-card:hover .pillar-icon {
+  background: color-mix(in srgb, var(--color-accent) 15%, transparent);
+  transform: scale(1.05);
 }
 
 .pillar-card h3 {
@@ -1664,6 +1701,12 @@ pre code {
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
   padding: var(--spacing-2xl);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.ribose-card:hover {
+  border-color: var(--color-accent);
+  box-shadow: var(--shadow-sm);
 }
 
 .ribose-logo-link {
@@ -1720,12 +1763,29 @@ pre code {
   text-decoration: none;
   color: var(--color-text);
   transition: all var(--transition-fast);
+  position: relative;
+  overflow: hidden;
+}
+
+.oss-link-card::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: transparent;
+  transition: background var(--transition-fast);
 }
 
 .oss-link-card:hover {
   border-color: var(--color-accent);
   box-shadow: var(--shadow-sm);
   color: var(--color-text);
+}
+
+.oss-link-card:hover::before {
+  background: var(--color-accent);
 }
 
 .oss-link-card svg {
@@ -1770,6 +1830,12 @@ pre code {
   border-left: 3px solid var(--color-accent);
   border-radius: var(--radius-md);
   padding: var(--spacing-md);
+  transition: box-shadow var(--transition-fast), border-color var(--transition-fast);
+}
+
+.constant-item:hover {
+  box-shadow: var(--shadow-sm);
+  border-color: var(--color-accent);
 }
 
 .constant-item dt {
@@ -1818,6 +1884,7 @@ pre code {
 .math-block {
   background: var(--color-surface-elevated);
   border: 1px solid var(--color-border);
+  border-left: 3px solid var(--color-accent);
   border-radius: var(--radius-md);
   padding: var(--spacing-lg) var(--spacing-xl);
   margin: var(--spacing-lg) 0;
@@ -1891,11 +1958,13 @@ pre code {
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
   padding: var(--spacing-lg);
-  transition: box-shadow var(--transition-fast);
+  border-left: 3px solid transparent;
+  transition: box-shadow var(--transition-fast), border-color var(--transition-fast);
 }
 
 .ref-card:hover {
   box-shadow: var(--shadow-md);
+  border-left-color: var(--color-accent);
 }
 
 .ref-header {
@@ -1906,11 +1975,13 @@ pre code {
 }
 
 .ref-header h3 {
+  font-family: var(--font-display);
   font-size: var(--font-size-base);
   margin: 0;
 }
 
 .ref-year {
+  font-family: var(--font-mono);
   font-size: var(--font-size-xs);
   color: var(--color-text-light);
   background: var(--color-surface-elevated);
