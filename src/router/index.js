@@ -31,6 +31,12 @@ const routes = [
     meta: { tab: 'charts' }
   },
   {
+    path: '/calculator/wind',
+    name: 'Wind',
+    component: () => import('@/views/CalculatorView.vue'),
+    meta: { tab: 'wind' }
+  },
+  {
     path: '/library',
     name: 'Library',
     component: () => import('@/views/LibraryView.vue')

@@ -3,7 +3,7 @@ import { useSeo, buildSoftwareApplicationSchema } from '@/composables/useSeo'
 
 useSeo({
   title: 'Library Documentation',
-  description: 'Atmospheris library documentation — Ruby gem and TypeScript/JavaScript package for ISO 2533 Standard Atmosphere calculations.',
+  description: 'Atmospheris library documentation — Ruby gem and TypeScript/JavaScript package for ISO 2533 Standard Atmosphere and ISO 5878 wind distribution calculations.',
   path: '/library',
   schema: buildSoftwareApplicationSchema()
 })
@@ -13,10 +13,11 @@ useSeo({
   <div class="content-page">
     <h1>Library Documentation</h1>
     <p class="content-lead">
-      Atmospheris provides the ISO 2533 Standard Atmosphere model as both a Ruby gem and a
-      TypeScript/JavaScript library. Both implement the complete set of atmospheric property
-      calculations from the standard, covering all 19 derived properties across the full
-      altitude range of &minus;2,000 m to 80,000 m.
+      Atmospheris provides the ISO 2533 Standard Atmosphere model and ISO 5878 wind
+      distribution calculations as both a Ruby gem and a TypeScript/JavaScript library.
+      Both implement the complete set of atmospheric property calculations from the
+      standard, covering all 19 derived properties across the full altitude range of
+      &minus;2,000 m to 80,000 m, plus Rice distribution wind modeling per ISO 5878.
     </p>
 
     <!-- Installation -->
@@ -52,7 +53,7 @@ useSeo({
       <h2 class="section-title">TypeScript Quick Start</h2>
       <div class="code-block code-dark">
         <div class="code-tab">index.ts</div>
-        <pre><code>import { getAllProperties, getAltitudeFromPressure } from "atmospheris"
+        <pre><code>import { getAllProperties, getAltitudeFromPressure, computeWindDerived } from "atmospheris"
 
 // Get all properties at 10,000 m geopotential altitude
 const result = getAllProperties({
@@ -72,7 +73,11 @@ const alt = getAltitudeFromPressure({
   value: 264.36,
   unit: "mbar"
 })
-console.log(alt.geopotentialAltitude.meters) // ~10000</code></pre>
+console.log(alt.geopotentialAltitude.meters) // ~10000
+
+// Wind distribution (ISO 5878)
+const wind = computeWindDerived(-3.9, -1.2, 5.9)
+console.log(wind.Vsc)                     // 6.03 m/s</code></pre>
       </div>
     </section>
 
@@ -212,19 +217,71 @@ const r2 = getAltitudeFromProperty({
       <p>
         Computes derived wind characteristics from observed zonal and meridional wind
         components using the Rice (circular normal) distribution model defined in
-        ISO 5878. Returns scalar mean wind speed, per-component standard deviation,
-        and wind speeds at six percentile levels (1%, 10%, 20%, 80%, 90%, 99%).
+        ISO 5878 Section 5.4. Returns scalar mean wind speed, per-component standard
+        deviation, and wind speeds at six percentile levels (1%, 10%, 20%, 80%, 90%, 99%).
       </p>
 
       <div class="code-block code-dark">
         <pre><code>import { computeWindDerived } from "atmospheris"
 
 const wind = computeWindDerived(-3.9, -1.2, 5.9)
-// wind.Vr     => vector mean wind magnitude
-// wind.Vsc    => scalar mean wind speed
-// wind.sigma  => per-component std deviation
-// wind.percentiles["1"]  => { low, high }
-// wind.percentiles["99"] => { low, high }</code></pre>
+// wind.Vr     => 4.08 — vector mean wind magnitude
+// wind.Vsc    => 6.03 — scalar mean wind speed
+// wind.sigma  => 4.17 — per-component std deviation
+// wind.percentiles["1"]  => { low: ~0.1, high: ~14.7 }
+// wind.percentiles["10"] => { low: ~0.5, high: ~12.0 }
+// wind.percentiles["20"] => { low: ~1.2, high: ~10.5 }</code></pre>
+      </div>
+      <p>
+        For latitude zones above 20°N where the meridional component Vy is negligible,
+        pass <code>{ useAbsoluteVx: true }</code> to use |Vx| as Vr directly.
+      </p>
+
+      <h3 class="api-subsection">TypeScript &mdash; <code>RiceDistribution</code></h3>
+      <p>
+        Object-oriented wrapper that encapsulates a Rice distribution with fixed
+        parameters, providing lazy-cached PDF, CDF, quantile, mean, and percentile
+        computations:
+      </p>
+      <div class="code-block code-dark">
+        <pre><code>import { RiceDistribution } from "atmospheris"
+
+const dist = new RiceDistribution(4.08, 5.9)
+dist.mean()              // Vsc ≈ 6.03 m/s
+dist.pdf(5.0)            // probability density at 5 m/s
+dist.cdf(10.0)           // P(wind ≤ 10 m/s)
+dist.quantile(0.99)      // wind speed exceeded on 1% of occasions
+dist.percentileBounds()  // { 1: {low,high}, 10: {low,high}, 20: {low,high} }</code></pre>
+      </div>
+
+      <h3 class="api-subsection">TypeScript &mdash; <code>WindObservation</code></h3>
+      <p>
+        Encapsulates a single altitude-level wind observation with empirically measured
+        parameters and lazily computed derived statistics:
+      </p>
+      <div class="code-block code-dark">
+        <pre><code>import { WindObservation } from "atmospheris"
+
+const obs = new WindObservation({
+  geopotentialAltitude: 1000,
+  vx: -3.9, vy: -1.2, sigmaR: 5.9
+})
+obs.vr                        // 4.08 — vector mean wind magnitude
+obs.vsc                       // 6.03 — calculated scalar mean speed
+obs.percentileBounds[1].high  // ~14.7</code></pre>
+      </div>
+
+      <h3 class="api-subsection">TypeScript &mdash; Low-level wind functions</h3>
+      <p>
+        The underlying mathematical functions are also exported for advanced use:
+      </p>
+      <div class="code-block code-dark">
+        <pre><code>import {
+  besselI0, besselI1,     // Modified Bessel functions (Abramowitz & Stegun)
+  ricePdf, riceCdf,       // Rice distribution PDF and CDF
+  riceInvCdf,             // Rice inverse CDF (quantile)
+  riceMean,               // Rice analytical mean (ISO 5878 Eq. 4)
+} from "atmospheris"</code></pre>
       </div>
 
       <h3 class="api-subsection">TypeScript &mdash; Constants &amp; Layers</h3>
@@ -294,6 +351,55 @@ attrs.geopotential_altitude_meters  # => ~10000</code></pre>
         (Sutherland&rsquo;s formula), kinematic viscosity, speed of sound, thermal conductivity,
         mean free path, collision frequency, and air number density.
       </p>
+
+      <h3 class="api-subsection">Ruby &mdash; <code>Atmospheris::Iso5878.compute_wind_derived</code></h3>
+      <p>
+        Computes derived wind characteristics from observed zonal and meridional wind
+        components using the Rice (circular normal) distribution per ISO 5878 Section 5.4.
+      </p>
+      <div class="code-block code-dark">
+        <pre><code># Quick function API
+wind = Atmospheris::Iso5878.compute_wind_derived(-3.9, -1.2, 5.9)
+wind.vr     #=> 4.08 — vector mean wind magnitude
+wind.vsc    #=> 6.03 — scalar mean wind speed
+wind.sigma  #=> 4.17 — per-component std deviation
+wind.percentiles[1].high   #=> ~14.7
+wind.percentiles[10]       #=> PercentilePair(low, high)
+
+# For zones > 20°N where Vy ≈ 0
+wind = Atmospheris::Iso5878.compute_wind_derived(-3.9, 0, 5.9,
+  use_absolute_vx: true
+)</code></pre>
+      </div>
+
+      <h3 class="api-subsection">Ruby &mdash; <code>WindObservation</code></h3>
+      <p>
+        Encapsulates a single altitude-level wind observation with empirical parameters
+        and lazily computed derived statistics:
+      </p>
+      <div class="code-block code-dark">
+        <pre><code>obs = Atmospheris::Iso5878::WindObservation.new(
+  geopotential_altitude: 1000,
+  vx: -3.9, vy: -1.2, sigma_r: 5.9
+)
+obs.vr                          #=> 4.08
+obs.vsc                         #=> 6.03 (calculated)
+obs.percentile_bounds[1].high   #=> ~14.7
+obs.derived_fields              #=> WindDerivedFields struct</code></pre>
+      </div>
+
+      <h3 class="api-subsection">Ruby &mdash; <code>RiceDistribution</code></h3>
+      <p>
+        Object-oriented wrapper for the Rice distribution with lazy-cached computations:
+      </p>
+      <div class="code-block code-dark">
+        <pre><code>dist = Atmospheris::Iso5878::RiceDistribution.new(vr: 4.08, sigma_r: 5.9)
+dist.mean              #=> 6.03
+dist.pdf(5.0)          #=> probability density at 5 m/s
+dist.cdf(10.0)         #=> P(wind ≤ 10 m/s)
+dist.quantile(0.99)    #=> ~14.7
+dist.percentile_bounds #=> { 1 => Pair, 10 => Pair, 20 => Pair }</code></pre>
+      </div>
     </section>
 
     <!-- Precision Modes -->
