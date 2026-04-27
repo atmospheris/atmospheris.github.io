@@ -17,7 +17,7 @@ const year = new Date().getFullYear()
         <div class="footer-column">
           <h4>Resources</h4>
           <router-link to="/calculator">Calculator</router-link>
-          <router-link to="/library">Use API</router-link>
+          <router-link to="/api">API</router-link>
           <router-link to="/iso-2533">ISO 2533</router-link>
           <router-link to="/iso-5878">ISO 5878</router-link>
           <router-link to="/symbols">Symbols &amp; Variables</router-link>

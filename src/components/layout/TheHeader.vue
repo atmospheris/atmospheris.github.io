@@ -73,7 +73,7 @@ onUnmounted(() => {
 
       <nav class="header-nav">
         <router-link to="/calculator">Calculator</router-link>
-        <router-link to="/library">Use API</router-link>
+        <router-link to="/api">API</router-link>
         <div class="nav-dropdown" ref="dropdownRef" @click.stop="toggleDropdown" @keydown="onDropdownKeydown">
           <button
             class="nav-dropdown-trigger"
@@ -115,7 +115,7 @@ onUnmounted(() => {
 
   <nav class="mobile-nav" :class="{ open: mobileOpen }">
     <router-link to="/calculator" @click="closeMobile">Calculator</router-link>
-    <router-link to="/library" @click="closeMobile">Use API</router-link>
+    <router-link to="/api" @click="closeMobile">API</router-link>
     <div class="mobile-nav-section">Standards</div>
     <router-link to="/iso-2533" @click="closeMobile" class="mobile-nav-sub">ISO 2533</router-link>
     <router-link to="/iso-5878" @click="closeMobile" class="mobile-nav-sub">ISO 5878</router-link>

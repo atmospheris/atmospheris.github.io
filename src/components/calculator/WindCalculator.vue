@@ -405,7 +405,7 @@ onUnmounted(() => {
     <p class="wind-standards-note">
       Wind distribution calculated using the circular normal (Rice) distribution per
       <router-link to="/iso-5878">ISO 5878</router-link> Section 5.4.
-      See the <router-link to="/library">Library docs</router-link> for the
+      See the <router-link to="/api/js">API docs</router-link> for the
       <code>computeWindDerived</code> API.
     </p>
   </div>

@@ -873,7 +873,7 @@ const windBands = [
               <router-link to="/calculator" class="btn btn-primary">Open Calculator</router-link>
               <router-link to="/iso-2533" class="btn btn-outline">ISO 2533</router-link>
               <router-link to="/iso-5878" class="btn btn-outline">ISO 5878</router-link>
-              <router-link to="/library" class="btn btn-outline">Library Docs</router-link>
+              <router-link to="/api" class="btn btn-outline">Library Docs</router-link>
             </div>
           </div>
         </div>
