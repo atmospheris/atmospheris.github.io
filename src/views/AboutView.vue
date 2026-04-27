@@ -110,6 +110,25 @@ function toggle(key) {
         </div>
 
         <div class="origin-block">
+          <h3 class="origin-heading">The Name</h3>
+          <p>
+            <strong>Atmospheris</strong> blends two roots:
+            the Ancient Greek <em>atmos</em> (ἀτμός,
+            &ldquo;vapour&rdquo;) + <em>sphaira</em> (σφαῖρα,
+            &ldquo;sphere&rdquo;), giving us <em>atmosphere</em> &mdash;
+            the gaseous envelope surrounding Earth &mdash; and the suffix
+            <strong>&ndash;is</strong>, a direct nod to <strong>IS</strong> in
+            <em>International Standard</em>, the class of ISO documents that
+            define globally harmonized technical references.
+          </p>
+          <p>
+            The name captures the project&rsquo;s purpose in a single word:
+            the <em>atmosphere</em>, made accessible through an
+            <em>International Standard</em>.
+          </p>
+        </div>
+
+        <div class="origin-block">
           <h3 class="origin-heading">Why It Was Built</h3>
           <p>
             Atmospheris was first developed as a companion tool for the revised
