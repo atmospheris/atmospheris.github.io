@@ -312,14 +312,14 @@ puts wind.vsc  #=> 6.03 m/s`
           title="Dual Precision"
           description="Normal precision for engineering or reduced precision for quick estimates, dynamically calculated per ISO 2533 formulas."
           link-text="Learn more"
-          linkTo="/library"
+          linkTo="/api"
         />
         <FeatureCard
           :icon="featureIcons.export"
           title="Data Export"
           description="Export calculated properties to YAML, XML, and other formats for integration with your tools."
           link-text="View API"
-          linkTo="/library"
+          linkTo="/api"
         />
         <FeatureCard
           :icon="featureIcons.tables"
@@ -359,7 +359,7 @@ puts wind.vsc  #=> 6.03 m/s`
         </div>
       </div>
       <div class="quickstart-cta">
-        <router-link to="/library" class="btn btn-outline-dark">Full Documentation &rarr;</router-link>
+        <router-link to="/api" class="btn btn-outline-dark">Full Documentation &rarr;</router-link>
       </div>
     </div>
   </section>

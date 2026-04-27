@@ -42,6 +42,21 @@ const routes = [
     component: () => import('@/views/LibraryView.vue')
   },
   {
+    path: '/api',
+    name: 'API',
+    component: () => import('@/views/ApiView.vue')
+  },
+  {
+    path: '/api/js',
+    name: 'API-JS',
+    component: () => import('@/views/ApiJsView.vue')
+  },
+  {
+    path: '/api/ruby',
+    name: 'API-Ruby',
+    component: () => import('@/views/ApiRubyView.vue')
+  },
+  {
     path: '/iso-2533',
     name: 'ISO2533',
     component: () => import('@/views/Iso2533View.vue')

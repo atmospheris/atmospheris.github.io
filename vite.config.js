@@ -30,11 +30,7 @@ export default defineConfig({
     script: 'async',
     formatting: 'minify',
     includedRoutes() {
-      return ['/', '/calculator', '/calculator/explorer', '/calculator/wind', '/calculator/table', '/calculator/charts', '/library', '/iso-2533', '/iso-5878', '/references', '/symbols', '/about']
-    },
-    sitemap: {
-      hostname: 'https://www.atmospheris.org',
-      lastmod: new Date().toISOString()
+      return ['/', '/calculator', '/calculator/explorer', '/calculator/wind', '/calculator/table', '/calculator/charts', '/library', '/api', '/api/js', '/api/ruby', '/iso-2533', '/iso-5878', '/references', '/symbols', '/about']
     },
     crittersOptions: {
       reduceInlineStyles: false
