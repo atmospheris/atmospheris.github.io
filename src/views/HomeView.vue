@@ -59,6 +59,19 @@ const displayProps = computed(() => {
   ]
 })
 
+// Atmospheric layer for current altitude
+const altitudeLayer = computed(() => {
+  const m = altitudeInMeters.value
+  if (m < 0) return { name: 'Below Sea Level', color: '#64748b' }
+  if (m < 11000) return { name: 'Troposphere', color: '#2c84bf' }
+  if (m < 20000) return { name: 'Tropopause', color: '#38bdf8' }
+  if (m < 32000) return { name: 'Stratosphere', color: '#7abae5' }
+  if (m < 47000) return { name: 'Stratosphere (Upper)', color: '#818cf8' }
+  if (m < 51000) return { name: 'Stratopause', color: '#a78bfa' }
+  if (m < 71000) return { name: 'Mesosphere', color: '#6366f1' }
+  return { name: 'Mesopause+', color: '#4f46e5' }
+})
+
 const featureIcons = {
   altitude: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5M5 12l7-7 7 7"/></svg>',
   pressure: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>',
@@ -118,13 +131,92 @@ puts wind.vsc  #=> 6.03 m/s`
       <router-link to="/calculator" class="btn btn-primary">Open Calculator</router-link>
       <a href="https://github.com/atmospheris/" target="_blank" rel="noopener" class="btn btn-outline">View on GitHub</a>
     </div>
+
+    <template #decoration>
+      <svg viewBox="0 0 260 520" class="atmosphere-column" role="img" aria-label="Atmospheric layers from sea level to 80 km">
+        <defs>
+          <linearGradient id="atm-tropo" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.3"/>
+            <stop offset="100%" stop-color="#0ea5e9" stop-opacity="0.6"/>
+          </linearGradient>
+          <linearGradient id="atm-strato" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#818cf8" stop-opacity="0.25"/>
+            <stop offset="100%" stop-color="#6366f1" stop-opacity="0.45"/>
+          </linearGradient>
+          <linearGradient id="atm-meso" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#6366f1" stop-opacity="0.4"/>
+            <stop offset="100%" stop-color="#4338ca" stop-opacity="0.7"/>
+          </linearGradient>
+          <filter id="atm-glow">
+            <feGaussianBlur stdDeviation="2" result="blur"/>
+            <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+        </defs>
+        <!-- Column background -->
+        <rect x="30" y="16" width="200" height="488" rx="8" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.12)" stroke-width="0.5"/>
+
+        <!-- Troposphere 0–11 km (bottom portion) -->
+        <rect x="32" y="422" width="196" height="80" rx="0" fill="url(#atm-tropo)"/>
+        <text x="130" y="466" text-anchor="middle" fill="rgba(255,255,255,0.85)" font-size="11" font-family="var(--font-display)" font-weight="600">Troposphere</text>
+        <text x="130" y="480" text-anchor="middle" fill="rgba(255,255,255,0.45)" font-size="8" font-family="var(--font-mono)">0 – 11 km</text>
+
+        <!-- Tropopause 11–20 km -->
+        <rect x="32" y="374" width="196" height="48" fill="rgba(56,189,248,0.15)"/>
+        <text x="130" y="400" text-anchor="middle" fill="rgba(255,255,255,0.6)" font-size="8" font-family="var(--font-mono)">Tropopause · 11–20 km</text>
+
+        <!-- Stratosphere 20–47 km -->
+        <rect x="32" y="220" width="196" height="154" fill="url(#atm-strato)"/>
+        <text x="130" y="290" text-anchor="middle" fill="rgba(255,255,255,0.85)" font-size="11" font-family="var(--font-display)" font-weight="600">Stratosphere</text>
+        <text x="130" y="304" text-anchor="middle" fill="rgba(255,255,255,0.45)" font-size="8" font-family="var(--font-mono)">20 – 47 km</text>
+
+        <!-- Stratopause 47–51 km -->
+        <rect x="32" y="194" width="196" height="26" fill="rgba(139,92,246,0.15)"/>
+        <text x="130" y="210" text-anchor="middle" fill="rgba(255,255,255,0.6)" font-size="8" font-family="var(--font-mono)">Stratopause · 47–51 km</text>
+
+        <!-- Mesosphere 51–71 km -->
+        <rect x="32" y="82" width="196" height="112" fill="url(#atm-meso)"/>
+        <text x="130" y="136" text-anchor="middle" fill="rgba(255,255,255,0.85)" font-size="11" font-family="var(--font-display)" font-weight="600">Mesosphere</text>
+        <text x="130" y="150" text-anchor="middle" fill="rgba(255,255,255,0.45)" font-size="8" font-family="var(--font-mono)">51 – 71 km</text>
+
+        <!-- Top -->
+        <rect x="32" y="18" width="196" height="64" rx="6" fill="rgba(67,56,202,0.3)"/>
+        <text x="130" y="50" text-anchor="middle" fill="rgba(255,255,255,0.5)" font-size="8" font-family="var(--font-mono)">71 – 80 km</text>
+
+        <!-- Altitude markers on left -->
+        <line x1="20" y1="502" x2="30" y2="502" stroke="rgba(255,255,255,0.3)" stroke-width="0.5"/>
+        <text x="18" y="505" text-anchor="end" fill="rgba(255,255,255,0.35)" font-size="7" font-family="var(--font-mono)">0</text>
+
+        <line x1="20" y1="422" x2="30" y2="422" stroke="rgba(255,255,255,0.2)" stroke-width="0.5"/>
+        <text x="18" y="425" text-anchor="end" fill="rgba(255,255,255,0.25)" font-size="7" font-family="var(--font-mono)">11</text>
+
+        <line x1="20" y1="374" x2="30" y2="374" stroke="rgba(255,255,255,0.2)" stroke-width="0.5"/>
+        <text x="18" y="377" text-anchor="end" fill="rgba(255,255,255,0.25)" font-size="7" font-family="var(--font-mono)">20</text>
+
+        <line x1="20" y1="220" x2="30" y2="220" stroke="rgba(255,255,255,0.2)" stroke-width="0.5"/>
+        <text x="18" y="223" text-anchor="end" fill="rgba(255,255,255,0.25)" font-size="7" font-family="var(--font-mono)">47</text>
+
+        <line x1="20" y1="82" x2="30" y2="82" stroke="rgba(255,255,255,0.2)" stroke-width="0.5"/>
+        <text x="18" y="85" text-anchor="end" fill="rgba(255,255,255,0.25)" font-size="7" font-family="var(--font-mono)">71</text>
+
+        <text x="18" y="10" text-anchor="end" fill="rgba(255,255,255,0.25)" font-size="7" font-family="var(--font-mono)">km</text>
+
+        <!-- Animated altitude indicator line -->
+        <rect x="230" y="422" width="3" height="80" fill="rgba(255,255,255,0.6)" rx="1" filter="url(#atm-glow)">
+          <animate attributeName="y" values="502;82;502" dur="8s" repeatCount="indefinite"/>
+          <animate attributeName="height" values="2;2;2" dur="8s" repeatCount="indefinite"/>
+        </rect>
+      </svg>
+    </template>
   </HeroSection>
 
   <!-- Inline Calculator -->
   <section class="section">
     <div class="container">
       <div class="inline-calc animate-on-scroll">
-        <h3 class="inline-calc-title">Quick Calculator</h3>
+        <div class="inline-calc-header">
+          <h3 class="inline-calc-title">Quick Calculator</h3>
+          <span class="layer-badge" :style="{ '--layer-color': altitudeLayer.color }">{{ altitudeLayer.name }}</span>
+        </div>
         <div class="inline-calc-input">
           <label for="home-alt-input">Altitude <span class="range-hint">(-2,000 to 80,000)</span></label>
           <div class="inline-input-composite">
@@ -265,6 +357,42 @@ puts wind.vsc  #=> 6.03 m/s`
 </template>
 
 <style scoped>
+.atmosphere-column {
+  width: 100%;
+  height: auto;
+  filter: drop-shadow(0 0 20px rgba(44, 132, 191, 0.15));
+}
+
+.inline-calc-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+}
+
+.inline-calc-header .inline-calc-title {
+  margin-bottom: 0;
+}
+
+.layer-badge {
+  font-family: var(--font-display);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 0.2em 0.7em;
+  border-radius: var(--radius-full);
+  background: color-mix(in srgb, var(--layer-color) 12%, transparent);
+  color: var(--layer-color);
+  white-space: nowrap;
+  transition: background 0.3s, color 0.3s;
+}
+
+[data-theme="dark"] .layer-badge {
+  background: color-mix(in srgb, var(--layer-color) 18%, transparent);
+}
+
 .standards-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));

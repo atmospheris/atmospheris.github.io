@@ -696,7 +696,43 @@ pre code {
 .hero-content {
   position: relative;
   z-index: 1;
-  max-width: 800px;
+  max-width: 1100px;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2xl);
+  width: 100%;
+}
+
+.hero-main {
+  flex: 1;
+  max-width: 680px;
+  text-align: center;
+}
+
+.hero-decoration {
+  flex-shrink: 0;
+  width: 260px;
+  opacity: 0;
+  animation: hero-fade-up 0.8s ease-out 0.5s forwards;
+}
+
+@media (max-width: 900px) {
+  .hero-content {
+    flex-direction: column;
+    max-width: 800px;
+  }
+  .hero-main {
+    max-width: 100%;
+  }
+  .hero-decoration {
+    width: 200px;
+  }
+}
+
+@media (max-width: 640px) {
+  .hero-decoration {
+    display: none;
+  }
 }
 
 /* Hero entrance animation */

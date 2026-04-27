@@ -286,6 +286,69 @@ const latitudeZones = [
         <math><msub><mi>I</mi><mn>0</mn></msub></math> is the zero-order modified
         Bessel function of the first kind.
       </p>
+
+      <!-- Wind Vector Diagram -->
+      <div class="wind-vector-wrapper">
+        <svg viewBox="0 0 320 260" class="wind-vector-svg" role="img" aria-label="Wind vector diagram showing zonal (Vx), meridional (Vy), and resultant (Vr) components">
+          <defs>
+            <marker id="arrowhead" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+              <polygon points="0 0, 8 3, 0 6" fill="var(--color-text-light)"/>
+            </marker>
+            <marker id="arrow-accent" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+              <polygon points="0 0, 8 3, 0 6" fill="var(--color-accent)"/>
+            </marker>
+          </defs>
+          <!-- Coordinate axes -->
+          <line x1="60" y1="200" x2="280" y2="200" stroke="var(--color-text-light)" stroke-width="1" marker-end="url(#arrowhead)"/>
+          <line x1="60" y1="200" x2="60" y2="30" stroke="var(--color-text-light)" stroke-width="1" marker-end="url(#arrowhead)"/>
+
+          <!-- Axis labels -->
+          <text x="270" y="218" class="wv-axis-label" fill="var(--color-text-light)">Zonal (East+)</text>
+          <text x="20" y="35" class="wv-axis-label" fill="var(--color-text-light)">Meridional (North+)</text>
+
+          <!-- Vx vector (zonal component) -->
+          <line x1="60" y1="200" x2="220" y2="200" stroke="#f59e0b" stroke-width="2.5" stroke-dasharray="6 3"/>
+          <text x="140" y="218" text-anchor="middle" class="wv-label" fill="#f59e0b">
+            <tspan font-weight="600">V</tspan><tspan font-size="8" dy="3">x</tspan>
+          </text>
+
+          <!-- Vy vector (meridional component) -->
+          <line x1="220" y1="200" x2="220" y2="100" stroke="#38bdf8" stroke-width="2.5" stroke-dasharray="6 3"/>
+          <text x="234" y="150" class="wv-label" fill="#38bdf8">
+            <tspan font-weight="600">V</tspan><tspan font-size="8" dy="3">y</tspan>
+          </text>
+
+          <!-- Dashed projection lines -->
+          <line x1="60" y1="100" x2="220" y2="100" stroke="var(--color-border)" stroke-width="0.8" stroke-dasharray="3 3"/>
+
+          <!-- Vr vector (resultant) -->
+          <line x1="60" y1="200" x2="220" y2="100" stroke="var(--color-accent)" stroke-width="3" marker-end="url(#arrow-accent)"/>
+
+          <text x="125" y="140" text-anchor="middle" class="wv-resultant" fill="var(--color-accent)">
+            <tspan font-weight="700">V</tspan><tspan font-size="9" dy="3">r</tspan>
+          </text>
+
+          <!-- Angle arc -->
+          <path d="M 80 200 A 20 20 0 0 0 74 184" fill="none" stroke="var(--color-accent-light)" stroke-width="1"/>
+          <text x="88" y="188" class="wv-angle" fill="var(--color-accent-light)">&theta;</text>
+
+          <!-- sigma_r scatter representation -->
+          <circle cx="220" cy="100" r="30" fill="none" stroke="var(--color-accent)" stroke-width="1" stroke-dasharray="4 3" opacity="0.4"/>
+          <circle cx="220" cy="100" r="60" fill="none" stroke="var(--color-accent)" stroke-width="0.5" stroke-dasharray="2 4" opacity="0.2"/>
+          <text x="255" y="70" class="wv-sigma" fill="var(--color-accent)" opacity="0.6">
+            &sigma;<tspan font-size="8" dy="3">r</tspan>
+          </text>
+
+          <!-- Origin label -->
+          <text x="52" y="215" text-anchor="middle" class="wv-origin" fill="var(--color-text-light)">O</text>
+
+          <!-- Legend -->
+          <rect x="60" y="230" width="200" height="26" rx="4" fill="var(--color-surface-elevated)" stroke="var(--color-border)" stroke-width="0.5"/>
+          <line x1="70" y1="243" x2="90" y2="243" stroke="var(--color-accent)" stroke-width="2.5"/>
+          <text x="95" y="246" class="wv-legend" fill="var(--color-text-light)">V<tspan font-size="9" dy="2">r</tspan><tspan dy="-2"> = </tspan><tspan font-size="11">&radic;</tspan>(V<tspan font-size="9" dy="2">x</tspan><tspan dy="-2">&sup2; + V</tspan><tspan font-size="9" dy="2">y</tspan><tspan dy="-2">&sup2;)</tspan></text>
+        </svg>
+      </div>
+
       <p>
         For latitude zones above 20°N, where the meridional component
         <math><msub><mi>V</mi><mi>y</mi></msub></math> does not exceed 6% of the
@@ -776,6 +839,58 @@ const latitudeZones = [
 </template>
 
 <style scoped>
+/* --- Wind Vector Diagram --- */
+.wind-vector-wrapper {
+  margin-top: var(--spacing-lg);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg);
+  max-width: 420px;
+}
+
+.wind-vector-svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.wv-axis-label {
+  font-size: 9px;
+  font-family: var(--font-display);
+}
+
+.wv-label {
+  font-size: 12px;
+  font-family: var(--font-mono);
+}
+
+.wv-resultant {
+  font-size: 14px;
+  font-family: var(--font-mono);
+}
+
+.wv-angle {
+  font-size: 10px;
+  font-family: var(--font-mono);
+  font-style: italic;
+}
+
+.wv-sigma {
+  font-size: 11px;
+  font-family: var(--font-mono);
+}
+
+.wv-origin {
+  font-size: 10px;
+  font-family: var(--font-mono);
+}
+
+.wv-legend {
+  font-size: 9.5px;
+  font-family: var(--font-mono);
+}
+
 /* --- Globe Visualization --- */
 .zone-layout {
   display: grid;

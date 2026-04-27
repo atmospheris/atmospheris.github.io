@@ -1,4 +1,5 @@
 <script setup>
+import { computed } from 'vue'
 import { CONSTANTS, DERIVED_CONSTANTS, TEMPERATURE_LAYERS } from 'atmospheris'
 import { useSeo } from '@/composables/useSeo'
 
@@ -6,6 +7,32 @@ useSeo({
   title: 'ISO 2533 Standard Atmosphere',
   description: 'The ISO 2533 Standard Atmosphere model defines a reference vertical distribution of atmospheric properties. Key constants, temperature layers, and formulas.',
   path: '/iso-2533'
+})
+
+// Temperature profile diagram helpers
+// Map: x = temperature (180–300K), y = altitude (0–85km)
+// SVG viewBox: x: 60–500, y: 20–490
+const tempX = (t) => 60 + (t - 180) / (300 - 180) * (500 - 60)
+const altY = (km) => 490 - km / 85 * (490 - 20)
+
+// Build the polyline points from TEMPERATURE_LAYERS
+const tempProfilePointsArray = computed(() => {
+  const layers = TEMPERATURE_LAYERS.map((l, i) => {
+    const baseH = l.H / 1000 // km
+    const baseT = l.T
+    const beta = l.B || 0
+    const nextH = i < TEMPERATURE_LAYERS.length - 1 ? TEMPERATURE_LAYERS[i + 1].H / 1000 : 80
+    const topT = baseT + beta * (nextH * 1000 - l.H)
+    return [
+      { x: tempX(baseT), y: altY(baseH) },
+      { x: tempX(Math.max(180, Math.min(300, topT))), y: altY(nextH) }
+    ]
+  })
+  return layers.flat()
+})
+
+const tempProfilePoints = computed(() => {
+  return tempProfilePointsArray.value.map(p => `${p.x},${p.y}`).join(' ')
 })
 
 // Atmospheric composition from ISO 2533:2026 Table 2
@@ -499,6 +526,88 @@ const seaLevelCharacteristics = [
           </tbody>
         </table>
       </div>
+
+      <!-- Temperature Profile Diagram -->
+      <div class="temp-profile-wrapper">
+        <svg viewBox="0 0 520 520" class="temp-profile-svg" role="img" aria-label="ISA temperature profile showing temperature vs altitude for each atmospheric layer">
+          <defs>
+            <linearGradient id="tp-tropo" x1="0" y1="1" x2="0" y2="0">
+              <stop offset="0%" stop-color="#0ea5e9" stop-opacity="0.12"/>
+              <stop offset="100%" stop-color="#0ea5e9" stop-opacity="0.04"/>
+            </linearGradient>
+            <linearGradient id="tp-strato" x1="0" y1="1" x2="0" y2="0">
+              <stop offset="0%" stop-color="#818cf8" stop-opacity="0.08"/>
+              <stop offset="100%" stop-color="#818cf8" stop-opacity="0.12"/>
+            </linearGradient>
+            <linearGradient id="tp-meso" x1="0" y1="1" x2="0" y2="0">
+              <stop offset="0%" stop-color="#6366f1" stop-opacity="0.08"/>
+              <stop offset="100%" stop-color="#4338ca" stop-opacity="0.15"/>
+            </linearGradient>
+          </defs>
+
+          <!-- Grid lines -->
+          <line v-for="t in [180, 200, 220, 240, 260, 280, 300]" :key="'g'+t"
+            :x1="tempX(t)" y1="20" :x2="tempX(t)" y2="490"
+            stroke="var(--color-border)" stroke-width="0.5" stroke-dasharray="2 4"
+          />
+          <line v-for="h in [0, 10, 20, 30, 40, 50, 60, 70, 80]" :key="'h'+h"
+            x1="60" :y1="altY(h)" x2="500" :y2="altY(h)"
+            stroke="var(--color-border)" stroke-width="0.5" stroke-dasharray="2 4"
+          />
+
+          <!-- Layer background bands -->
+          <rect :x="tempX(180)" :y="altY(11)" :width="tempX(300)-tempX(180)" :height="altY(0)-altY(11)" fill="url(#tp-tropo)" />
+          <rect :x="tempX(180)" :y="altY(20)" :width="tempX(300)-tempX(180)" :height="altY(11)-altY(20)" fill="url(#tp-tropo)" />
+          <rect :x="tempX(180)" :y="altY(47)" :width="tempX(300)-tempX(180)" :height="altY(20)-altY(47)" fill="url(#tp-strato)" />
+          <rect :x="tempX(180)" :y="altY(80)" :width="tempX(300)-tempX(180)" :height="altY(47)-altY(80)" fill="url(#tp-meso)" />
+
+          <!-- Temperature profile line -->
+          <polyline
+            :points="tempProfilePoints"
+            fill="none"
+            stroke="var(--color-accent)"
+            stroke-width="2.5"
+            stroke-linejoin="round"
+            stroke-linecap="round"
+          />
+
+          <!-- Layer boundary markers -->
+          <circle v-for="(pt, i) in tempProfilePointsArray" :key="'p'+i"
+            :cx="pt.x" :cy="pt.y" r="3.5"
+            :fill="i === 0 ? 'var(--color-accent-warm)' : 'var(--color-accent)'"
+            stroke="var(--color-surface)" stroke-width="1.5"
+          />
+
+          <!-- Layer labels on right side -->
+          <text :x="tempX(300) + 8" :y="altY(5) + 3" class="tp-label" fill="var(--color-accent)">Troposphere</text>
+          <text :x="tempX(300) + 8" :y="altY(15) + 3" class="tp-label" fill="var(--color-accent-light)">Tropopause</text>
+          <text :x="tempX(300) + 8" :y="altY(35) + 3" class="tp-label" fill="#818cf8">Stratosphere</text>
+          <text :x="tempX(300) + 8" :y="altY(49) + 3" class="tp-label" fill="#a78bfa">Stratopause</text>
+          <text :x="tempX(300) + 8" :y="altY(65) + 3" class="tp-label" fill="#6366f1">Mesosphere</text>
+
+          <!-- Axes -->
+          <line x1="60" y1="20" x2="60" y2="490" stroke="var(--color-text-light)" stroke-width="1"/>
+          <line x1="60" y1="490" x2="500" y2="490" stroke="var(--color-text-light)" stroke-width="1"/>
+
+          <!-- X-axis labels (Temperature) -->
+          <text v-for="t in [180, 200, 220, 240, 260, 280, 300]" :key="'tl'+t"
+            :x="tempX(t)" y="506" text-anchor="middle"
+            class="tp-axis-label" fill="var(--color-text-light)"
+          >{{ t }}</text>
+          <text :x="(tempX(180)+tempX(300))/2" y="520" text-anchor="middle" class="tp-axis-title" fill="var(--color-text-light)">Temperature (K)</text>
+
+          <!-- Y-axis labels (Altitude) -->
+          <text v-for="h in [0, 10, 20, 30, 40, 50, 60, 70, 80]" :key="'hl'+h"
+            x="54" :y="altY(h) + 3.5" text-anchor="end"
+            class="tp-axis-label" fill="var(--color-text-light)"
+          >{{ h }}</text>
+          <text x="14" :y="(altY(0)+altY(80))/2" text-anchor="middle" class="tp-axis-title" fill="var(--color-text-light)"
+            transform="rotate(-90, 14, 255)">Altitude (km)</text>
+
+          <!-- Sea level marker -->
+          <text :x="tempX(288.15)" :y="altY(0) + 16" text-anchor="middle" class="tp-hint" fill="var(--color-accent-warm)">288.15 K (15 °C)</text>
+        </svg>
+      </div>
     </section>
 
     <!-- Formulas -->
@@ -928,6 +1037,46 @@ const seaLevelCharacteristics = [
 .total-row td {
   background: var(--color-surface-elevated);
   font-weight: var(--font-weight-semibold);
+}
+
+/* Temperature Profile Diagram */
+.temp-profile-wrapper {
+  margin-top: var(--spacing-xl);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg);
+}
+
+.temp-profile-svg {
+  width: 100%;
+  max-width: 520px;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+}
+
+.tp-label {
+  font-size: 10px;
+  font-family: var(--font-display);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: 0.02em;
+}
+
+.tp-axis-label {
+  font-size: 8.5px;
+  font-family: var(--font-mono);
+}
+
+.tp-axis-title {
+  font-size: 9.5px;
+  font-family: var(--font-display);
+  font-weight: var(--font-weight-semibold);
+}
+
+.tp-hint {
+  font-size: 8px;
+  font-family: var(--font-mono);
 }
 
 .why-grid {
