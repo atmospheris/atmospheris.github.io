@@ -34,8 +34,8 @@ const profilePts = computed(() =>
   TEMPERATURE_LAYERS.map(l => ({ x: tX(l.T), y: aY(l.H), H: l.H, T: l.T, B: l.B }))
 )
 
-const layerColors = ['#f59e0b', '#eab308', '#3b82f6', '#f97316', '#ef4444', '#dc2626', '#8b5cf6', '#6366f1']
-const layerNames = ['Lower Troposphere', 'Troposphere', 'Tropopause', 'Lower Stratosphere', 'Upper Stratosphere', 'Stratopause', 'Mesosphere', 'Upper Mesosphere']
+const layerColors = ['#d97706', '#f59e0b', '#eab308', '#3b82f6', '#f97316', '#ef4444', '#dc2626', '#8b5cf6']
+const layerNames = ['Below Sea Level', 'Lower Troposphere', 'Troposphere', 'Tropopause', 'Lower Stratosphere', 'Upper Stratosphere', 'Stratopause', 'Mesosphere']
 
 const segments = computed(() => {
   const p = profilePts.value
@@ -53,7 +53,7 @@ const fillPath = computed(() => {
   return `M${lx},${aY(A_MIN)} ${points} L${lx},${aY(A_MAX)} Z`
 })
 
-const altGrid = [0, 10, 20, 30, 40, 50, 60, 70, 80].map(km => ({ y: aY(km * 1000), label: km }))
+const altGrid = [-2, 0, 10, 20, 30, 40, 50, 60, 70, 80].map(km => ({ y: aY(km * 1000), label: km }))
 const tempGrid = [200, 220, 240, 260, 280, 300].map(k => ({ x: tX(k), label: k }))
 
 // ── Layer Table ──
@@ -300,7 +300,7 @@ const windBands = [
                 :viewBox="`0 0 ${SVG_W} ${SVG_H}`"
                 class="profile-svg"
                 role="img"
-                aria-label="Standard Atmosphere temperature profile: temperature versus altitude from 0 to 80 km"
+                aria-label="Standard Atmosphere temperature profile: temperature versus altitude from -2 to 80 km"
               >
                 <defs>
                   <linearGradient id="profile-fill-grad" x1="0" y1="1" x2="0" y2="0">
