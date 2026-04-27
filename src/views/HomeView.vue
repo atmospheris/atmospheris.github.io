@@ -14,6 +14,7 @@ useSeo({
 
 const sliderAltitude = ref(0)
 const altUnit = ref('m')
+const altType = ref('geopotential')
 
 const altRange = computed(() => {
   return altUnit.value === 'm'
@@ -36,7 +37,7 @@ const props = computed(() => {
     return getAllProperties({
       value: altitudeInMeters.value,
       unit: 'meters',
-      type: 'geopotential',
+      type: altType.value,
       precision: 'normal'
     })
   } catch {
@@ -219,9 +220,16 @@ puts wind.vsc  #=> 6.03 m/s`
           <span class="layer-badge" :style="{ '--layer-color': altitudeLayer.color }">{{ altitudeLayer.name }}</span>
         </div>
         <div class="inline-calc-input">
-          <label for="home-alt-input">Altitude <span class="range-hint">(-2,000 to 80,000)</span></label>
+          <label for="home-alt-input">
+            Altitude
+            <span class="range-hint">({{ altType === 'geopotential' ? 'H' : 'h' }}, -2,000 to 80,000)</span>
+          </label>
           <div class="inline-input-composite">
             <input id="home-alt-input" type="number" v-model.number="sliderAltitude" :min="altRange.min" :max="altRange.max" :step="altRange.step" aria-label="Altitude value" />
+            <div class="inline-unit-seg" role="group" aria-label="Altitude reference">
+              <button :class="{ active: altType === 'geopotential' }" @click="altType = 'geopotential'" aria-label="Geopotential altitude" aria-pressed="altType === 'geopotential'">H</button>
+              <button :class="{ active: altType === 'geometric' }" @click="altType = 'geometric'" aria-label="Geometric altitude" aria-pressed="altType === 'geometric'">h</button>
+            </div>
             <div class="inline-unit-seg" role="group" aria-label="Altitude unit">
               <button :class="{ active: altUnit === 'm' }" @click="setAltUnit('m')" aria-label="Meters" aria-pressed="altUnit === 'm'">m</button>
               <button :class="{ active: altUnit === 'ft' }" @click="setAltUnit('ft')" aria-label="Feet" aria-pressed="altUnit === 'ft'">ft</button>
@@ -372,8 +380,8 @@ puts wind.vsc  #=> 6.03 m/s`
   margin-bottom: var(--spacing-lg);
 }
 
-.inline-calc-header .inline-calc-title {
-  margin-bottom: 0;
+.inline-input-composite {
+  width: 240px;
 }
 
 .layer-badge {
