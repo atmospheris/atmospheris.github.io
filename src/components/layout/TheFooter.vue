@@ -45,6 +45,10 @@ const year = new Date().getFullYear()
           </a>
         </div>
       </div>
+
+      <p class="footer-disclaimer">
+        ISO documents are copyright to ISO. This site only provides content developed independently of ISO's copyrighted material.
+      </p>
     </div>
   </footer>
 </template>
