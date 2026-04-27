@@ -178,9 +178,10 @@ puts wind.vsc  #=> 6.03 m/s`
         <text x="130" y="136" text-anchor="middle" fill="rgba(255,255,255,0.85)" font-size="11" font-family="var(--font-display)" font-weight="600">Mesosphere</text>
         <text x="130" y="150" text-anchor="middle" fill="rgba(255,255,255,0.45)" font-size="8" font-family="var(--font-mono)">51 – 71 km</text>
 
-        <!-- Top -->
+        <!-- Mesopause / Top -->
         <rect x="32" y="18" width="196" height="64" rx="6" fill="rgba(67,56,202,0.3)"/>
-        <text x="130" y="50" text-anchor="middle" fill="rgba(255,255,255,0.5)" font-size="8" font-family="var(--font-mono)">71 – 80 km</text>
+        <text x="130" y="38" text-anchor="middle" fill="rgba(255,255,255,0.85)" font-size="11" font-family="var(--font-display)" font-weight="600">Mesopause</text>
+        <text x="130" y="52" text-anchor="middle" fill="rgba(255,255,255,0.45)" font-size="8" font-family="var(--font-mono)">71 – 80 km</text>
 
         <!-- Altitude markers on left -->
         <line x1="20" y1="502" x2="30" y2="502" stroke="rgba(255,255,255,0.3)" stroke-width="0.5"/>
