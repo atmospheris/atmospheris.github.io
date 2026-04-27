@@ -81,7 +81,7 @@ onUnmounted(() => {
             :aria-expanded="refDropdownOpen"
             aria-haspopup="true"
           >
-            Reference
+            Standards
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
           </button>
           <div class="nav-dropdown-menu" v-if="refDropdownOpen" role="menu">
@@ -89,10 +89,9 @@ onUnmounted(() => {
             <router-link to="/iso-5878" @click="closeDropdown">ISO 5878</router-link>
             <router-link to="/symbols" @click="closeDropdown">Symbols &amp; Variables</router-link>
             <router-link to="/references" @click="closeDropdown">References</router-link>
-            <div class="nav-dropdown-divider"></div>
-            <router-link to="/about" @click="closeDropdown">About</router-link>
           </div>
         </div>
+        <router-link to="/about">About</router-link>
       </nav>
 
       <div class="header-right">
@@ -117,11 +116,11 @@ onUnmounted(() => {
   <nav class="mobile-nav" :class="{ open: mobileOpen }">
     <router-link to="/calculator" @click="closeMobile">Calculator</router-link>
     <router-link to="/library" @click="closeMobile">Use API</router-link>
-    <div class="mobile-nav-section">Reference</div>
+    <div class="mobile-nav-section">Standards</div>
     <router-link to="/iso-2533" @click="closeMobile" class="mobile-nav-sub">ISO 2533</router-link>
     <router-link to="/iso-5878" @click="closeMobile" class="mobile-nav-sub">ISO 5878</router-link>
     <router-link to="/symbols" @click="closeMobile" class="mobile-nav-sub">Symbols &amp; Variables</router-link>
     <router-link to="/references" @click="closeMobile" class="mobile-nav-sub">References</router-link>
-    <router-link to="/about" @click="closeMobile" class="mobile-nav-sub">About</router-link>
+    <router-link to="/about" @click="closeMobile">About</router-link>
   </nav>
 </template>

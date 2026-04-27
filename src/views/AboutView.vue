@@ -54,8 +54,75 @@ function toggle(key) {
       </div>
     </section>
 
-    <!-- Three Pillars -->
+    <!-- The Logo -->
     <section class="about-section about-section-alt">
+      <div class="about-section-inner">
+        <h2 class="about-section-title">The Logo</h2>
+
+        <div class="logo-breakdown">
+          <div class="logo-display">
+            <img src="@/assets/images/atmospheris-logo.svg" alt="Atmospheris Logo" class="the-logo-image" />
+          </div>
+          <div class="logo-details">
+            <p class="logo-intro">
+              The Atmospheris logo is a stylized cross-section of Earth's atmosphere
+              &mdash; five curved bands, each representing one of the principal
+              atmospheric layers, arranged from the densest to the thinnest.
+            </p>
+            <div class="logo-layers-list">
+              <div class="logo-layer-row">
+                <span class="layer-swatch" style="background: #f3e0d3;"></span>
+                <div class="layer-info">
+                  <strong>Exosphere</strong>
+                  <span>The outermost shell, fading into the vacuum of space</span>
+                </div>
+              </div>
+              <div class="logo-layer-row">
+                <span class="layer-swatch" style="background: #7abae5;"></span>
+                <div class="layer-info">
+                  <strong>Thermosphere</strong>
+                  <span>Where the International Space Station orbits and auroras ignite</span>
+                </div>
+              </div>
+              <div class="logo-layer-row">
+                <span class="layer-swatch" style="background: #2c84bf;"></span>
+                <div class="layer-info">
+                  <strong>Mesosphere</strong>
+                  <span>The coldest atmospheric layer, where meteors burn up</span>
+                </div>
+              </div>
+              <div class="logo-layer-row">
+                <span class="layer-swatch" style="background: #33588e;"></span>
+                <div class="layer-info">
+                  <strong>Stratosphere</strong>
+                  <span>Home to the ozone layer &mdash; stable, calm, and critical</span>
+                </div>
+              </div>
+              <div class="logo-layer-row">
+                <span class="layer-swatch" style="background: #1f2b3e;"></span>
+                <div class="layer-info">
+                  <strong>Troposphere</strong>
+                  <span>Where all weather happens &mdash; the densest band of all</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="origin-block">
+          <h3 class="origin-heading">Why It Was Built</h3>
+          <p>
+            Atmospheris was first developed as a companion tool for the revised
+            <strong>ISO&nbsp;2533</strong> and <strong>ISO&nbsp;5878</strong> standards,
+            giving standards users a dynamic calculator and clear reference materials
+            to better understand the background and information described in the standards.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Three Pillars -->
+    <section class="about-section">
       <div class="about-section-inner">
         <h2 class="about-section-title">What We Build</h2>
         <div class="pillars-grid">
