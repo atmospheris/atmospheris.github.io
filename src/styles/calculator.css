@@ -88,6 +88,34 @@
   padding: 4px;
   margin-bottom: var(--spacing-xl);
   overflow-x: auto;
+  align-items: center;
+}
+
+.calc-tab-group-label {
+  font-size: 0.6rem;
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-text-light);
+  opacity: 0.6;
+  padding: 0 var(--spacing-xs);
+  white-space: nowrap;
+  user-select: none;
+}
+
+.calc-tab-divider {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: 0 var(--spacing-xs);
+}
+
+.calc-tab-divider::before {
+  content: '';
+  width: 1px;
+  height: 20px;
+  background: var(--color-border);
+  flex-shrink: 0;
 }
 
 .calc-tabs button,
@@ -1503,6 +1531,9 @@
 @media (max-width: 768px) {
   .calc-tabs {
     gap: 2px;
+  }
+  .calc-tab-group-label {
+    display: none;
   }
   .calc-tabs button,
   .calc-tab-btn {

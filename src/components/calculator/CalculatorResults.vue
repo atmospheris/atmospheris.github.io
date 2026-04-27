@@ -40,27 +40,28 @@ function setGlobalUnit(system) {
 }
 
 // Imperial conversion factors (multiply metric base value)
+// Keys MUST match the row `key` values in the `rows` computed property below
 const IMPERIAL = {
   // density: kg/m³ → slugs/ft³
-  density: { 'kg/m³': 1, 'slugs/ft³': 1.9403203e-3 },
+  dens: { 'kg/m³': 1, 'slugs/ft³': 1.9403203e-3 },
   // dynamic viscosity: Pa·s → lbf·s/ft²
-  dynamicViscosity: { 'Pa·s': 1, 'lbf·s/ft²': 2.0885434e-2 },
+  dv: { 'Pa·s': 1, 'lbf·s/ft²': 2.0885434e-2 },
   // kinematic viscosity: m²/s → ft²/s
-  kinematicViscosity: { 'm²/s': 1, 'ft²/s': 1 / 0.09290304 },
+  kv: { 'm²/s': 1, 'ft²/s': 1 / 0.09290304 },
   // speed of sound: m/s → ft/s, knots
-  speedOfSound: { 'm/s': 1, 'ft/s': 1 / 0.3048, 'knots': 1.9438445 },
+  sos: { 'm/s': 1, 'ft/s': 1 / 0.3048, 'knots': 1.9438445 },
   // mean particle speed: m/s → ft/s, knots
-  meanParticleSpeed: { 'm/s': 1, 'ft/s': 1 / 0.3048, 'knots': 1.9438445 },
+  mps: { 'm/s': 1, 'ft/s': 1 / 0.3048, 'knots': 1.9438445 },
   // gravity: m/s² → ft/s²
-  gravity: { 'm/s²': 1, 'ft/s²': 1 / 0.3048 },
+  grav: { 'm/s²': 1, 'ft/s²': 1 / 0.3048 },
   // specific weight: N/m³ → lbf/ft³
-  specificWeight: { 'N/m³': 1, 'lbf/ft³': 6.365880e-2 },
+  sw: { 'N/m³': 1, 'lbf/ft³': 6.365880e-2 },
   // thermal conductivity: W/(m·K) → BTU/(hr·ft·°F)
-  thermalConductivity: { 'W/(m·K)': 1, 'BTU/(hr·ft·°F)': 0.5778 },
+  tc: { 'W/(m·K)': 1, 'BTU/(hr·ft·°F)': 0.5778 },
   // pressure scale height: m → ft, nmi
-  pressureScaleHeight: { 'm': 1, 'ft': 1 / 0.3048, 'nmi': 5.3996e-4 },
+  psh: { 'm': 1, 'ft': 1 / 0.3048, 'nmi': 5.3996e-4 },
   // mean free path: m → ft, nmi
-  meanFreePath: { 'm': 1, 'ft': 1 / 0.3048, 'nmi': 5.3996e-4 },
+  mfp: { 'm': 1, 'ft': 1 / 0.3048, 'nmi': 5.3996e-4 },
 }
 
 function getConversionFactor(row) {
@@ -124,29 +125,29 @@ const rows = computed(() => {
       { name: 'Pressure Ratio', symbol: '<math><mi>δ</mi></math>', key: 'pratio', value: r.pressureRatio, unit: '', unitOptions: null },
     ]},
     { group: 'Density', rows: [
-      { name: 'Density', symbol: '<math><mi>ρ</mi></math>', key: 'dens', value: r.density, unitOptions: ['kg/m³', 'slugs/ft³'], conversions: IMPERIAL.density },
+      { name: 'Density', symbol: '<math><mi>ρ</mi></math>', key: 'dens', value: r.density, unitOptions: ['kg/m³', 'slugs/ft³'], conversions: IMPERIAL.dens },
       { name: 'Density Ratio', symbol: '<math><mi>σ</mi></math>', key: 'dratio', value: r.densityRatio, unit: '', unitOptions: null },
       { name: 'Square Root Density Ratio', symbol: '<math><msqrt><mi>σ</mi></msqrt></math>', key: 'sqrt_dratio', value: r.sqrtDensityRatio, unit: '', unitOptions: null },
     ]},
     { group: 'Motion & Viscosity', rows: [
-      { name: 'Speed of Sound', symbol: '<math><mi>a</mi></math>', key: 'sos', value: r.speedOfSound, unitOptions: ['m/s', 'ft/s', 'knots'], conversions: IMPERIAL.speedOfSound },
+      { name: 'Speed of Sound', symbol: '<math><mi>a</mi></math>', key: 'sos', value: r.speedOfSound, unitOptions: ['m/s', 'ft/s', 'knots'], conversions: IMPERIAL.sos },
       { name: 'Speed of Sound Ratio', symbol: '<math><mi>a</mi><mo>/</mo><msub><mi>a</mi><mn>0</mn></msub></math>', key: 'sos_r', value: r.speedOfSoundRatio, unit: '', unitOptions: null },
-      { name: 'Dynamic Viscosity', symbol: '<math><mi>μ</mi></math>', key: 'dv', value: r.dynamicViscosity, unitOptions: ['Pa·s', 'lbf·s/ft²'], conversions: IMPERIAL.dynamicViscosity },
+      { name: 'Dynamic Viscosity', symbol: '<math><mi>μ</mi></math>', key: 'dv', value: r.dynamicViscosity, unitOptions: ['Pa·s', 'lbf·s/ft²'], conversions: IMPERIAL.dv },
       { name: 'Dynamic Viscosity Ratio', symbol: '<math><mi>μ</mi><mo>/</mo><msub><mi>μ</mi><mn>0</mn></msub></math>', key: 'dv_r', value: r.dynamicViscosityRatio, unit: '', unitOptions: null },
-      { name: 'Kinematic Viscosity', symbol: '<math><mi>ν</mi></math>', key: 'kv', value: r.kinematicViscosity, unitOptions: ['m²/s', 'ft²/s'], conversions: IMPERIAL.kinematicViscosity },
+      { name: 'Kinematic Viscosity', symbol: '<math><mi>ν</mi></math>', key: 'kv', value: r.kinematicViscosity, unitOptions: ['m²/s', 'ft²/s'], conversions: IMPERIAL.kv },
       { name: 'Kinematic Viscosity Ratio', symbol: '<math><mi>ν</mi><mo>/</mo><msub><mi>ν</mi><mn>0</mn></msub></math>', key: 'kv_r', value: r.kinematicViscosityRatio, unit: '', unitOptions: null },
-      { name: 'Mean Particle Speed', symbol: '<math><mover><mi>v</mi><mo>¯</mo></mover></math>', key: 'mps', value: r.meanParticleSpeed, unitOptions: ['m/s', 'ft/s', 'knots'], conversions: IMPERIAL.meanParticleSpeed },
+      { name: 'Mean Particle Speed', symbol: '<math><mover><mi>v</mi><mo>¯</mo></mover></math>', key: 'mps', value: r.meanParticleSpeed, unitOptions: ['m/s', 'ft/s', 'knots'], conversions: IMPERIAL.mps },
     ]},
     { group: 'Other Properties', rows: [
-      { name: 'Gravity', symbol: '<math><mi>g</mi></math>', key: 'grav', value: r.gravity, unitOptions: ['m/s²', 'ft/s²'], conversions: IMPERIAL.gravity },
+      { name: 'Gravity', symbol: '<math><mi>g</mi></math>', key: 'grav', value: r.gravity, unitOptions: ['m/s²', 'ft/s²'], conversions: IMPERIAL.grav },
       { name: 'Gravity Ratio', symbol: '<math><mi>g</mi><mo>/</mo><msub><mi>g</mi><mi>n</mi></msub></math>', key: 'grav_r', value: r.gravityRatio, unit: '', unitOptions: null },
-      { name: 'Specific Weight', symbol: '<math><mi>γ</mi></math>', key: 'sw', value: r.specificWeight, unitOptions: ['N/m³', 'lbf/ft³'], conversions: IMPERIAL.specificWeight },
-      { name: 'Pressure Scale Height', symbol: '<math><msub><mi>H</mi><mi>p</mi></msub></math>', key: 'psh', value: r.pressureScaleHeight, unitOptions: ['m', 'ft', 'nmi'], conversions: IMPERIAL.pressureScaleHeight },
-      { name: 'Thermal Conductivity', symbol: '<math><mi>λ</mi></math>', key: 'tc', value: r.thermalConductivity, unitOptions: ['W/(m·K)', 'BTU/(hr·ft·°F)'], conversions: IMPERIAL.thermalConductivity },
+      { name: 'Specific Weight', symbol: '<math><mi>γ</mi></math>', key: 'sw', value: r.specificWeight, unitOptions: ['N/m³', 'lbf/ft³'], conversions: IMPERIAL.sw },
+      { name: 'Pressure Scale Height', symbol: '<math><msub><mi>H</mi><mi>p</mi></msub></math>', key: 'psh', value: r.pressureScaleHeight, unitOptions: ['m', 'ft', 'nmi'], conversions: IMPERIAL.psh },
+      { name: 'Thermal Conductivity', symbol: '<math><mi>λ</mi></math>', key: 'tc', value: r.thermalConductivity, unitOptions: ['W/(m·K)', 'BTU/(hr·ft·°F)'], conversions: IMPERIAL.tc },
       { name: 'Thermal Conductivity Ratio', symbol: '<math><mi>λ</mi><mo>/</mo><msub><mi>λ</mi><mn>0</mn></msub></math>', key: 'tc_r', value: r.thermalConductivityRatio, unit: '', unitOptions: null },
       { name: 'Air Number Density', symbol: '<math><mi>n</mi></math>', key: 'and', value: r.airNumberDensity, unit: 'm⁻³', unitOptions: null },
       { name: 'Collision Frequency', symbol: '<math><mi>ω</mi></math>', key: 'cf', value: r.collisionFrequency, unit: 's⁻¹', unitOptions: null },
-      { name: 'Mean Free Path', symbol: '<math><mi>l</mi></math>', key: 'mfp', value: r.meanFreePath, unitOptions: ['m', 'ft', 'nmi'], conversions: IMPERIAL.meanFreePath },
+      { name: 'Mean Free Path', symbol: '<math><mi>l</mi></math>', key: 'mfp', value: r.meanFreePath, unitOptions: ['m', 'ft', 'nmi'], conversions: IMPERIAL.mfp },
       { name: 'Mole Volume', symbol: '<math><msub><mi>V</mi><mi>m</mi></msub></math>', key: 'mv', value: r.moleVolume, unit: 'm³/mol', unitOptions: null },
     ]},
     { group: 'Aviation (from TAS)', rows: [] }
