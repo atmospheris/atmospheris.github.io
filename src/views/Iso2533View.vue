@@ -10,10 +10,10 @@ useSeo({
 })
 
 // Temperature profile diagram helpers
-// Map: x = temperature (180–300K), y = altitude (0–85km)
+// Map: x = temperature (180–310K), y = altitude (-2–80km)
 // SVG viewBox: x: 60–500, y: 20–490
-const tempX = (t) => 60 + (t - 180) / (300 - 180) * (500 - 60)
-const altY = (km) => 490 - km / 85 * (490 - 20)
+const tempX = (t) => 60 + (t - 180) / (310 - 180) * (500 - 60)
+const altY = (km) => 490 - (km + 2) / 82 * (490 - 20)
 
 // Build the polyline points from TEMPERATURE_LAYERS
 const tempProfilePointsArray = computed(() => {
@@ -25,7 +25,7 @@ const tempProfilePointsArray = computed(() => {
     const topT = baseT + beta * (nextH * 1000 - l.H)
     return [
       { x: tempX(baseT), y: altY(baseH) },
-      { x: tempX(Math.max(180, Math.min(300, topT))), y: altY(nextH) }
+      { x: tempX(Math.max(180, Math.min(310, topT))), y: altY(nextH) }
     ]
   })
   return layers.flat()
@@ -550,16 +550,16 @@ const seaLevelCharacteristics = [
             :x1="tempX(t)" y1="20" :x2="tempX(t)" y2="490"
             stroke="var(--color-border)" stroke-width="0.5" stroke-dasharray="2 4"
           />
-          <line v-for="h in [0, 10, 20, 30, 40, 50, 60, 70, 80]" :key="'h'+h"
+          <line v-for="h in [-2, 0, 10, 20, 30, 40, 50, 60, 70, 80]" :key="'h'+h"
             x1="60" :y1="altY(h)" x2="500" :y2="altY(h)"
             stroke="var(--color-border)" stroke-width="0.5" stroke-dasharray="2 4"
           />
 
           <!-- Layer background bands -->
-          <rect :x="tempX(180)" :y="altY(11)" :width="tempX(300)-tempX(180)" :height="altY(0)-altY(11)" fill="url(#tp-tropo)" />
-          <rect :x="tempX(180)" :y="altY(20)" :width="tempX(300)-tempX(180)" :height="altY(11)-altY(20)" fill="url(#tp-tropo)" />
-          <rect :x="tempX(180)" :y="altY(47)" :width="tempX(300)-tempX(180)" :height="altY(20)-altY(47)" fill="url(#tp-strato)" />
-          <rect :x="tempX(180)" :y="altY(80)" :width="tempX(300)-tempX(180)" :height="altY(47)-altY(80)" fill="url(#tp-meso)" />
+          <rect :x="tempX(180)" :y="altY(11)" :width="tempX(310)-tempX(180)" :height="altY(-2)-altY(11)" fill="url(#tp-tropo)" />
+          <rect :x="tempX(180)" :y="altY(20)" :width="tempX(310)-tempX(180)" :height="altY(11)-altY(20)" fill="url(#tp-tropo)" />
+          <rect :x="tempX(180)" :y="altY(47)" :width="tempX(310)-tempX(180)" :height="altY(20)-altY(47)" fill="url(#tp-strato)" />
+          <rect :x="tempX(180)" :y="altY(80)" :width="tempX(310)-tempX(180)" :height="altY(47)-altY(80)" fill="url(#tp-meso)" />
 
           <!-- Temperature profile line -->
           <polyline
@@ -579,7 +579,7 @@ const seaLevelCharacteristics = [
           />
 
           <!-- Layer labels on right side -->
-          <text :x="tempX(300) + 8" :y="altY(5) + 3" class="tp-label" fill="var(--color-accent)">Troposphere</text>
+          <text :x="tempX(300) + 8" :y="altY(4) + 3" class="tp-label" fill="var(--color-accent)">Troposphere</text>
           <text :x="tempX(300) + 8" :y="altY(15) + 3" class="tp-label" fill="var(--color-accent-light)">Tropopause</text>
           <text :x="tempX(300) + 8" :y="altY(35) + 3" class="tp-label" fill="#818cf8">Stratosphere</text>
           <text :x="tempX(300) + 8" :y="altY(49) + 3" class="tp-label" fill="#a78bfa">Stratopause</text>
@@ -594,14 +594,14 @@ const seaLevelCharacteristics = [
             :x="tempX(t)" y="506" text-anchor="middle"
             class="tp-axis-label" fill="var(--color-text-light)"
           >{{ t }}</text>
-          <text :x="(tempX(180)+tempX(300))/2" y="520" text-anchor="middle" class="tp-axis-title" fill="var(--color-text-light)">Temperature (K)</text>
+          <text :x="(tempX(180)+tempX(310))/2" y="520" text-anchor="middle" class="tp-axis-title" fill="var(--color-text-light)">Temperature (K)</text>
 
           <!-- Y-axis labels (Altitude) -->
-          <text v-for="h in [0, 10, 20, 30, 40, 50, 60, 70, 80]" :key="'hl'+h"
+          <text v-for="h in [-2, 0, 10, 20, 30, 40, 50, 60, 70, 80]" :key="'hl'+h"
             x="54" :y="altY(h) + 3.5" text-anchor="end"
             class="tp-axis-label" fill="var(--color-text-light)"
           >{{ h }}</text>
-          <text x="14" :y="(altY(0)+altY(80))/2" text-anchor="middle" class="tp-axis-title" fill="var(--color-text-light)"
+          <text x="14" :y="(altY(-2)+altY(80))/2" text-anchor="middle" class="tp-axis-title" fill="var(--color-text-light)"
             transform="rotate(-90, 14, 255)">Altitude (km)</text>
 
           <!-- Sea level marker -->
