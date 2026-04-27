@@ -11,8 +11,8 @@ import WindCalculator from '@/components/calculator/WindCalculator.vue'
 import { getAllProperties, getAltitudeFromPressure, getAltitudeFromProperty } from 'atmospheris'
 
 useSeo({
-  title: 'Standard Atmosphere Calculator',
-  description: 'Interactive calculator for ISO 2533 Standard Atmosphere properties. Calculate temperature, pressure, density, and more at any altitude with 3D visualization.',
+  title: 'Atmospheric Calculator',
+  description: 'Interactive calculator for ISO 2533 Standard Atmosphere properties and ISO 5878 wind distributions. Calculate temperature, pressure, density, and more at any altitude with 3D visualization, tables, and charts.',
   path: '/calculator',
   schema: buildWebApplicationSchema()
 })
@@ -26,11 +26,11 @@ const calcError = ref(null)
 const altitudeUnit = ref('meters')
 
 const tabs = [
-  { key: '', label: 'Calculator', path: '/calculator' },
-  { key: 'explorer', label: 'Explorer 3D', path: '/calculator/explorer' },
-  { key: 'wind', label: 'Wind', path: '/calculator/wind' },
-  { key: 'table', label: 'Table', path: '/calculator/table' },
-  { key: 'charts', label: 'Charts', path: '/calculator/charts' },
+  { key: '', label: 'Properties', path: '/calculator', group: 'isa' },
+  { key: 'table', label: 'Table', path: '/calculator/table', group: 'isa' },
+  { key: 'charts', label: 'Charts', path: '/calculator/charts', group: 'isa' },
+  { key: 'explorer', label: '3D Explorer', path: '/calculator/explorer', group: 'isa' },
+  { key: 'wind', label: 'Wind', path: '/calculator/wind', group: 'wind' },
 ]
 
 const activeTab = computed(() => {
@@ -142,29 +142,33 @@ onMounted(() => {
 <template>
   <div class="calculator-page">
     <div class="calculator-header">
-      <h1>Standard Atmosphere Calculator</h1>
-      <p>Calculate atmospheric properties from &minus;2,000 m to 80,000 m following the ISO 2533 Standard Atmosphere model.</p>
+      <h1>Atmospheric Calculator</h1>
+      <p>Calculate ISO 2533 Standard Atmosphere properties and ISO 5878 wind distributions &mdash; from &minus;2,000 m to 80,000 m.</p>
       <p class="calculator-subtitle">The International Standard Atmosphere (ISA) defines a reference vertical profile of temperature, pressure, density, and derived properties &mdash; used in aerospace engineering, meteorology, and scientific research worldwide.</p>
     </div>
 
     <div class="calculator-body">
       <!-- Tab navigation -->
       <div class="calc-tabs" role="tablist" aria-label="Calculator views">
-        <router-link
-          v-for="tab in tabs"
-          :key="tab.key"
-          :to="tab.path"
-          custom
-          v-slot="{ navigate }"
-        >
-          <button
-            role="tab"
-            class="calc-tab-btn"
-            :class="{ active: activeTab === (tab.key || 'calculator') }"
-            :aria-selected="activeTab === (tab.key || 'calculator')"
-            @click="navigate"
-          >{{ tab.label }}</button>
-        </router-link>
+        <span class="calc-tab-group-label">ISO 2533</span>
+        <template v-for="(tab, i) in tabs" :key="tab.key">
+          <div v-if="i > 0 && tab.group !== tabs[i-1].group" class="calc-tab-divider" role="separator">
+            <span class="calc-tab-group-label">ISO 5878</span>
+          </div>
+          <router-link
+            :to="tab.path"
+            custom
+            v-slot="{ navigate }"
+          >
+            <button
+              role="tab"
+              class="calc-tab-btn"
+              :class="{ active: activeTab === (tab.key || 'calculator') }"
+              :aria-selected="activeTab === (tab.key || 'calculator')"
+              @click="navigate"
+            >{{ tab.label }}</button>
+          </router-link>
+        </template>
       </div>
 
       <!-- Tab content -->
