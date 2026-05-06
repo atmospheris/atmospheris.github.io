@@ -613,6 +613,11 @@ pre code {
   color: rgba(248, 250, 252, 0.4);
 }
 
+.footer-copyright a {
+  color: inherit;
+  text-decoration: none;
+}
+
 .footer-ribose-link {
   display: inline-flex;
   align-items: center;

@@ -34,7 +34,7 @@ const year = new Date().getFullYear()
 
       <div class="footer-bottom">
         <div class="footer-bottom-left">
-          <span class="footer-copyright">&copy; {{ year }}</span>
+          <span class="footer-copyright">&copy; {{ year }} <a href="https://www.ribose.com" target="_blank" rel="noopener">Ribose</a></span>
           <span class="footer-collab-text">Official collaboration between</span>
           <a href="https://www.iso.org/committee/46560.html" target="_blank" rel="noopener" class="footer-collab-name">
             <img src="/iso-logo.svg" alt="" class="footer-collab-logo">
