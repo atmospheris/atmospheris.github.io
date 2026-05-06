@@ -4,7 +4,7 @@ import { useSeo } from '@/composables/useSeo'
 
 useSeo({
   title: 'About Atmospheris',
-  description: 'Atmospheris — Atmosphere + International Standard. The open-source reference implementation of ISO 2533 Standard Atmosphere, published by Ribose.',
+  description: 'Atmospheris — Atmosphere + International Standard. The open-source reference implementation of ISO 2533 Standard Atmosphere, published by ISO/TC 20/SC 6 and Ribose.',
   path: '/about'
 })
 
@@ -240,29 +240,59 @@ function toggle(key) {
       </div>
     </section>
 
-    <!-- Published by Ribose -->
+    <!-- Published by -->
     <section class="about-section about-section-alt">
       <div class="about-section-inner">
         <h2 class="about-section-title">Published by</h2>
-        <div class="ribose-card">
-          <a href="https://www.ribose.com" target="_blank" rel="noopener" class="ribose-logo-link" aria-label="Ribose">
-            <img src="/ribose-logo.svg" alt="Ribose" class="ribose-logo" width="200" height="50">
-          </a>
-          <div class="ribose-text">
-            <p>
-              Ribose is a technology company specializing in standards development and
-              open-source software. Ribose develops and maintains Atmospheris as part of
-              its commitment to making international standards more accessible and practically
-              useful for the engineering and scientific community.
-            </p>
-            <p>
-              Ribose is also the author of Metanorma, UniDoc, Plurimath, and other
-              open-source tools that bridge the gap between international standards and software.
-            </p>
-            <a href="https://www.ribose.com" target="_blank" rel="noopener" class="about-external-link">
-              ribose.com
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3"/></svg>
+        <div class="publisher-grid">
+          <div class="publisher-card">
+            <a href="https://www.iso.org/committee/46560.html" target="_blank" rel="noopener" class="publisher-logo-link" aria-label="ISO/TC 20/SC 6">
+              <img src="/iso-logo.svg" alt="ISO" class="publisher-logo iso-logo" width="100" height="100">
             </a>
+            <div class="publisher-body">
+              <h3 class="publisher-name">
+                <a href="https://www.iso.org/committee/46560.html" target="_blank" rel="noopener">ISO/TC 20/SC 6</a>
+              </h3>
+              <p class="publisher-subtitle">Standard Atmospheres</p>
+              <div class="publisher-text">
+                <p>
+                  ISO Technical Committee 20, Subcommittee 6 &mdash; the body responsible for
+                  standardizing atmospheric reference models for aerospace, aviation,
+                  and meteorology worldwide.
+                </p>
+                <p>
+                  SC 6 authored the foundational <strong>ISO/R 2533:1975</strong> and the
+                  authoritative <strong>ISO 5878:1982</strong>, whose work underpins aircraft
+                  performance certification, spacecraft design, and weather forecasting.
+                </p>
+              </div>
+              <a href="https://www.iso.org/committee/46560.html" target="_blank" rel="noopener" class="about-external-link">
+                iso.org/committee/46560
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3"/></svg>
+              </a>
+            </div>
+          </div>
+          <div class="publisher-card">
+            <a href="https://www.ribose.com" target="_blank" rel="noopener" class="publisher-logo-link" aria-label="Ribose">
+              <img src="/ribose-logo.svg" alt="Ribose" class="publisher-logo ribose-publisher-logo" width="140" height="35">
+            </a>
+            <div class="publisher-body">
+              <div class="publisher-text">
+                <p>
+                  Ribose provides technical support to ISO/TC 20/SC 6, developing and
+                  maintaining Atmospheris as the committee&rsquo;s reference implementation
+                  of the International Standard Atmosphere.
+                </p>
+                <p>
+                  Ribose is also the author of Metanorma, UniWord, Plurimath, and other
+                  open-source tools that bridge the gap between international standards and software.
+                </p>
+              </div>
+              <a href="https://www.ribose.com" target="_blank" rel="noopener" class="about-external-link">
+                ribose.com
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3"/></svg>
+              </a>
+            </div>
           </div>
         </div>
       </div>
