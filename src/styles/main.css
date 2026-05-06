@@ -1930,7 +1930,7 @@ pre code {
   color: var(--color-text-light);
 }
 
-[data-theme="dark"] .publisher-logo {
+[data-theme="dark"] .ribose-publisher-logo {
   filter: brightness(0) invert(1);
 }
 
